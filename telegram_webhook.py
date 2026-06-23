@@ -32,11 +32,11 @@ from telegram_subscribers import SupabaseSubscriberStore, TelegramSubscriber
 
 STATUS_JSON_URL = (
     "https://raw.githubusercontent.com/"
-    "giuse2003/ETH_Prudential_Signal/main/docs/status.json"
+    "giuse2003/ETH_Prudential_Signal/master/docs/status.json"
 )
 CHART_DATA_URL = (
     "https://raw.githubusercontent.com/"
-    "giuse2003/ETH_Prudential_Signal/main/docs/chart-data.json"
+    "giuse2003/ETH_Prudential_Signal/master/docs/chart-data.json"
 )
 STATUS_ERROR_MESSAGE = (
     "Impossibile calcolare il segnale ETH LIVE aggiornato. Riprova tra poco."

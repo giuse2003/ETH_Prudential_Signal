@@ -129,7 +129,7 @@ Il webhook:
 1. riceve l'update Telegram;
 2. restituisce rapidamente HTTP 200;
 3. scarica
-   `https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/main/docs/status.json`;
+   `https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json`;
 4. risponde con segnale, rischio, prezzo EUR e indicazione.
 
 Sono supportati anche `/start` e `/help`.

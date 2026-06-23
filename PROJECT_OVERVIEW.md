@@ -483,7 +483,7 @@ SUPABASE_SERVICE_ROLE_KEY
 Variabile non segreta in `cloudflare-worker/wrangler.toml`:
 
 ```text
-STATUS_JSON_URL=https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/main/docs/status.json
+STATUS_JSON_URL=https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json
 ```
 
 ### GitHub Actions

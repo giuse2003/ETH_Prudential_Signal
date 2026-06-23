@@ -204,7 +204,7 @@ async function processCommand(request, env) {
 async function fetchGithubStatus(env) {
   const statusUrl =
     env.STATUS_JSON_URL ||
-    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/main/docs/status.json";
+    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json";
   const separator = statusUrl.includes("?") ? "&" : "?";
   const response = await fetch(`${statusUrl}${separator}t=${Date.now()}`, {
     headers: {
@@ -225,7 +225,7 @@ async function fetchGithubStatus(env) {
 async function fetchGithubChartData(env) {
   const statusUrl =
     env.STATUS_JSON_URL ||
-    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/main/docs/status.json";
+    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json";
   const chartUrl =
     env.CHART_DATA_URL ||
     statusUrl.replace(/\/status\.json(\?.*)?$/, "/chart-data.json");
@@ -249,7 +249,7 @@ async function fetchGithubChartData(env) {
 async function fetchGithubLiveStatus(env) {
   const statusUrl =
     env.STATUS_JSON_URL ||
-    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/main/docs/status.json";
+    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json";
   const liveUrl =
     env.LIVE_STATUS_URL ||
     statusUrl.replace(/\/status\.json(\?.*)?$/, "/live-status.json");
