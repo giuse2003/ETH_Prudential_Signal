@@ -1,0 +1,183 @@
+# ETH Prudential Signal - Roadmap Operativa
+
+Ultimo aggiornamento: 2026-06-23
+
+Questo file tiene traccia delle problematiche riscontrate durante la creazione
+del progetto Ethereum e delle attivita ancora da completare. Va aggiornato a
+ogni avanzamento rilevante.
+
+## Stato Attuale
+
+- Repository GitHub pubblico creato:
+  `https://github.com/giuse2003/ETH_Prudential_Signal`
+- Dashboard GitHub Pages attiva:
+  `https://giuse2003.github.io/ETH_Prudential_Signal/`
+- Branch principale: `master`
+- Dashboard statica pubblicata da `/docs`.
+- Worker Cloudflare ETH deployato:
+  `https://eth-prudential-signal.giuse2003.workers.dev/`
+- Test Python: 53 test passati.
+- Ultimo backtest ETH generato su candela chiusa `2026-06-22`.
+
+## Problemi Riscontrati
+
+### 1. Metriche dashboard copiate dal progetto BTC
+
+La sezione backtest della dashboard mostrava gli stessi valori del progetto
+Bitcoin per rendimento, drawdown e Sharpe ratio.
+
+Cause:
+
+- i dati ETH venivano generati correttamente;
+- la sezione backtest era pero hard-coded in `docs/index.html`;
+- non esisteva un file JSON dedicato alle metriche di backtest.
+
+Correzioni applicate:
+
+- aggiunto `reports/backtest.json`;
+- aggiunto `docs/backtest.json`;
+- aggiornata la dashboard per leggere le metriche da `backtest.json`;
+- aggiornati `main.py`, `hourly_monitor.py` e workflow GitHub Actions;
+- rimossi i vecchi valori BTC dalla dashboard;
+- aggiornati `PROJECT_OVERVIEW.md` e `SIGNAL_RULE_VERIFICATION_LOG.md`.
+
+Metriche ETH correnti:
+
+| Strategia | Rendimento totale | Rendimento annualizzato | Drawdown massimo | Operazioni | Win rate | Sharpe |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| ETH Prudential Signal | +980,86% | +31,80% | -52,57% | 28 | 39,3% | 0,849 |
+| Buy & Hold Ethereum | +438,05% | +21,55% | -93,96% | 0 | n/a | 0,659 |
+
+### 2. GitHub Pages non attivo inizialmente
+
+La dashboard era presente nella cartella `docs`, ma GitHub Pages non era
+ancora configurato.
+
+Correzione applicata:
+
+- attivato GitHub Pages da branch `master`, cartella `/docs`;
+- verificato HTTP 200 sulla dashboard pubblica.
+
+### 3. Bot Telegram ETH non operativo
+
+Il codice e la dashboard puntano a `@ETH_Prudential_Signal_bot`, ma il bot non
+e ancora pienamente configurato.
+
+Problemi rilevati:
+
+- il repository ETH non ha secret GitHub Actions;
+- il Worker Cloudflare ETH era assente ed e stato deployato solo come base;
+- il Worker Cloudflare ETH non ha secret configurati;
+- l'endpoint `/subscribers/count` restituisce `503`;
+- il webhook Telegram non risulta ancora registrato verso il Worker ETH;
+- i token e i secret del progetto BTC non sono leggibili da GitHub/Cloudflare,
+  quindi non possono essere copiati automaticamente;
+- alcuni URL raw puntavano al branch `main`, mentre il repo ETH usa `master`.
+
+Correzioni applicate:
+
+- deployato Worker Cloudflare `eth-prudential-signal`;
+- corretto `main` -> `master` negli URL raw usati da Worker e webhook legacy;
+- verificato che `https://eth-prudential-signal.giuse2003.workers.dev/`
+  risponda `{"status":"ok"}`.
+
+## Checklist Prossimi Passi
+
+### A. Completare configurazione Telegram
+
+- [ ] Creare o verificare definitivamente il bot Telegram
+      `@ETH_Prudential_Signal_bot` tramite BotFather.
+- [ ] Recuperare il token del bot ETH da BotFather.
+- [ ] Decidere se usare una chat amministratore separata per ETH.
+- [ ] Recuperare `TELEGRAM_CHAT_ID` per le notifiche automatiche ETH.
+- [ ] Generare un nuovo `TELEGRAM_WEBHOOK_SECRET` dedicato a ETH.
+- [ ] Configurare i secret GitHub nel repo ETH:
+      - `TELEGRAM_BOT_TOKEN`
+      - `TELEGRAM_CHAT_ID`
+- [ ] Configurare i secret Cloudflare Worker ETH:
+      - `TELEGRAM_BOT_TOKEN`
+      - `TELEGRAM_WEBHOOK_SECRET`
+- [ ] Registrare il webhook Telegram verso:
+      `https://eth-prudential-signal.giuse2003.workers.dev/webhook`
+- [ ] Verificare `getWebhookInfo` sul bot ETH.
+- [ ] Lanciare il workflow `Telegram command menu`.
+- [ ] Testare `/help`, `/segnale`, `/conditions`, `/iscrivimi`,
+      `/disiscrivimi`, `/privacy` dal bot ETH.
+
+### B. Completare Supabase iscritti
+
+- [ ] Decidere se usare lo stesso progetto Supabase del BTC o crearne uno ETH.
+- [ ] Se si usa lo stesso Supabase, verificare che la tabella distingua
+      correttamente BTC/ETH o che gli iscritti ETH non si mischino a quelli BTC.
+- [ ] Se serve isolamento, aggiungere una colonna `project` o creare tabella
+      dedicata.
+- [ ] Configurare secret Cloudflare Worker ETH:
+      - `SUPABASE_URL`
+      - `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] Verificare:
+      `https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
+- [ ] Aggiornare dashboard se il contatore resta temporaneamente non disponibile.
+
+### C. Validare GitHub Actions
+
+- [ ] Eseguire manualmente `Hourly ETH monitor (Telegram)`.
+- [ ] Verificare che il workflow aggiorni:
+      - `docs/status.json`
+      - `docs/chart-data.json`
+      - `docs/backtest.json`
+      - `docs/live-status.json`, se generato
+- [ ] Verificare che il workflow invii notifiche solo al bot/chat ETH.
+- [ ] Controllare che cache `.state` e CSV ETH non confliggano con BTC.
+- [ ] Verificare che Pages si aggiorni dopo il commit automatico del workflow.
+
+### D. Validare Worker Cloudflare
+
+- [ ] Verificare root endpoint:
+      `https://eth-prudential-signal.giuse2003.workers.dev/`
+- [ ] Verificare `/subscribers/count` dopo i secret Supabase.
+- [ ] Verificare `/live-preview` dopo che `docs/live-status.json` esiste.
+- [ ] Verificare CORS dalla dashboard GitHub Pages.
+- [ ] Controllare log con `wrangler tail eth-prudential-signal` durante test
+      Telegram.
+
+### E. Pulizia Documentazione
+
+- [ ] Rileggere `README.md` e rimuovere eventuali affermazioni che dicono
+      "operativo" prima che bot e Supabase siano davvero completati.
+- [ ] Aggiornare `PROJECT_STATUS.md` con lo stato reale ETH.
+- [ ] Aggiornare `DECISION_LOG.md` separando decisioni copiate dal progetto BTC
+      da decisioni effettivamente validate su ETH.
+- [ ] Valutare se mantenere `RENDER_DEPLOYMENT.md` come legacy o archiviarlo.
+
+### F. Verifiche finali prima di considerare il progetto completo
+
+- [ ] Dashboard pubblica mostra dati ETH aggiornati.
+- [ ] Backtest dashboard e `reports/report.txt` hanno metriche coerenti.
+- [ ] Bot Telegram ETH risponde ai comandi.
+- [ ] Iscrizione/disiscrizione funziona.
+- [ ] Contatore iscritti dashboard funziona.
+- [ ] Workflow orario aggiorna dashboard e invia notifiche ETH.
+- [ ] Nessun endpoint ETH usa token, chat ID o Worker BTC.
+- [ ] Test Python passano.
+- [ ] Ultime modifiche committate e pushate.
+
+## Comandi Utili
+
+```powershell
+python main.py --force-download
+python -m unittest discover -s tests
+gh secret list --repo giuse2003/ETH_Prudential_Signal
+cd cloudflare-worker
+npx wrangler deploy
+npx wrangler secret list
+npx wrangler tail eth-prudential-signal
+```
+
+## Registro Avanzamenti
+
+| Data | Stato | Note |
+| --- | --- | --- |
+| 2026-06-23 | Creato progetto ETH | Repo, dashboard, backtest ETH e Pages attivi. |
+| 2026-06-23 | Corretto backtest dashboard | Rimosse metriche statiche BTC, aggiunto `backtest.json`. |
+| 2026-06-23 | Deploy Worker base | Worker ETH risponde su root, ma mancano secret Telegram/Supabase. |
+| 2026-06-23 | Creato questo file | Roadmap iniziale per completamento bot e automazioni. |
