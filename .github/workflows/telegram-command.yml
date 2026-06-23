@@ -1,0 +1,27 @@
+name: Telegram command menu
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: telegram-command-menu
+  cancel-in-progress: false
+
+jobs:
+  update-menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Configure Telegram command menu
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl --fail --silent --show-error \
+            --request POST \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands" \
+            --header "Content-Type: application/json" \
+            --data '{"commands":[{"command":"segnale","description":"Mostra il segnale ETH corrente"},{"command":"conditions","description":"Mostra le condizioni di acquisto e vendita"},{"command":"iscrivimi","description":"Ricevi notifiche automatiche"},{"command":"disiscrivimi","description":"Interrompi le notifiche automatiche"},{"command":"privacy","description":"Informazioni sui dati memorizzati"},{"command":"help","description":"Mostra i comandi disponibili"}]}'
