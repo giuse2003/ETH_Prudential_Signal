@@ -74,8 +74,8 @@ Problemi rilevati:
 - il webhook Telegram non risultava ancora registrato verso il Worker ETH;
 - il comando `/segnale` falliva quando `docs/live-status.json` non era ancora
   disponibile;
-- il deploy locale via Wrangler richiede un token API Cloudflare dedicato,
-  perche l'ambiente locale non ha `CLOUDFLARE_API_TOKEN` configurato;
+- il deploy locale via Wrangler richiedeva un token API Cloudflare dedicato,
+  perche l'ambiente locale non aveva `CLOUDFLARE_API_TOKEN` configurato;
 - i token e i secret del progetto BTC non sono leggibili da GitHub/Cloudflare,
   quindi non possono essere copiati automaticamente;
 - alcuni URL raw puntavano al branch `main`, mentre il repo ETH usa `master`.
@@ -99,6 +99,10 @@ Correzioni applicate:
   `docs/live-status.json` non esiste ancora;
 - verificato che `/live-preview` restituisca il segnale daily ETH e che
   `/segnale` funzioni dal bot Telegram.
+- creato token API Cloudflare dedicato per Wrangler;
+- verificato `npx wrangler whoami`;
+- eseguito deploy via `npx wrangler deploy`
+  (Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`).
 
 ## Checklist Prossimi Passi
 
@@ -160,8 +164,8 @@ Correzioni applicate:
 - [ ] Verificare CORS dalla dashboard GitHub Pages.
 - [ ] Controllare log con `wrangler tail eth-prudential-signal` durante test
       Telegram.
-- [ ] Creare un token API Cloudflare dedicato per deploy e tail da CLI.
-- [ ] Configurare localmente `CLOUDFLARE_API_TOKEN` per usare `wrangler deploy`.
+- [x] Creare un token API Cloudflare dedicato per deploy e tail da CLI.
+- [x] Configurare localmente `CLOUDFLARE_API_TOKEN` per usare `wrangler deploy`.
 
 ### E. Pulizia Documentazione
 
@@ -207,4 +211,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-23 | Creato questo file | Roadmap iniziale per completamento bot e automazioni. |
 | 2026-06-24 | Configurato Telegram base | Bot ETH dedicato, secret GitHub/Cloudflare e webhook verso Worker completati. |
 | 2026-06-24 | Corretto `/segnale` Worker | Aggiunto fallback da `live-status.json` mancante a `status.json`; `/live-preview` e `/segnale` funzionano. |
-| 2026-06-24 | Pianificato token API Cloudflare | Serve `CLOUDFLARE_API_TOKEN` dedicato per deploy e tail via Wrangler da CLI. |
+| 2026-06-24 | Configurato token API Cloudflare | `wrangler whoami` e `wrangler deploy` funzionano da CLI; deploy Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`. |

@@ -17,8 +17,8 @@ Nota di riallineamento ETH del 24 giugno 2026:
   `docs/live-status.json` non e ancora disponibile;
 - `/iscrivimi`, `/disiscrivimi` e `/subscribers/count` restano bloccati finche
   `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` non sono configurati nel Worker;
-- serve creare un token API Cloudflare dedicato e configurare
-  `CLOUDFLARE_API_TOKEN` per consentire deploy e tail da CLI con Wrangler.
+- token API Cloudflare dedicato creato e `CLOUDFLARE_API_TOKEN` configurato
+  nella sessione PowerShell per consentire deploy da CLI con Wrangler.
 
 ## Obiettivo
 
@@ -280,8 +280,8 @@ Non modificare:
   nei file versionati.
 - [ ] **5.7 Utente/Codex:** configurare `SUPABASE_URL` e
   `SUPABASE_SERVICE_ROLE_KEY` come secret del Worker Cloudflare ETH.
-- [ ] **5.8 Utente/Codex:** creare token API Cloudflare dedicato per Wrangler.
-- [ ] **5.9 Codex:** configurare `CLOUDFLARE_API_TOKEN` localmente per deploy e
+- [x] **5.8 Utente/Codex:** creare token API Cloudflare dedicato per Wrangler.
+- [x] **5.9 Codex:** configurare `CLOUDFLARE_API_TOKEN` localmente per deploy e
   log tail da CLI.
 
 ### Fase 6 - Privacy e rilascio
@@ -383,6 +383,7 @@ La funzionalita sara considerata completata quando:
 | 2026-06-11 | Deploy pubblico Fase 3 | Completato | Render e GitHub Pages aggiornati; endpoint e card restituiscono il conteggio 1. |
 | 2026-06-11 | Verifica CORS e privacy | Completato | Origine GitHub Pages autorizzata; risposta limitata a `active_subscribers`. |
 | 2026-06-24 | Bot ETH Cloudflare | Parziale | Bot dedicato e webhook funzionanti; `/segnale` corretto con fallback daily; Supabase Worker ancora da configurare. |
+| 2026-06-24 | Token API Cloudflare | Completato | `wrangler whoami` e deploy CLI riusciti per `eth-prudential-signal`. |
 
 ## Prossimo passo
 
