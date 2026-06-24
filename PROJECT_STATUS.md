@@ -13,6 +13,8 @@ Cloudflare.
 - Repository GitHub pubblico operativo.
 - Dashboard GitHub Pages attiva da branch `master`, cartella `/docs`.
 - Pipeline dati Yahoo Finance operativa per `ETH-USD` e `ETH-EUR`.
+- Backtest riallineato dalla prima data comune reale `ETH-USD` / `ETH-EUR`
+  (`2017-11-11` nel run corrente), senza riempimento EUR all'indietro.
 - Prezzi spot Coinbase disponibili in USD ed EUR.
 - Indicatori, strategia, rischio, report e dashboard implementati.
 - Backtest dashboard alimentato da `docs/backtest.json`, non piu hard-coded.
@@ -41,7 +43,7 @@ node --check cloudflare-worker\src\worker.js
 Risultato:
 
 ```text
-Ran 54 tests
+Ran 55 tests
 OK
 ```
 
@@ -70,6 +72,8 @@ Da completare:
 ## File Principali
 
 - `ETH_PROJECT_ROADMAP.md`: roadmap operativa aggiornata.
+- `MODEL_IMPROVEMENT_ROADMAP.md`: baseline e piano test per migliorare il
+  modello.
 - `config.py`: configurazione centralizzata.
 - `main.py`: esecuzione completa locale.
 - `hourly_monitor.py`: monitor GitHub Actions.

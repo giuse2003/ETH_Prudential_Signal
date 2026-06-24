@@ -151,6 +151,8 @@ def save_backtest_json(
     metrics_strategy,
     metrics_bh,
     out_path: str | Path,
+    start_date=None,
+    end_date=None,
 ) -> Path:
     """
     Salva le metriche di backtest usate dalla dashboard.
@@ -162,6 +164,10 @@ def save_backtest_json(
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     payload = {
+        "period": {
+            "start_date": _json_date(start_date),
+            "end_date": _json_date(end_date),
+        },
         "strategy": {
             "total_return": _json_float(metrics_strategy.total_return),
             "annualized_return": _json_float(metrics_strategy.annualized_return),
@@ -188,6 +194,12 @@ def _json_float(value) -> float | None:
     return float(value)
 
 
+def _json_date(value) -> str | None:
+    if value is None or pd.isna(value):
+        return None
+    return pd.Timestamp(value).strftime("%Y-%m-%d")
+
+
 def save_text_report(
     df: pd.DataFrame,
     metrics_strategy,
@@ -195,6 +207,8 @@ def save_text_report(
     out_path: str | Path,
     price_eur: float | None = None,
     price_usd: float | None = None,
+    backtest_start_date=None,
+    backtest_end_date=None,
 ) -> Path:
     """
     Crea il report testuale completo.
@@ -239,7 +253,12 @@ def save_text_report(
     lines.append("Motivazione dettagliata:")
     lines.append(motivazione)
     lines.append("")
-    lines.append("BACKTEST (dal 2015 ad oggi)")
+    if backtest_start_date is not None and backtest_end_date is not None:
+        start_txt = pd.Timestamp(backtest_start_date).strftime("%Y-%m-%d")
+        end_txt = pd.Timestamp(backtest_end_date).strftime("%Y-%m-%d")
+        lines.append(f"BACKTEST ({start_txt} - {end_txt})")
+    else:
+        lines.append("BACKTEST (periodo dati disponibile)")
     lines.append("")
 
     def fmt_pct(x: float) -> str:

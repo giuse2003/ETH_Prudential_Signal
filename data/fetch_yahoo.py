@@ -144,3 +144,32 @@ def load_daily_csv(csv_path: str | Path) -> pd.DataFrame:
     df.index.name = "Date"
     return df
 
+
+def join_usd_with_eur_from_first_common_date(
+    df_usd: pd.DataFrame,
+    df_eur: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Combina ETH-USD con ETH-EUR partendo dalla prima data comune reale.
+
+    Il backtest usa ETH-USD per prezzi/volumi e ETH-EUR come serie di supporto
+    per il prezzo in euro. Per evitare di simulare un periodo in cui la
+    quotazione EUR non era disponibile, tagliamo entrambe le serie dalla prima
+    data in cui esistono dati su entrambe.
+    """
+    if df_usd.empty:
+        raise ValueError("La serie ETH-USD e' vuota.")
+    if df_eur.empty:
+        raise ValueError("La serie ETH-EUR e' vuota.")
+
+    common_start = max(df_usd.index.min(), df_eur.index.min())
+    df_usd_aligned = df_usd.loc[df_usd.index >= common_start].copy()
+    df_eur_close = df_eur.loc[df_eur.index >= common_start, "Close"].rename("Close_EUR")
+
+    df = df_usd_aligned.join(df_eur_close, how="left")
+    df["Close_EUR"] = df["Close_EUR"].ffill()
+    df = df.dropna(subset=["Close_EUR"])
+    if df.empty:
+        raise ValueError("Nessuna data comune disponibile tra ETH-USD ed ETH-EUR.")
+    return df
+

@@ -7,7 +7,7 @@ Pipeline:
 2) Calcola indicatori tecnici richiesti
 3) Calcola punteggio 0..100 e Segnale (ACQUISTA / MANTIENI / VENDI)
 4) Calcola il livello di rischio informativo
-5) Backtest 2015..oggi vs Buy & Hold
+5) Backtest dalla prima quotazione ETH-EUR disponibile vs Buy & Hold
 6) Output:
    - report testuale
    - CSV storico con indicatori + segnali
@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from data.fetch_yahoo import fetch_eth_daily_csv, load_daily_csv
+from data.fetch_yahoo import fetch_eth_daily_csv, join_usd_with_eur_from_first_common_date, load_daily_csv
 from data.daily_candles import keep_closed_daily_candles
 from indicators.technical_indicators import compute_all_indicators
 from live.coinbase import fetch_spot_price
@@ -76,9 +76,7 @@ def main() -> None:
     if csv_path_eur is not None:
         try:
             df_eur = keep_closed_daily_candles(load_daily_csv(csv_path_eur))
-            df_eur_close = df_eur["Close"].rename("Close_EUR")
-            df = df_usd.join(df_eur_close, how="left")
-            df["Close_EUR"] = df["Close_EUR"].ffill().bfill()
+            df = join_usd_with_eur_from_first_common_date(df_usd, df_eur)
         except Exception as e:
             print(f"ATTENZIONE: Errore nel caricamento del file ETH-EUR: {e}. Continuo senza dati EUR storici.")
             df = df_usd.copy()
@@ -104,6 +102,8 @@ def main() -> None:
         metrics_strategy=metrics_strategy,
         metrics_bh=metrics_bh,
         out_path=out_reports / "backtest.json",
+        start_date=equity_df.index[0],
+        end_date=equity_df.index[-1],
     )
 
     # 6) Output richiesti
@@ -131,6 +131,8 @@ def main() -> None:
         out_path=report_path,
         price_eur=spot_eur,
         price_usd=spot_usd,
+        backtest_start_date=equity_df.index[0],
+        backtest_end_date=equity_df.index[-1],
     )
 
     # Salva status.json per la dashboard

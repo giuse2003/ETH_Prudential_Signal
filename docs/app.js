@@ -38,6 +38,8 @@ const els = {
   buyHoldComparisonReturn: document.getElementById("buyHoldComparisonReturn"),
   strategyComparisonBar: document.getElementById("strategyComparisonBar"),
   buyHoldComparisonBar: document.getElementById("buyHoldComparisonBar"),
+  backtestPeriod: document.getElementById("backtestPeriod"),
+  backtestPeriodItem: document.getElementById("backtestPeriodItem"),
   
   // Technical details
   rsiVal: document.getElementById("rsiVal"),
@@ -246,6 +248,7 @@ async function loadBacktestMetrics() {
     const strategyDrawdown = Number(strategy.max_drawdown);
     const buyHoldDrawdown = Number(buyHold.max_drawdown);
     const strategySharpe = Number(strategy.sharpe_ratio);
+    const period = payload.period || {};
 
     els.strategyReturn.textContent = formatPercent(strategyReturn, { signed: true });
     els.strategyDrawdown.textContent = formatPercent(strategyDrawdown);
@@ -256,6 +259,14 @@ async function loadBacktestMetrics() {
       `Rendimento totale ${formatPercent(strategyReturn, { signed: true })}`;
     els.buyHoldComparisonReturn.textContent =
       `Rendimento totale ${formatPercent(buyHoldReturn, { signed: true })}`;
+    if (els.backtestPeriod && period.start_date && period.end_date) {
+      els.backtestPeriod.textContent =
+        `Backtest ${formatDateShort(period.start_date)} - ${formatDateShort(period.end_date)}`;
+    }
+    if (els.backtestPeriodItem && period.start_date && period.end_date) {
+      els.backtestPeriodItem.textContent =
+        `Periodo ${period.start_date} - ${period.end_date}`;
+    }
 
     const maxReturn = Math.max(Math.abs(strategyReturn), Math.abs(buyHoldReturn), 1);
     els.strategyComparisonBar.style.width = `${Math.max(4, Math.abs(strategyReturn) / maxReturn * 100)}%`;

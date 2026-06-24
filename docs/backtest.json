@@ -1,17 +1,21 @@
 {
+  "period": {
+    "start_date": "2017-11-11",
+    "end_date": "2026-06-23"
+  },
   "strategy": {
     "total_return": 9.8086434405023,
-    "annualized_return": 0.3178387958598732,
+    "annualized_return": 0.3180700395658005,
     "max_drawdown": -0.5257437993761869,
     "num_operations": 28,
     "win_rate": 0.39285714285714285,
-    "sharpe_ratio": 0.8490062312096575
+    "sharpe_ratio": 0.8492765043114915
   },
   "buy_hold": {
-    "total_return": 4.1901520600582405,
-    "annualized_return": 0.2103827408080563,
+    "total_return": 4.292460519924081,
+    "annualized_return": 0.21327432233055044,
     "max_drawdown": -0.9396254038538314,
-    "sharpe_ratio": 0.6543149161345395
+    "sharpe_ratio": 0.6570686707651552
   },
   "last_update": "2026-06-24 20:15:52 UTC"
 }
