@@ -65,7 +65,7 @@ Decisione attuale:
 
 Da completare:
 
-- testare `/iscrivimi` e `/disiscrivimi` dal bot ETH.
+- testare `/disiscrivimi` dal bot ETH.
 
 ## File Principali
 
