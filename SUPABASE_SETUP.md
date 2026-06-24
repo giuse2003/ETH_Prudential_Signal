@@ -48,7 +48,10 @@ supabase/telegram_subscribers.sql
 
 Lo script:
 
-- crea `public.telegram_subscribers`;
+- crea `public.telegram_subscribers_eth`;
+- usa una tabella ETH dedicata, cosi gli iscritti non si mescolano con
+  eventuali iscritti del progetto BTC anche se viene riusato lo stesso progetto
+  Supabase;
 - usa `telegram_chat_id` come chiave primaria e impedisce duplicati;
 - registra consenso, iscrizione e disiscrizione;
 - prepara campi per errori di consegna;
@@ -62,8 +65,8 @@ Lo script:
 Alla fine dello script, la prima query deve restituire:
 
 ```text
-table_name             rls_enabled   rls_forced
-telegram_subscribers   true          true
+table_name                rls_enabled   rls_forced
+telegram_subscribers_eth  true          true
 ```
 
 La seconda query, relativa alle policy, deve restituire zero righe.
@@ -71,7 +74,7 @@ La seconda query, relativa alle policy, deve restituire zero righe.
 Puoi anche aprire **Table Editor** e verificare la presenza della tabella:
 
 ```text
-telegram_subscribers
+telegram_subscribers_eth
 ```
 
 La tabella inizialmente deve essere vuota.
@@ -111,7 +114,7 @@ Non usare la chiave `anon` o `publishable` per il backend degli iscritti.
 ## 6. Cosa non fare ancora
 
 Non aggiungere ancora le credenziali a Render o GitHub. Questo avverra nella
-Fase 5, dopo l'implementazione e i test del client Supabase.
+configurazione del Worker Cloudflare, dopo aver verificato lo script SQL.
 
 Non inserire manualmente righe nella tabella. La prima iscrizione verra creata
 dal comando `/iscrivimi`.
@@ -123,7 +126,7 @@ Quando hai completato i passaggi, comunica soltanto:
 ```text
 Progetto Supabase creato.
 Script SQL eseguito.
-Tabella telegram_subscribers presente.
+Tabella telegram_subscribers_eth presente.
 RLS enabled: true.
 RLS forced: true.
 Policy trovate: 0.

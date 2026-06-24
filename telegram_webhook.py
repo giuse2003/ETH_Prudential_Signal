@@ -348,6 +348,7 @@ def subscriber_count() -> dict[str, int]:
     """Restituisce soltanto il numero aggregato degli iscritti attivi."""
     supabase_url = os.environ.get("SUPABASE_URL", "").strip()
     supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    subscribers_table = os.environ.get("SUBSCRIBERS_TABLE", "telegram_subscribers_eth").strip()
     if not supabase_url or not supabase_key:
         raise HTTPException(status_code=503, detail="Servizio iscritti non configurato.")
 
@@ -355,6 +356,7 @@ def subscriber_count() -> dict[str, int]:
         active_subscribers = SupabaseSubscriberStore(
             supabase_url,
             supabase_key,
+            table_name=subscribers_table,
         ).count_active()
     except Exception as exc:
         logger.exception("Conteggio degli iscritti Supabase non riuscito.")
@@ -379,6 +381,7 @@ def telegram_webhook(
     webhook_secret = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "").strip()
     supabase_url = os.environ.get("SUPABASE_URL", "").strip()
     supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    subscribers_table = os.environ.get("SUBSCRIBERS_TABLE", "telegram_subscribers_eth").strip()
 
     if not bot_token:
         raise HTTPException(status_code=503, detail="Configurazione Telegram mancante.")
@@ -390,7 +393,7 @@ def telegram_webhook(
     if command is not None:
         cfg = TelegramConfig(bot_token=bot_token, chat_id=str(command.chat_id))
         subscriber_store = (
-            SupabaseSubscriberStore(supabase_url, supabase_key)
+            SupabaseSubscriberStore(supabase_url, supabase_key, table_name=subscribers_table)
             if supabase_url and supabase_key
             else None
         )

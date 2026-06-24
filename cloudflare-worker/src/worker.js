@@ -504,7 +504,7 @@ async function subscribeUser(request, env) {
 
   try {
     const now = new Date().toISOString();
-    await supabaseFetch(env, "/telegram_subscribers?on_conflict=telegram_chat_id", {
+    await supabaseFetch(env, `${subscribersTablePath(env)}?on_conflict=telegram_chat_id`, {
       method: "POST",
       headers: {
         Prefer: "resolution=merge-duplicates,return=minimal",
@@ -540,7 +540,7 @@ async function unsubscribeUser(chatId, env) {
   try {
     const response = await supabaseFetch(
       env,
-      `/telegram_subscribers?telegram_chat_id=eq.${chatId}&select=telegram_chat_id`,
+      `${subscribersTablePath(env)}?telegram_chat_id=eq.${chatId}&select=telegram_chat_id`,
       {
         method: "PATCH",
         headers: {
@@ -565,7 +565,7 @@ async function unsubscribeUser(chatId, env) {
 async function countActiveSubscribers(env) {
   const response = await supabaseFetch(
     env,
-    "/telegram_subscribers?active=eq.true&select=telegram_chat_id",
+    `${subscribersTablePath(env)}?active=eq.true&select=telegram_chat_id`,
     {
       method: "GET",
       headers: {
@@ -580,6 +580,10 @@ async function countActiveSubscribers(env) {
     throw new Error("Conteggio Supabase non valido.");
   }
   return Number(total);
+}
+
+function subscribersTablePath(env) {
+  return `/${env.SUBSCRIBERS_TABLE || "telegram_subscribers_eth"}`;
 }
 
 async function supabaseFetch(env, path, init = {}) {

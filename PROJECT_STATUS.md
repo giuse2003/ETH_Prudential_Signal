@@ -1,100 +1,90 @@
 # Project Status
 
-Ultimo aggiornamento: 10 giugno 2026
+Ultimo aggiornamento: 2026-06-24
 
 ## Obiettivo
 
 Produrre segnali prudenziali giornalieri su Ethereum, pubblicarli in una
-dashboard e notificare variazioni rilevanti tramite Telegram.
+dashboard pubblica e gestire notifiche/comandi Telegram tramite Worker
+Cloudflare.
 
-## Stato corrente
+## Stato Corrente
 
+- Repository GitHub pubblico operativo.
+- Dashboard GitHub Pages attiva da branch `master`, cartella `/docs`.
 - Pipeline dati Yahoo Finance operativa per `ETH-USD` e `ETH-EUR`.
 - Prezzi spot Coinbase disponibili in USD ed EUR.
 - Indicatori, strategia, rischio, report e dashboard implementati.
-- Monitor GitHub Actions e notifiche Telegram operativi.
-- GitHub Pages alimentata da `docs/status.json`.
-- Test automatici presenti per calendario, candele chiuse e metriche trade.
-- Notifica Telegram semplificata con il solo prezzo EUR e senza sezione
-  riepilogativa.
-- Avvio manuale GitHub Actions configurato per inviare un'anteprima reale
-  della notifica operativa.
-- Webhook FastAPI pubblicato e operativo su Render:
-  `https://eth-prudential-signal.onrender.com`.
-- Webhook Telegram registrato su
-  `https://eth-prudential-signal.onrender.com/webhook`.
-- Comando `/segnale` disponibile in ogni chat privata con il bot.
-- Database Supabase degli iscritti creato e verificato con RLS forzata.
-- Comandi `/iscrivimi`, `/disiscrivimi` e `/privacy` implementati.
-- Dashboard Telegram con deep link e contatore aggregato implementata.
-- Dashboard e contatore verificati pubblicamente su GitHub Pages e Render.
-- Lettura diretta di `docs/status.json` da GitHub Raw, senza copie locali.
-- Workflow `Telegram command listener` mantenuto soltanto come fallback e
-  disabilitato durante l'uso del webhook.
-- Workflow `Hourly ETH monitor (Telegram)` mantenuto attivo.
+- Backtest dashboard alimentato da `docs/backtest.json`, non piu hard-coded.
+- Worker Cloudflare `eth-prudential-signal` deployato.
+- Bot Telegram ETH dedicato collegato al Worker via webhook.
+- Menu comandi Telegram aggiornato tramite GitHub Actions.
+- Comandi `/start`, `/segnale` e `/conditions` verificati.
+- GitHub Actions Secrets configurati per Telegram:
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_CHAT_ID`
+- Cloudflare Worker Secrets configurati per Telegram:
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_WEBHOOK_SECRET`
+- Supabase iscritti in corso: schema e codice puntano alla tabella dedicata
+  `public.telegram_subscribers_eth`.
+- Endpoint `/subscribers/count` ancora non operativo finche non vengono
+  configurati i secret Supabase nel Worker.
 
-## Correzioni completate
-
-### Calendario crypto
-
-- `365` periodi giornalieri per annualizzazione e Sharpe Ratio.
-- Finestra a 52 settimane impostata a `365` giorni.
-
-### Candele giornaliere
-
-- La candela UTC del giorno corrente viene esclusa.
-- Segnale e rischio vengono calcolati sull'ultima candela conclusa.
-- La stessa regola viene applicata sia da `main.py` sia da
-  `hourly_monitor.py`.
-
-### Operazioni e win rate
-
-- Una operazione corrisponde a un trade long completato.
-- Il win rate usa come denominatore soltanto i trade chiusi.
-- Le posizioni ancora aperte non vengono considerate concluse.
-
-### Webhook Telegram
-
-- Servizio Render in stato `Live`.
-- Health check pubblico verificato con risposta `{"status":"ok"}`.
-- Registrazione Telegram verificata tramite `getWebhookInfo`.
-- Comandi disponibili nelle chat private; i gruppi vengono ignorati.
-- Richieste autenticate con `TELEGRAM_WEBHOOK_SECRET`.
-- `/segnale`, `/start`, `/help`, `/privacy`, `/iscrivimi` e
-  `/disiscrivimi` gestiti da FastAPI.
-- Iscrizioni persistenti su Supabase senza duplicati.
-- Endpoint pubblico `GET /subscribers/count` senza dati personali.
-- CORS limitato all'origine GitHub Pages e agli indirizzi locali di test.
-
-## Verifica
-
-Comando:
+## Verifiche Recenti
 
 ```powershell
-python -m unittest discover -s tests -v
+python -m unittest discover -s tests
+node --check cloudflare-worker\src\worker.js
 ```
 
-Risultato al momento dell'ultimo aggiornamento:
+Risultato:
 
 ```text
-Ran 32 tests
+Ran 54 tests
 OK
 ```
 
-## File principali
+Endpoint verificati:
 
+- `GET https://eth-prudential-signal.giuse2003.workers.dev/` -> OK
+- `GET https://eth-prudential-signal.giuse2003.workers.dev/live-preview` -> OK
+- `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
+  -> `503` finche mancano `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+
+## Supabase
+
+Decisione attuale:
+
+- usare una tabella ETH dedicata: `public.telegram_subscribers_eth`;
+- questa scelta consente di riusare lo stesso progetto Supabase del BTC senza
+  mescolare iscritti o stati di iscrizione.
+
+Da completare:
+
+- eseguire `supabase/telegram_subscribers.sql` nel SQL Editor Supabase;
+- configurare nel Worker Cloudflare:
+  - `SUPABASE_URL`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+- verificare `/subscribers/count`;
+- testare `/iscrivimi` e `/disiscrivimi` dal bot ETH.
+
+## File Principali
+
+- `ETH_PROJECT_ROADMAP.md`: roadmap operativa aggiornata.
 - `config.py`: configurazione centralizzata.
-- `data/daily_candles.py`: selezione delle candele concluse.
-- `strategy/signals.py`: segnale, punteggio e rischio.
+- `main.py`: esecuzione completa locale.
+- `hourly_monitor.py`: monitor GitHub Actions.
+- `strategy/signals.py`: regole segnale/rischio.
 - `backtest/backtest.py`: esposizione e metriche.
-- `hourly_monitor.py`: esecuzione cloud e Telegram.
-- `telegram_command.py`: listener polling mantenuto come fallback.
-- `telegram_webhook.py`: endpoint FastAPI per i comandi Telegram.
-- `telegram_subscribers.py`: accesso server-side agli iscritti Supabase.
-- `render.yaml`: configurazione di deploy Render.
-- `reports/generate.py`: report e stato dashboard.
+- `reports/generate.py`: report e JSON dashboard.
+- `cloudflare-worker/src/worker.js`: bot Telegram e API pubbliche.
+- `cloudflare-worker/wrangler.toml`: configurazione Worker.
+- `supabase/telegram_subscribers.sql`: schema database iscritti ETH.
+- `telegram_subscribers.py`: client Supabase legacy/server-side.
 
-## Ambito rinviato
+## Ambito Rinviato
 
-Il backtest non include ancora commissioni, spread, slippage o rendimento
-della liquidita. Questa estensione e intenzionalmente rinviata.
+- Broadcast automatico a tutti gli iscritti Supabase.
+- Costi di transazione, spread, slippage e rendimento liquidita nel backtest.
+- Pulizia completa dei file legacy Render/FastAPI.

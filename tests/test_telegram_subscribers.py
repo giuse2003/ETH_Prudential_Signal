@@ -14,7 +14,7 @@ class SupabaseSubscriberStoreTests(unittest.TestCase):
         )
 
     @patch("telegram_subscribers.requests.post")
-    def test_subscribe_uses_upsert_on_chat_id(self, mock_post: Mock) -> None:
+    def test_subscribe_uses_eth_table_and_upsert_on_chat_id(self, mock_post: Mock) -> None:
         mock_post.return_value = Mock()
         subscriber = TelegramSubscriber(
             telegram_chat_id=123,
@@ -27,6 +27,7 @@ class SupabaseSubscriberStoreTests(unittest.TestCase):
         self.store.subscribe(subscriber)
 
         _, kwargs = mock_post.call_args
+        self.assertTrue(mock_post.call_args.args[0].endswith("/telegram_subscribers_eth"))
         self.assertEqual(
             kwargs["params"],
             {"on_conflict": "telegram_chat_id"},
@@ -47,6 +48,7 @@ class SupabaseSubscriberStoreTests(unittest.TestCase):
 
         self.assertTrue(removed)
         _, kwargs = mock_patch.call_args
+        self.assertTrue(mock_patch.call_args.args[0].endswith("/telegram_subscribers_eth"))
         self.assertEqual(kwargs["params"]["telegram_chat_id"], "eq.123")
         self.assertFalse(kwargs["json"]["active"])
         response.raise_for_status.assert_called_once_with()
@@ -72,6 +74,7 @@ class SupabaseSubscriberStoreTests(unittest.TestCase):
 
         self.assertEqual(count, 12)
         _, kwargs = mock_get.call_args
+        self.assertTrue(mock_get.call_args.args[0].endswith("/telegram_subscribers_eth"))
         self.assertEqual(kwargs["params"]["active"], "eq.true")
         self.assertEqual(kwargs["headers"]["Prefer"], "count=exact")
         self.assertEqual(kwargs["headers"]["Range"], "0-0")
@@ -84,6 +87,21 @@ class SupabaseSubscriberStoreTests(unittest.TestCase):
         mock_get.return_value = response
 
         self.assertEqual(self.store.count_active(), 0)
+
+    @patch("telegram_subscribers.requests.get")
+    def test_table_name_can_be_overridden(self, mock_get: Mock) -> None:
+        response = Mock()
+        response.headers = {"Content-Range": "*/0"}
+        mock_get.return_value = response
+        store = SupabaseSubscriberStore(
+            "https://project.supabase.co/",
+            "service-role-test-key",
+            table_name="custom_subscribers",
+        )
+
+        store.count_active()
+
+        self.assertTrue(mock_get.call_args.args[0].endswith("/custom_subscribers"))
 
 
 if __name__ == "__main__":

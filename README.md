@@ -163,7 +163,7 @@ Configurazione:
 
 1. Apri **Settings > Pages** nel repository.
 2. Seleziona **Deploy from branch**.
-3. Imposta il branch `main` e la cartella `/docs`.
+3. Imposta il branch `master` e la cartella `/docs`.
 
 Il workflow aggiorna `reports/status.json`, lo copia in `docs/status.json` e
 pubblica il nuovo stato.
@@ -242,6 +242,10 @@ Guida completa: [CLOUDFLARE_WORKER_DEPLOYMENT.md](CLOUDFLARE_WORKER_DEPLOYMENT.m
 Il workflow `Telegram command menu` serve solo ad aggiornare il menu dei
 comandi Telegram. Il workflow `Hourly ETH monitor (Telegram)` deve restare
 attivo per aggiornare `docs/status.json` e inviare i cambi automatici.
+
+Gli iscritti Telegram ETH vengono salvati in Supabase nella tabella dedicata
+`public.telegram_subscribers_eth`, separata da eventuali tabelle del progetto
+BTC.
 
 ## Test
 

@@ -286,6 +286,10 @@ class TelegramWebhookTests(unittest.TestCase):
 
         self.assertEqual(result, {"active_subscribers": 7})
         self.assertEqual(list(result), ["active_subscribers"])
+        self.assertEqual(
+            mock_store.call_args.kwargs["table_name"],
+            "telegram_subscribers_eth",
+        )
 
     def test_subscriber_count_requires_server_configuration(self) -> None:
         with patch.dict(

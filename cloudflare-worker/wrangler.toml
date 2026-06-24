@@ -4,3 +4,4 @@ compatibility_date = "2026-06-18"
 
 [vars]
 STATUS_JSON_URL = "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json"
+SUBSCRIBERS_TABLE = "telegram_subscribers_eth"

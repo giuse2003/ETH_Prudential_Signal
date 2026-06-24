@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 import requests
 
 
-TABLE_NAME = "telegram_subscribers"
+DEFAULT_TABLE_NAME = "telegram_subscribers_eth"
 
 
 @dataclass(frozen=True)
@@ -23,8 +23,15 @@ class TelegramSubscriber:
 class SupabaseSubscriberStore:
     """Repository minimo basato sulle API REST generate da Supabase."""
 
-    def __init__(self, base_url: str, service_role_key: str, timeout_s: int = 8):
-        self.table_url = f"{base_url.rstrip('/')}/rest/v1/{TABLE_NAME}"
+    def __init__(
+        self,
+        base_url: str,
+        service_role_key: str,
+        timeout_s: int = 8,
+        table_name: str = DEFAULT_TABLE_NAME,
+    ):
+        self.table_name = table_name
+        self.table_url = f"{base_url.rstrip('/')}/rest/v1/{table_name}"
         self.timeout_s = timeout_s
         self.headers = {
             "apikey": service_role_key,

@@ -18,7 +18,7 @@ ogni avanzamento rilevante.
   `https://eth-prudential-signal.giuse2003.workers.dev/`
 - Bot Telegram ETH dedicato creato e collegato via webhook:
   `@ETH_Prudential_Signal_bot`
-- Test Python: 53 test passati.
+- Test Python: 54 test passati.
 - Ultimo backtest ETH generato su candela chiusa `2026-06-22`.
 
 ## Problemi Riscontrati
@@ -134,10 +134,12 @@ Correzioni applicate:
 
 ### B. Completare Supabase iscritti
 
-- [ ] Decidere se usare lo stesso progetto Supabase del BTC o crearne uno ETH.
-- [ ] Se si usa lo stesso Supabase, verificare che la tabella distingua
-      correttamente BTC/ETH o che gli iscritti ETH non si mischino a quelli BTC.
-- [ ] Se serve isolamento, aggiungere una colonna `project` o creare tabella
+- [x] Decidere se usare lo stesso progetto Supabase del BTC o crearne uno ETH:
+      il codice usa una tabella ETH dedicata, quindi puo riusare lo stesso
+      progetto Supabase senza mescolare gli iscritti.
+- [x] Separare gli iscritti ETH da quelli BTC:
+      tabella `public.telegram_subscribers_eth`.
+- [x] Aggiornare schema, Worker e webhook legacy per usare la tabella ETH
       dedicata.
 - [ ] Configurare secret Cloudflare Worker ETH:
       - `SUPABASE_URL`
@@ -225,3 +227,5 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Configurato token API Cloudflare | `wrangler whoami` e `wrangler deploy` funzionano da CLI; deploy Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`. |
 | 2026-06-24 | Nota PC Lenovo/casa | Le configurazioni cloud sono gia attive; sul PC di casa va controllata prima l'eventuale API/Wrangler del progetto BTC. |
 | 2026-06-24 | Aggiornato menu comandi Telegram | Workflow `Telegram command menu` registrato da GitHub Actions e completato con successo. |
+| 2026-06-24 | Decisa separazione Supabase ETH | Schema e codice puntano a `public.telegram_subscribers_eth`, evitando conflitti con BTC. |
+| 2026-06-24 | Deploy Worker con tabella ETH | Deploy Version ID `e6f86860-d16a-4c9c-9029-84b4f0213395`; `/subscribers/count` resta 503 finche mancano i secret Supabase. |

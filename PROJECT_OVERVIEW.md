@@ -349,7 +349,7 @@ supabase/telegram_subscribers.sql
 Tabella:
 
 ```text
-public.telegram_subscribers
+public.telegram_subscribers_eth
 ```
 
 Campi principali:
@@ -365,6 +365,10 @@ Campi principali:
 - `consent_version`;
 - `consent_source`;
 - campi di diagnostica delivery.
+
+La tabella operativa ETH e `public.telegram_subscribers_eth`, separata da
+eventuali tabelle del progetto BTC anche quando si riusa lo stesso progetto
+Supabase.
 
 La tabella ha Row Level Security attiva e forzata. I ruoli `anon` e
 `authenticated` non hanno accesso; il Worker usa `service_role`.
@@ -484,6 +488,7 @@ Variabile non segreta in `cloudflare-worker/wrangler.toml`:
 
 ```text
 STATUS_JSON_URL=https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json
+SUBSCRIBERS_TABLE=telegram_subscribers_eth
 ```
 
 ### GitHub Actions
