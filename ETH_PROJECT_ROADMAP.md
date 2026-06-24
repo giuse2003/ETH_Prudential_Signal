@@ -139,18 +139,18 @@ Correzioni applicate:
       progetto Supabase senza mescolare gli iscritti.
 - [x] Confermato che su Supabase esiste solo il progetto Bitcoin: si procede
       riusandolo con tabella ETH dedicata.
-- [ ] Rinominare il progetto Supabase da `btc-prudential-signal` a un nome
+- [x] Rinominare il progetto Supabase da `btc-prudential-signal` a un nome
       neutro, consigliato `crypto-prudential-signal`.
 - [x] Separare gli iscritti ETH da quelli BTC:
       tabella `public.telegram_subscribers_eth`.
 - [x] Aggiornare schema, Worker e webhook legacy per usare la tabella ETH
       dedicata.
-- [ ] Configurare secret Cloudflare Worker ETH:
+- [x] Configurare secret Cloudflare Worker ETH:
       - `SUPABASE_URL`
       - `SUPABASE_SERVICE_ROLE_KEY`
 - [x] Preparare script locale per caricare i secret senza stamparli:
       `scripts/configure_supabase_worker_secrets.ps1`.
-- [ ] Verificare:
+- [x] Verificare:
       `https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
 - [x] Aggiungere endpoint diagnostico non sensibile:
       `https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health`
@@ -173,8 +173,8 @@ Correzioni applicate:
 
 - [x] Verificare root endpoint:
       `https://eth-prudential-signal.giuse2003.workers.dev/`
-- [ ] Verificare `/subscribers/count` dopo i secret Supabase.
-- [ ] Verificare `/subscribers/health` dopo i secret Supabase.
+- [x] Verificare `/subscribers/count` dopo i secret Supabase.
+- [x] Verificare `/subscribers/health` dopo i secret Supabase.
 - [x] Verificare `/live-preview` con fallback su `docs/status.json`.
 - [ ] Verificare `/live-preview` con `docs/live-status.json`, quando generato.
 - [ ] Verificare CORS dalla dashboard GitHub Pages.
@@ -243,3 +243,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Preparato caricamento secret Supabase | Aggiunto script PowerShell per caricare `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` da variabili d'ambiente locali. |
 | 2026-06-24 | Scelta Supabase esistente | Confermato che esiste solo il progetto Supabase Bitcoin; ETH usera lo stesso progetto con tabella `telegram_subscribers_eth`. |
 | 2026-06-24 | Da rinominare Supabase | Il progetto Supabase condiviso non dovrebbe chiamarsi `btc-prudential-signal`; nome consigliato `crypto-prudential-signal`. |
+| 2026-06-24 | Supabase ETH collegato | Progetto rinominato `crypto-prudential-signal`, secret `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` caricati nel Worker; `/subscribers/health` configurato true e `/subscribers/count` restituisce `0`. |

@@ -26,10 +26,10 @@ Cloudflare.
 - Cloudflare Worker Secrets configurati per Telegram:
   - `TELEGRAM_BOT_TOKEN`
   - `TELEGRAM_WEBHOOK_SECRET`
-- Supabase iscritti in corso: schema e codice puntano alla tabella dedicata
-  `public.telegram_subscribers_eth`.
-- Endpoint `/subscribers/count` ancora non operativo finche non vengono
-  configurati i secret Supabase nel Worker.
+- Supabase iscritti collegato: schema, Worker e secret puntano alla tabella
+  dedicata `public.telegram_subscribers_eth`.
+- Endpoint `/subscribers/count` operativo; al momento restituisce `0`
+  iscritti attivi.
 
 ## Verifiche Recenti
 
@@ -50,9 +50,9 @@ Endpoint verificati:
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/` -> OK
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/live-preview` -> OK
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health`
-  -> mostra se i secret Supabase sono configurati, senza esporre valori.
+  -> configurato true su `telegram_subscribers_eth`, senza esporre valori.
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
-  -> `503` finche mancano `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+  -> `{"active_subscribers":0}`.
 
 ## Supabase
 
@@ -61,16 +61,10 @@ Decisione attuale:
 - usare una tabella ETH dedicata: `public.telegram_subscribers_eth`;
 - questa scelta consente di riusare lo stesso progetto Supabase del BTC senza
   mescolare iscritti o stati di iscrizione.
-- il progetto Supabase condiviso va rinominato da `btc-prudential-signal` a un
-  nome neutro, consigliato `crypto-prudential-signal`.
+- il progetto Supabase condiviso e stato rinominato `crypto-prudential-signal`.
 
 Da completare:
 
-- eseguire `supabase/telegram_subscribers.sql` nel SQL Editor Supabase;
-- configurare nel Worker Cloudflare:
-  - `SUPABASE_URL`
-  - `SUPABASE_SERVICE_ROLE_KEY`
-- verificare `/subscribers/count`;
 - testare `/iscrivimi` e `/disiscrivimi` dal bot ETH.
 
 ## File Principali
