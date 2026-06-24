@@ -153,6 +153,25 @@ e il nome tabella. `/subscribers/count` deve restituire:
 
 oppure un numero maggiore se esistono gia iscritti attivi.
 
+### Caricamento secret da variabili d'ambiente locali
+
+Se vuoi evitare di incollare secret nella chat, imposta le variabili in una
+console PowerShell locale:
+
+```powershell
+$env:SUPABASE_URL="https://<project-ref>.supabase.co"
+$env:SUPABASE_SERVICE_ROLE_KEY="<service-role-secret>"
+```
+
+Poi esegui:
+
+```powershell
+.\scripts\configure_supabase_worker_secrets.ps1
+```
+
+Lo script carica i secret nel Worker Cloudflare tramite Wrangler e non stampa i
+valori.
+
 ## Motivazione della sicurezza
 
 La tabella si trova nel schema `public`, esposto dalle API Supabase, ma RLS e

@@ -144,6 +144,8 @@ Correzioni applicate:
 - [ ] Configurare secret Cloudflare Worker ETH:
       - `SUPABASE_URL`
       - `SUPABASE_SERVICE_ROLE_KEY`
+- [x] Preparare script locale per caricare i secret senza stamparli:
+      `scripts/configure_supabase_worker_secrets.ps1`.
 - [ ] Verificare:
       `https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
 - [x] Aggiungere endpoint diagnostico non sensibile:
@@ -234,3 +236,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Decisa separazione Supabase ETH | Schema e codice puntano a `public.telegram_subscribers_eth`, evitando conflitti con BTC. |
 | 2026-06-24 | Deploy Worker con tabella ETH | Deploy Version ID `e6f86860-d16a-4c9c-9029-84b4f0213395`; `/subscribers/count` resta 503 finche mancano i secret Supabase. |
 | 2026-06-24 | Aggiunta verifica Supabase | Endpoint `/subscribers/health` e workflow manuale `Verify Supabase subscribers` preparati; deploy Worker Version ID `8fee045f-d5da-4811-827e-13412c1f9d0b`. |
+| 2026-06-24 | Preparato caricamento secret Supabase | Aggiunto script PowerShell per caricare `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` da variabili d'ambiente locali. |
