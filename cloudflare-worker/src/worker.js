@@ -271,13 +271,19 @@ async function fetchGithubLiveStatus(env) {
 }
 
 async function buildLiveSignalMessage(env) {
-  const live = await fetchGithubLiveStatus(env);
-  return formatMonitorMessage(
-    String(live.signal || "MANTIENI"),
-    Number(live.price_eur),
-    live.condition_groups,
-    "ETH MONITOR LIVE!",
-  );
+  try {
+    const live = await fetchGithubLiveStatus(env);
+    return formatMonitorMessage(
+      String(live.signal || "MANTIENI"),
+      Number(live.price_eur),
+      live.condition_groups,
+      "ETH MONITOR LIVE!",
+    );
+  } catch (error) {
+    console.warn("LIVE status non disponibile, uso status daily.", error);
+    const status = await fetchGithubStatus(env);
+    return buildDailySignalMessage(status);
+  }
 }
 
 function buildDailySignalMessage(status) {

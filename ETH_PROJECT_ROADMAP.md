@@ -1,6 +1,6 @@
 # ETH Prudential Signal - Roadmap Operativa
 
-Ultimo aggiornamento: 2026-06-23
+Ultimo aggiornamento: 2026-06-24
 
 Questo file tiene traccia delle problematiche riscontrate durante la creazione
 del progetto Ethereum e delle attivita ancora da completare. Va aggiornato a
@@ -16,6 +16,8 @@ ogni avanzamento rilevante.
 - Dashboard statica pubblicata da `/docs`.
 - Worker Cloudflare ETH deployato:
   `https://eth-prudential-signal.giuse2003.workers.dev/`
+- Bot Telegram ETH dedicato creato e collegato via webhook:
+  `@ETH_Prudential_Signal_bot`
 - Test Python: 53 test passati.
 - Ultimo backtest ETH generato su candela chiusa `2026-06-22`.
 
@@ -65,11 +67,15 @@ e ancora pienamente configurato.
 
 Problemi rilevati:
 
-- il repository ETH non ha secret GitHub Actions;
+- il repository ETH non aveva secret GitHub Actions;
 - il Worker Cloudflare ETH era assente ed e stato deployato solo come base;
-- il Worker Cloudflare ETH non ha secret configurati;
+- il Worker Cloudflare ETH non aveva secret Telegram configurati;
 - l'endpoint `/subscribers/count` restituisce `503`;
-- il webhook Telegram non risulta ancora registrato verso il Worker ETH;
+- il webhook Telegram non risultava ancora registrato verso il Worker ETH;
+- il comando `/segnale` falliva quando `docs/live-status.json` non era ancora
+  disponibile;
+- il deploy locale via Wrangler richiede un token API Cloudflare dedicato,
+  perche l'ambiente locale non ha `CLOUDFLARE_API_TOKEN` configurato;
 - i token e i secret del progetto BTC non sono leggibili da GitHub/Cloudflare,
   quindi non possono essere copiati automaticamente;
 - alcuni URL raw puntavano al branch `main`, mentre il repo ETH usa `master`.
@@ -80,29 +86,43 @@ Correzioni applicate:
 - corretto `main` -> `master` negli URL raw usati da Worker e webhook legacy;
 - verificato che `https://eth-prudential-signal.giuse2003.workers.dev/`
   risponda `{"status":"ok"}`.
+- creato/verificato bot Telegram dedicato `@ETH_Prudential_Signal_bot`;
+- configurati i secret GitHub Actions:
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_CHAT_ID`
+- configurati i secret Cloudflare Worker ETH:
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_WEBHOOK_SECRET`
+- registrato il webhook Telegram verso:
+  `https://eth-prudential-signal.giuse2003.workers.dev/webhook`.
+- aggiornato il Worker per usare `docs/status.json` come fallback quando
+  `docs/live-status.json` non esiste ancora;
+- verificato che `/live-preview` restituisca il segnale daily ETH e che
+  `/segnale` funzioni dal bot Telegram.
 
 ## Checklist Prossimi Passi
 
 ### A. Completare configurazione Telegram
 
-- [ ] Creare o verificare definitivamente il bot Telegram
+- [x] Creare o verificare definitivamente il bot Telegram
       `@ETH_Prudential_Signal_bot` tramite BotFather.
-- [ ] Recuperare il token del bot ETH da BotFather.
-- [ ] Decidere se usare una chat amministratore separata per ETH.
-- [ ] Recuperare `TELEGRAM_CHAT_ID` per le notifiche automatiche ETH.
-- [ ] Generare un nuovo `TELEGRAM_WEBHOOK_SECRET` dedicato a ETH.
-- [ ] Configurare i secret GitHub nel repo ETH:
+- [x] Recuperare il token del bot ETH da BotFather.
+- [x] Decidere se usare una chat amministratore separata per ETH.
+- [x] Recuperare `TELEGRAM_CHAT_ID` per le notifiche automatiche ETH.
+- [x] Generare un nuovo `TELEGRAM_WEBHOOK_SECRET` dedicato a ETH.
+- [x] Configurare i secret GitHub nel repo ETH:
       - `TELEGRAM_BOT_TOKEN`
       - `TELEGRAM_CHAT_ID`
-- [ ] Configurare i secret Cloudflare Worker ETH:
+- [x] Configurare i secret Cloudflare Worker ETH:
       - `TELEGRAM_BOT_TOKEN`
       - `TELEGRAM_WEBHOOK_SECRET`
-- [ ] Registrare il webhook Telegram verso:
+- [x] Registrare il webhook Telegram verso:
       `https://eth-prudential-signal.giuse2003.workers.dev/webhook`
 - [ ] Verificare `getWebhookInfo` sul bot ETH.
 - [ ] Lanciare il workflow `Telegram command menu`.
-- [ ] Testare `/help`, `/segnale`, `/conditions`, `/iscrivimi`,
-      `/disiscrivimi`, `/privacy` dal bot ETH.
+- [x] Testare `/start`, `/segnale` e `/conditions` dal bot ETH.
+- [ ] Testare `/help` e `/privacy` dal bot ETH.
+- [ ] Testare `/iscrivimi` e `/disiscrivimi` dopo configurazione Supabase.
 
 ### B. Completare Supabase iscritti
 
@@ -132,13 +152,16 @@ Correzioni applicate:
 
 ### D. Validare Worker Cloudflare
 
-- [ ] Verificare root endpoint:
+- [x] Verificare root endpoint:
       `https://eth-prudential-signal.giuse2003.workers.dev/`
 - [ ] Verificare `/subscribers/count` dopo i secret Supabase.
-- [ ] Verificare `/live-preview` dopo che `docs/live-status.json` esiste.
+- [x] Verificare `/live-preview` con fallback su `docs/status.json`.
+- [ ] Verificare `/live-preview` con `docs/live-status.json`, quando generato.
 - [ ] Verificare CORS dalla dashboard GitHub Pages.
 - [ ] Controllare log con `wrangler tail eth-prudential-signal` durante test
       Telegram.
+- [ ] Creare un token API Cloudflare dedicato per deploy e tail da CLI.
+- [ ] Configurare localmente `CLOUDFLARE_API_TOKEN` per usare `wrangler deploy`.
 
 ### E. Pulizia Documentazione
 
@@ -171,6 +194,7 @@ cd cloudflare-worker
 npx wrangler deploy
 npx wrangler secret list
 npx wrangler tail eth-prudential-signal
+$env:CLOUDFLARE_API_TOKEN="..."
 ```
 
 ## Registro Avanzamenti
@@ -181,3 +205,6 @@ npx wrangler tail eth-prudential-signal
 | 2026-06-23 | Corretto backtest dashboard | Rimosse metriche statiche BTC, aggiunto `backtest.json`. |
 | 2026-06-23 | Deploy Worker base | Worker ETH risponde su root, ma mancano secret Telegram/Supabase. |
 | 2026-06-23 | Creato questo file | Roadmap iniziale per completamento bot e automazioni. |
+| 2026-06-24 | Configurato Telegram base | Bot ETH dedicato, secret GitHub/Cloudflare e webhook verso Worker completati. |
+| 2026-06-24 | Corretto `/segnale` Worker | Aggiunto fallback da `live-status.json` mancante a `status.json`; `/live-preview` e `/segnale` funzionano. |
+| 2026-06-24 | Pianificato token API Cloudflare | Serve `CLOUDFLARE_API_TOKEN` dedicato per deploy e tail via Wrangler da CLI. |

@@ -1,8 +1,24 @@
 # Telegram Subscribers Roadmap
 
-Ultimo aggiornamento: 11 giugno 2026
+Ultimo aggiornamento: 24 giugno 2026
 
-Stato generale: `FASE 3 COMPLETATA - FASE 4 DA IMPLEMENTARE`
+Stato generale: `BOT ETH ATTIVO - SUPABASE WORKER DA CONFIGURARE - FASE 4 DA IMPLEMENTARE`
+
+Nota di riallineamento ETH del 24 giugno 2026:
+
+- bot dedicato `@ETH_Prudential_Signal_bot` creato;
+- `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` configurati nei secret GitHub;
+- `TELEGRAM_BOT_TOKEN` e `TELEGRAM_WEBHOOK_SECRET` configurati nel Worker
+  Cloudflare ETH;
+- webhook Telegram registrato verso
+  `https://eth-prudential-signal.giuse2003.workers.dev/webhook`;
+- `/start`, `/conditions` e `/segnale` rispondono dal bot ETH;
+- `/segnale` usa il fallback daily da `docs/status.json` quando
+  `docs/live-status.json` non e ancora disponibile;
+- `/iscrivimi`, `/disiscrivimi` e `/subscribers/count` restano bloccati finche
+  `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` non sono configurati nel Worker;
+- serve creare un token API Cloudflare dedicato e configurare
+  `CLOUDFLARE_API_TOKEN` per consentire deploy e tail da CLI con Wrangler.
 
 ## Obiettivo
 
@@ -262,6 +278,11 @@ Non modificare:
   `TELEGRAM_CHAT_ID`, se necessaria.
 - [x] **5.6 Verifica:** confermare che nessun secret sia presente nei log o
   nei file versionati.
+- [ ] **5.7 Utente/Codex:** configurare `SUPABASE_URL` e
+  `SUPABASE_SERVICE_ROLE_KEY` come secret del Worker Cloudflare ETH.
+- [ ] **5.8 Utente/Codex:** creare token API Cloudflare dedicato per Wrangler.
+- [ ] **5.9 Codex:** configurare `CLOUDFLARE_API_TOKEN` localmente per deploy e
+  log tail da CLI.
 
 ### Fase 6 - Privacy e rilascio
 
@@ -361,6 +382,7 @@ La funzionalita sara considerata completata quando:
 | 2026-06-11 | Test Fase 3 | Completato | 32 test automatici e conteggio reale Supabase pari a 1. |
 | 2026-06-11 | Deploy pubblico Fase 3 | Completato | Render e GitHub Pages aggiornati; endpoint e card restituiscono il conteggio 1. |
 | 2026-06-11 | Verifica CORS e privacy | Completato | Origine GitHub Pages autorizzata; risposta limitata a `active_subscribers`. |
+| 2026-06-24 | Bot ETH Cloudflare | Parziale | Bot dedicato e webhook funzionanti; `/segnale` corretto con fallback daily; Supabase Worker ancora da configurare. |
 
 ## Prossimo passo
 
