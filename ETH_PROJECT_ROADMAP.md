@@ -131,7 +131,7 @@ Correzioni applicate:
 - [x] Testare `/start`, `/segnale` e `/conditions` dal bot ETH.
 - [ ] Testare `/help` e `/privacy` dal bot ETH.
 - [x] Testare `/iscrivimi` dopo configurazione Supabase.
-- [ ] Testare `/disiscrivimi` dopo configurazione Supabase.
+- [x] Testare `/disiscrivimi` dopo configurazione Supabase.
 
 ### B. Completare Supabase iscritti
 
@@ -246,3 +246,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Da rinominare Supabase | Il progetto Supabase condiviso non dovrebbe chiamarsi `btc-prudential-signal`; nome consigliato `crypto-prudential-signal`. |
 | 2026-06-24 | Supabase ETH collegato | Progetto rinominato `crypto-prudential-signal`, secret `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` caricati nel Worker; `/subscribers/health` configurato true e `/subscribers/count` restituisce `0`. |
 | 2026-06-24 | Iscrizione Telegram ETH verificata | Dopo `/iscrivimi` dal bot ETH, `/subscribers/count` restituisce `1`, confermando scrittura su `telegram_subscribers_eth`. |
+| 2026-06-24 | Disiscrizione Telegram ETH verificata | Dopo `/disiscrivimi` dal bot ETH, `/subscribers/count` torna a `0`, confermando disattivazione iscrizione. |

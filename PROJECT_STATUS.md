@@ -65,7 +65,7 @@ Decisione attuale:
 
 Da completare:
 
-- testare `/disiscrivimi` dal bot ETH.
+- testare `/help` e `/privacy` dal bot ETH.
 
 ## File Principali
 
