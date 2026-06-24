@@ -19,6 +19,10 @@ Nota di riallineamento ETH del 24 giugno 2026:
   `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` non sono configurati nel Worker;
 - token API Cloudflare dedicato creato e `CLOUDFLARE_API_TOKEN` configurato
   nella sessione PowerShell per consentire deploy da CLI con Wrangler.
+- le operazioni del 24 giugno sono state eseguite sul PC Lenovo al lavoro; sul
+  PC di casa bisogna prima controllare se esiste gia una configurazione
+  API/Wrangler del progetto `BTC_Prudential_Signal` riutilizzabile, evitando di
+  creare token duplicati se non necessario.
 
 ## Obiettivo
 
@@ -283,6 +287,9 @@ Non modificare:
 - [x] **5.8 Utente/Codex:** creare token API Cloudflare dedicato per Wrangler.
 - [x] **5.9 Codex:** configurare `CLOUDFLARE_API_TOKEN` localmente per deploy e
   log tail da CLI.
+- [ ] **5.10 Utente/Codex:** sul PC di casa verificare eventuale configurazione
+  API/Wrangler gia usata per `BTC_Prudential_Signal` prima di creare o salvare
+  nuovi token.
 
 ### Fase 6 - Privacy e rilascio
 
@@ -384,6 +391,7 @@ La funzionalita sara considerata completata quando:
 | 2026-06-11 | Verifica CORS e privacy | Completato | Origine GitHub Pages autorizzata; risposta limitata a `active_subscribers`. |
 | 2026-06-24 | Bot ETH Cloudflare | Parziale | Bot dedicato e webhook funzionanti; `/segnale` corretto con fallback daily; Supabase Worker ancora da configurare. |
 | 2026-06-24 | Token API Cloudflare | Completato | `wrangler whoami` e deploy CLI riusciti per `eth-prudential-signal`. |
+| 2026-06-24 | Nota PC Lenovo/casa | Da casa controllare prima eventuale API/Wrangler BTC gia presente prima di configurare nuovi token. |
 
 ## Prossimo passo
 

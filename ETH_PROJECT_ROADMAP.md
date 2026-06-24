@@ -166,6 +166,13 @@ Correzioni applicate:
       Telegram.
 - [x] Creare un token API Cloudflare dedicato per deploy e tail da CLI.
 - [x] Configurare localmente `CLOUDFLARE_API_TOKEN` per usare `wrangler deploy`.
+- [ ] Sul PC di casa, prima di configurare un nuovo token/API, verificare se
+      esiste gia una configurazione Wrangler/API del progetto
+      `BTC_Prudential_Signal` riutilizzabile in modo sicuro.
+- [ ] Sul PC di casa, riallineare solo la configurazione locale
+      (`git pull`, Node/Wrangler o runtime Codex, `CLOUDFLARE_API_TOKEN`) senza
+      ricreare bot, secret GitHub, secret Cloudflare o webhook gia configurati
+      lato cloud.
 
 ### E. Pulizia Documentazione
 
@@ -212,3 +219,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Configurato Telegram base | Bot ETH dedicato, secret GitHub/Cloudflare e webhook verso Worker completati. |
 | 2026-06-24 | Corretto `/segnale` Worker | Aggiunto fallback da `live-status.json` mancante a `status.json`; `/live-preview` e `/segnale` funzionano. |
 | 2026-06-24 | Configurato token API Cloudflare | `wrangler whoami` e `wrangler deploy` funzionano da CLI; deploy Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`. |
+| 2026-06-24 | Nota PC Lenovo/casa | Le configurazioni cloud sono gia attive; sul PC di casa va controllata prima l'eventuale API/Wrangler del progetto BTC. |
