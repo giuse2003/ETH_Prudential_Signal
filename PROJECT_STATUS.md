@@ -49,6 +49,8 @@ Endpoint verificati:
 
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/` -> OK
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/live-preview` -> OK
+- `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health`
+  -> mostra se i secret Supabase sono configurati, senza esporre valori.
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
   -> `503` finche mancano `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
 

@@ -146,6 +146,9 @@ Correzioni applicate:
       - `SUPABASE_SERVICE_ROLE_KEY`
 - [ ] Verificare:
       `https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
+- [x] Aggiungere endpoint diagnostico non sensibile:
+      `https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health`
+- [x] Aggiungere workflow manuale `Verify Supabase subscribers`.
 - [ ] Aggiornare dashboard se il contatore resta temporaneamente non disponibile.
 
 ### C. Validare GitHub Actions
@@ -165,6 +168,7 @@ Correzioni applicate:
 - [x] Verificare root endpoint:
       `https://eth-prudential-signal.giuse2003.workers.dev/`
 - [ ] Verificare `/subscribers/count` dopo i secret Supabase.
+- [ ] Verificare `/subscribers/health` dopo i secret Supabase.
 - [x] Verificare `/live-preview` con fallback su `docs/status.json`.
 - [ ] Verificare `/live-preview` con `docs/live-status.json`, quando generato.
 - [ ] Verificare CORS dalla dashboard GitHub Pages.
@@ -229,3 +233,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Aggiornato menu comandi Telegram | Workflow `Telegram command menu` registrato da GitHub Actions e completato con successo. |
 | 2026-06-24 | Decisa separazione Supabase ETH | Schema e codice puntano a `public.telegram_subscribers_eth`, evitando conflitti con BTC. |
 | 2026-06-24 | Deploy Worker con tabella ETH | Deploy Version ID `e6f86860-d16a-4c9c-9029-84b4f0213395`; `/subscribers/count` resta 503 finche mancano i secret Supabase. |
+| 2026-06-24 | Aggiunta verifica Supabase | Endpoint `/subscribers/health` e workflow manuale `Verify Supabase subscribers` preparati; deploy Worker Version ID `8fee045f-d5da-4811-827e-13412c1f9d0b`. |

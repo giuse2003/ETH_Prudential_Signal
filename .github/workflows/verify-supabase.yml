@@ -1,0 +1,23 @@
+name: Verify Supabase subscribers
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check subscriber health endpoint
+        run: |
+          curl --fail --silent --show-error \
+            "https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health"
+
+      - name: Check subscriber count endpoint
+        run: |
+          curl --fail --silent --show-error \
+            "https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count"

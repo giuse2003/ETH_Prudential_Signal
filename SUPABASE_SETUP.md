@@ -134,6 +134,25 @@ Policy trovate: 0.
 
 Non comunicare URL, chiavi, password o altri secret.
 
+## 8. Verifica dopo i secret Cloudflare
+
+Dopo aver configurato `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` nel Worker,
+questi endpoint devono rispondere:
+
+```text
+GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health
+GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count
+```
+
+`/subscribers/health` non espone secret: mostra solo booleani di configurazione
+e il nome tabella. `/subscribers/count` deve restituire:
+
+```json
+{"active_subscribers": 0}
+```
+
+oppure un numero maggiore se esistono gia iscritti attivi.
+
 ## Motivazione della sicurezza
 
 La tabella si trova nel schema `public`, esposto dalle API Supabase, ma RLS e

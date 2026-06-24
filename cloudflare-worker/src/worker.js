@@ -64,6 +64,10 @@ export default {
       return handleSubscriberCount(env, request);
     }
 
+    if (request.method === "GET" && url.pathname === "/subscribers/health") {
+      return handleSubscriberHealth(env, request);
+    }
+
     if (request.method === "GET" && url.pathname === "/live-preview") {
       try {
         return json({ message: await buildLiveSignalMessage(env) }, 200, corsHeaders(request));
@@ -111,6 +115,19 @@ async function handleSubscriberCount(env, request) {
       corsHeaders(request),
     );
   }
+}
+
+function handleSubscriberHealth(env, request) {
+  return json(
+    {
+      configured: Boolean(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY),
+      table: env.SUBSCRIBERS_TABLE || "telegram_subscribers_eth",
+      has_supabase_url: Boolean(env.SUPABASE_URL),
+      has_service_role_key: Boolean(env.SUPABASE_SERVICE_ROLE_KEY),
+    },
+    200,
+    corsHeaders(request),
+  );
 }
 
 async function handleTelegramWebhook(request, env, ctx) {
