@@ -65,7 +65,7 @@ Decisione attuale:
 
 Da completare:
 
-- testare `/help` e `/privacy` dal bot ETH.
+- validare il workflow GitHub Actions `Hourly ETH monitor (Telegram)`.
 
 ## File Principali
 

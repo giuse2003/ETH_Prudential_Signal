@@ -129,7 +129,7 @@ Correzioni applicate:
 - [ ] Verificare `getWebhookInfo` sul bot ETH.
 - [x] Lanciare il workflow `Telegram command menu`.
 - [x] Testare `/start`, `/segnale` e `/conditions` dal bot ETH.
-- [ ] Testare `/help` e `/privacy` dal bot ETH.
+- [x] Testare `/help` e `/privacy` dal bot ETH.
 - [x] Testare `/iscrivimi` dopo configurazione Supabase.
 - [x] Testare `/disiscrivimi` dopo configurazione Supabase.
 
