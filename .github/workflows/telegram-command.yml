@@ -1,4 +1,5 @@
 name: Telegram command menu
+run-name: Update Telegram command menu
 
 on:
   workflow_dispatch: {}
