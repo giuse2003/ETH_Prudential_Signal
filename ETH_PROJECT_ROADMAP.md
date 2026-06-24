@@ -137,6 +137,8 @@ Correzioni applicate:
 - [x] Decidere se usare lo stesso progetto Supabase del BTC o crearne uno ETH:
       il codice usa una tabella ETH dedicata, quindi puo riusare lo stesso
       progetto Supabase senza mescolare gli iscritti.
+- [x] Confermato che su Supabase esiste solo il progetto Bitcoin: si procede
+      riusandolo con tabella ETH dedicata.
 - [x] Separare gli iscritti ETH da quelli BTC:
       tabella `public.telegram_subscribers_eth`.
 - [x] Aggiornare schema, Worker e webhook legacy per usare la tabella ETH
@@ -237,3 +239,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Deploy Worker con tabella ETH | Deploy Version ID `e6f86860-d16a-4c9c-9029-84b4f0213395`; `/subscribers/count` resta 503 finche mancano i secret Supabase. |
 | 2026-06-24 | Aggiunta verifica Supabase | Endpoint `/subscribers/health` e workflow manuale `Verify Supabase subscribers` preparati; deploy Worker Version ID `8fee045f-d5da-4811-827e-13412c1f9d0b`. |
 | 2026-06-24 | Preparato caricamento secret Supabase | Aggiunto script PowerShell per caricare `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` da variabili d'ambiente locali. |
+| 2026-06-24 | Scelta Supabase esistente | Confermato che esiste solo il progetto Supabase Bitcoin; ETH usera lo stesso progetto con tabella `telegram_subscribers_eth`. |

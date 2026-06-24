@@ -13,25 +13,30 @@ Non inserire token o chiavi Supabase nei file del repository.
 
 1. Apri <https://supabase.com/dashboard>.
 2. Accedi oppure crea un account.
-3. Seleziona **New project**.
+3. Seleziona il progetto Supabase gia usato per Bitcoin, se disponibile.
 
-## 2. Crea il progetto
+## 2. Progetto Supabase
 
-Compila i campi:
+Per il progetto ETH non e obbligatorio creare un secondo progetto Supabase.
+La configurazione corrente usa una tabella dedicata:
 
 ```text
-Organization: la tua organizzazione personale
+public.telegram_subscribers_eth
+```
+
+Quindi puoi riusare il progetto Supabase Bitcoin senza mescolare gli iscritti
+BTC e ETH.
+
+Se invece vuoi isolamento totale tra i due progetti, crea un nuovo progetto
+Supabase con:
+
+```text
 Name: eth-prudential-signal
-Database Password: genera una password forte e conservala
 Region: una regione europea vicina, ad esempio Frankfurt
 ```
 
-Se disponibile, seleziona il piano gratuito.
-
-Premi **Create new project** e attendi che il database sia pronto.
-
 La password del database non serve al codice attuale, ma va conservata in un
-password manager.
+password manager se crei un nuovo progetto.
 
 ## 3. Crea la tabella
 
@@ -43,7 +48,7 @@ password manager.
 supabase/telegram_subscribers.sql
 ```
 
-4. Copia l'intero contenuto nel SQL Editor.
+4. Copia l'intero contenuto nel SQL Editor del progetto Supabase scelto.
 5. Premi **Run**.
 
 Lo script:
