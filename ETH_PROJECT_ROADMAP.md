@@ -76,6 +76,9 @@ Problemi rilevati:
   disponibile;
 - il deploy locale via Wrangler richiedeva un token API Cloudflare dedicato,
   perche l'ambiente locale non aveva `CLOUDFLARE_API_TOKEN` configurato;
+- il workflow `Telegram command menu` esisteva nel repository, ma GitHub
+  Actions non lo aveva indicizzato finche non e stato aggiornato e pushato di
+  nuovo;
 - i token e i secret del progetto BTC non sono leggibili da GitHub/Cloudflare,
   quindi non possono essere copiati automaticamente;
 - alcuni URL raw puntavano al branch `main`, mentre il repo ETH usa `master`.
@@ -103,6 +106,7 @@ Correzioni applicate:
 - verificato `npx wrangler whoami`;
 - eseguito deploy via `npx wrangler deploy`
   (Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`).
+- aggiornato e lanciato con successo il workflow `Telegram command menu`.
 
 ## Checklist Prossimi Passi
 
@@ -123,7 +127,7 @@ Correzioni applicate:
 - [x] Registrare il webhook Telegram verso:
       `https://eth-prudential-signal.giuse2003.workers.dev/webhook`
 - [ ] Verificare `getWebhookInfo` sul bot ETH.
-- [ ] Lanciare il workflow `Telegram command menu`.
+- [x] Lanciare il workflow `Telegram command menu`.
 - [x] Testare `/start`, `/segnale` e `/conditions` dal bot ETH.
 - [ ] Testare `/help` e `/privacy` dal bot ETH.
 - [ ] Testare `/iscrivimi` e `/disiscrivimi` dopo configurazione Supabase.
@@ -220,3 +224,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Corretto `/segnale` Worker | Aggiunto fallback da `live-status.json` mancante a `status.json`; `/live-preview` e `/segnale` funzionano. |
 | 2026-06-24 | Configurato token API Cloudflare | `wrangler whoami` e `wrangler deploy` funzionano da CLI; deploy Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`. |
 | 2026-06-24 | Nota PC Lenovo/casa | Le configurazioni cloud sono gia attive; sul PC di casa va controllata prima l'eventuale API/Wrangler del progetto BTC. |
+| 2026-06-24 | Aggiornato menu comandi Telegram | Workflow `Telegram command menu` registrato da GitHub Actions e completato con successo. |
