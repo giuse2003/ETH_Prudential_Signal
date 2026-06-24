@@ -139,6 +139,8 @@ Correzioni applicate:
       progetto Supabase senza mescolare gli iscritti.
 - [x] Confermato che su Supabase esiste solo il progetto Bitcoin: si procede
       riusandolo con tabella ETH dedicata.
+- [ ] Rinominare il progetto Supabase da `btc-prudential-signal` a un nome
+      neutro, consigliato `crypto-prudential-signal`.
 - [x] Separare gli iscritti ETH da quelli BTC:
       tabella `public.telegram_subscribers_eth`.
 - [x] Aggiornare schema, Worker e webhook legacy per usare la tabella ETH
@@ -240,3 +242,4 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Aggiunta verifica Supabase | Endpoint `/subscribers/health` e workflow manuale `Verify Supabase subscribers` preparati; deploy Worker Version ID `8fee045f-d5da-4811-827e-13412c1f9d0b`. |
 | 2026-06-24 | Preparato caricamento secret Supabase | Aggiunto script PowerShell per caricare `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` da variabili d'ambiente locali. |
 | 2026-06-24 | Scelta Supabase esistente | Confermato che esiste solo il progetto Supabase Bitcoin; ETH usera lo stesso progetto con tabella `telegram_subscribers_eth`. |
+| 2026-06-24 | Da rinominare Supabase | Il progetto Supabase condiviso non dovrebbe chiamarsi `btc-prudential-signal`; nome consigliato `crypto-prudential-signal`. |

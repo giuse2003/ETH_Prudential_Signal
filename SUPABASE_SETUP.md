@@ -13,7 +13,9 @@ Non inserire token o chiavi Supabase nei file del repository.
 
 1. Apri <https://supabase.com/dashboard>.
 2. Accedi oppure crea un account.
-3. Seleziona il progetto Supabase gia usato per Bitcoin, se disponibile.
+3. Seleziona il progetto Supabase condiviso. Se oggi si chiama
+   `btc-prudential-signal`, rinominalo con un nome neutro, ad esempio
+   `crypto-prudential-signal`.
 
 ## 2. Progetto Supabase
 
@@ -24,8 +26,10 @@ La configurazione corrente usa una tabella dedicata:
 public.telegram_subscribers_eth
 ```
 
-Quindi puoi riusare il progetto Supabase Bitcoin senza mescolare gli iscritti
-BTC e ETH.
+Quindi puoi riusare lo stesso progetto Supabase senza mescolare gli iscritti
+BTC e ETH. Se il progetto esistente si chiama `btc-prudential-signal`,
+rinominalo in `crypto-prudential-signal` o in un altro nome neutro prima di
+proseguire.
 
 Se invece vuoi isolamento totale tra i due progetti, crea un nuovo progetto
 Supabase con:
@@ -37,6 +41,19 @@ Region: una regione europea vicina, ad esempio Frankfurt
 
 La password del database non serve al codice attuale, ma va conservata in un
 password manager se crei un nuovo progetto.
+
+### Rinominare il progetto Supabase esistente
+
+Nel pannello Supabase:
+
+1. apri il progetto `btc-prudential-signal`;
+2. vai in **Project Settings**;
+3. apri la sezione **General**;
+4. modifica il nome del progetto in `crypto-prudential-signal`;
+5. salva.
+
+Il rename cambia il nome visualizzato nel pannello Supabase. Non dovrebbe
+cambiare il Project URL o il project ref usato dalle API.
 
 ## 3. Crea la tabella
 
@@ -129,7 +146,7 @@ dal comando `/iscrivimi`.
 Quando hai completato i passaggi, comunica soltanto:
 
 ```text
-Progetto Supabase creato.
+Progetto Supabase rinominato in crypto-prudential-signal.
 Script SQL eseguito.
 Tabella telegram_subscribers_eth presente.
 RLS enabled: true.

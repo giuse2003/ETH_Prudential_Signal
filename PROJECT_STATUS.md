@@ -61,6 +61,8 @@ Decisione attuale:
 - usare una tabella ETH dedicata: `public.telegram_subscribers_eth`;
 - questa scelta consente di riusare lo stesso progetto Supabase del BTC senza
   mescolare iscritti o stati di iscrizione.
+- il progetto Supabase condiviso va rinominato da `btc-prudential-signal` a un
+  nome neutro, consigliato `crypto-prudential-signal`.
 
 Da completare:
 

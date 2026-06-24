@@ -370,6 +370,10 @@ La tabella operativa ETH e `public.telegram_subscribers_eth`, separata da
 eventuali tabelle del progetto BTC anche quando si riusa lo stesso progetto
 Supabase.
 
+Se il progetto Supabase condiviso si chiama ancora `btc-prudential-signal`, va
+rinominato con un nome neutro come `crypto-prudential-signal`. La separazione
+operativa resta comunque affidata alle tabelle dedicate.
+
 La tabella ha Row Level Security attiva e forzata. I ruoli `anon` e
 `authenticated` non hanno accesso; il Worker usa `service_role`.
 
