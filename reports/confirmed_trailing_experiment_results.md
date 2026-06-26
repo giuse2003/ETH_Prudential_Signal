@@ -85,3 +85,54 @@ Risultati del backtest (con commissioni 0.25% ad operazione incluse):
 - **Risoluzione falsi stop:** Questa variante evita del tutto le uscite inutili durante i ritracciamenti rialzisti (come il whipsaw del 11-01-2021), pur mantenendo la protezione dei grandi crash (Dicembre 2021, Gennaio 2025).
 - **Stato in progress:** Il trailing stop dinamico 15%/8% diventa il nuovo candidato di punta per la strategia di gestione del rischio, superando sia il trailing fisso all'8% sia la baseline SMA50.
 
+---
+
+## Sensibilità Trailing Stop: 8% vs 6% vs 4% (Caso Studio: Novembre 2021)
+
+Per analizzare il comportamento del trailing stop di fronte a improvvisi crolli giornalieri (es. le candele del 16 e 26 Novembre 2021), sono state simulate varianti più strette (6% e 4%) sul periodo critico dal 08 al 30 Novembre 2021 (costi di transazione dello 0.25% inclusi):
+
+- **Trailing Stop 8%**: Rendimento del periodo **-3.13%**. Ha subito solo l'uscita del 16-11 (con rientro il 23-11), ma ha resistito con successo al ribasso del 26-11 (Close a $4030.91, sopra lo stop di $3993.50), partecipando al successivo rialzo fino a $4631.48.
+- **Trailing Stop 6%**: Rendimento del periodo **-15.90%**. Stoppato il 26-11 (il Close a $4030.91 ha violato lo stop a $4080.32) e costretto a riacquistare il 30-11 a $4631.48.
+- **Trailing Stop 4%**: Rendimento del periodo **-9.10%**. Stoppato sia il 15-11 sia il 26-11, accumulando costi e perdite da riacquisto tardivo.
+
+Su base storica completa (2017-2026):
+- **Trailing Stop 8%**: Sharpe = 0.6856, Operazioni = 51, Rendimento Totale = +420.33%
+- **Trailing Stop 6%**: Sharpe = 0.7040, Operazioni = 65, Rendimento Totale = +432.41%
+- **Trailing Stop 4%**: Sharpe = 0.4147, Operazioni = 87, Rendimento Totale = +106.84%
+
+**Conclusione**: Ridurre ciecamente lo stop aumenta a dismisura i falsi stop ("whipsaws"). La chiusura del 26-11 ha dimostrato che una maggiore tolleranza (8%) permette di non farsi buttare fuori dal mercato in prossimità del bottom.
+
+---
+
+## Esecuzione Intraday "Al Tocco" vs Chiusura Giornaliera
+
+È stata valutata l'opportunità di uscire a mercato non appena il prezzo minimo tocca il trailing stop (`Low <= StopLevel`) anziché attendere la chiusura della candela giornaliera.
+
+Risultati del periodo (Nov 8 - Nov 30, 2021):
+- **Esecuzione alla Chiusura (Close Stop 8%)**: Rendimento **-3.13%**
+- **Esecuzione Intraday (Intraday Stop 8%)**: Rendimento **-12.75%** (attivato lo stop intraday a $3993.50 il 26-11 a causa del minimo a $3933.51, rientrando a $4631.48 il 30-11).
+
+Su base storica completa (2017-2026):
+- **Esecuzione alla Chiusura**: Sharpe = 0.6856, Rendimento Totale = +420.33%
+- **Esecuzione Intraday**: Sharpe = 0.6575, Rendimento Totale = +347.35%
+
+**Conclusione**: L'attesa della chiusura giornaliera è un filtro fondamentale contro la volatilità intraday ("noise filtering") tipica delle criptovalute. L'esecuzione intraday aumenta i costi e cattura troppi falsi stop causati da spike ribassisti temporanei.
+
+---
+
+## Teorie Future per le Candele Profonde e Uscite Rapide
+
+Per mitigare le perdite causate da singole giornate fortemente ribassiste (es. 26-11-2021, 03-12-2021) senza subire il whipsaw derivante da stop eccessivamente stretti, si propongono tre filoni di ricerca futuri:
+
+1. **Trailing Stop Dinamico basato sull'Estensione (RSI/Distanza SMA)**:
+   - *Idea*: Stringere lo stop (es. da 8% a 4%) quando il mercato è in forte ipercomprato (es. RSI >= 70) o molto distante dalle medie di riferimento (es. > 40% dalla SMA50/200).
+   - *Razionale*: Quando il prezzo è molto esteso, il rischio di inversione violenta è alto. Stringere lo stop protegge i profitti massimi riducendo il drawdown di uscita. In condizioni normali lo stop rimane largo (8%) per tollerare il rumore.
+
+2. **Chandelier Exit (ATR)**:
+   - *Idea*: Utilizzare un trailing stop basato sulla volatilità storica calcolato come `Massimo Prezzo - (N * ATR)`.
+   - *Razionale*: Nelle fasi di consolidamento a bassa volatilità, l'ATR diminuisce e lo stop si stringe automaticamente, proteggendo tempestivamente il capitale in caso di breakout ribassista improvviso. Nelle fasi ad alta volatilità lo stop si allarga per evitare whipsaw.
+
+3. **Dual Timeframe Exit (Uscite multi-timeframe)**:
+   - *Idea*: Eseguire l'ingresso basandosi sul grafico Daily (per stabilità), ma gestire l'uscita monitorando chiusure su grafici a timeframe inferiore (es. H4 o H1).
+   - *Razionale*: Se inizia un crash profondo, attendere la fine della giornata (Daily Close) espone all'intera perdita giornaliera. La chiusura di una candela H4 o H1 consente di confermare un'inversione e uscire entro poche ore dall'inizio del ribasso.
+
