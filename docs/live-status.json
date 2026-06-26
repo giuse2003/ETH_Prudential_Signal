@@ -1,9 +1,9 @@
 {
-  "signal": "VENDI",
-  "price_usd": 1558.84,
-  "price_eur": 1367.56,
-  "volume_24h_usd": 15000575406.0,
-  "last_update": "2026-06-26 15:07:35 UTC",
+  "signal": "MANTIENI",
+  "price_usd": 1582.94,
+  "price_eur": 1389.47,
+  "volume_24h_usd": 14781605869.0,
+  "last_update": "2026-06-26 17:13:00 UTC",
   "status": "Attivo",
   "condition_groups": {
     "buy": [
@@ -30,8 +30,8 @@
     ],
     "sell": [
       {
-        "label": "prezzo live sotto SMA50 live per 2 giorni consecutivi",
-        "passed": true
+        "label": "prezzo live inferiore o uguale allo stop level di trailing (8% dal picco)",
+        "passed": false
       }
     ]
   }

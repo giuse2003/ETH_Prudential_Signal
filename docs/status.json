@@ -1,9 +1,9 @@
 {
-  "price_usd": 1560.925,
-  "price_eur": 1369.665,
-  "signal": "VENDI",
+  "price_usd": 1584.5,
+  "price_eur": 1391.245,
+  "signal": "MANTIENI",
   "risk_level": "ALTO",
-  "last_update": "2026-06-26 15:07:35",
+  "last_update": "2026-06-26 17:13:00",
   "status": "Attivo",
   "rsi": 34.178233039087104,
   "sma50": 1950.6656713867187,
@@ -15,7 +15,9 @@
   "close_last_candle": 1624.0799560546875,
   "previous_close": 1665.436767578125,
   "previous_sma50": 1965.407724609375,
-  "below_sma50_2d": true,
+  "trailing_stop_triggered": false,
+  "stop_level": null,
+  "peak_close": null,
   "condition_groups": {
     "buy": [
       {
@@ -41,8 +43,8 @@
     ],
     "sell": [
       {
-        "label": "prezzo sotto SMA50 per 2 giorni consecutivi",
-        "passed": true
+        "label": "prezzo inferiore o uguale allo stop level di trailing (8% dal picco)",
+        "passed": false
       }
     ]
   }
