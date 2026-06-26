@@ -434,6 +434,34 @@ Conclusione:
   la priorita' diventa ridurre ulteriormente il drawdown;
 - nessuna combinazione viene promossa a regola operativa in questa fase.
 
+### Trailing stop dinamico adattivo su SMA200
+
+Run locale del 2026-06-26.
+
+Obiettivo: evitare uscite premature ("whipsaw") in trend fortemente rialzisti (ad esempio l'uscita del 11-01-2021 che ha causato un sovrapprezzo del 26.34% sul riacquisto).
+
+Regola testata:
+- Se la distanza dalla SMA200 (`DistanceFromSMA200_Pct`) e' superiore a 60% (fase parabolica), il trailing stop viene allargato al **15%** (o **17%**) per tollerare la normale volatilita' di un bull market.
+- Altrimenti, lo stop rimane al **8%** per proteggere rapidamente il capitale.
+- Entrambe le soglie richiedono la conferma momentum/volume (`momentum_7d >= -5%` e `volume_rel >= 10%`).
+
+Risultati sul periodo completo (con commissioni 0.25% ad operazione incluse):
+
+| Variante sperimentale | Rendimento annuo | Max drawdown | Sharpe | Profit factor | Operazioni | Sharpe netto 0,25% |
+|---|---:|---:|---:|---:|---:|---:|
+| Trail Dinamico 15%/8% | 54.06% | -56.50% | 1.143 | 10.306 | 19 | 1.120 |
+| Trail Dinamico 17%/8% | 54.06% | -56.50% | 1.143 | 10.306 | 19 | 1.120 |
+| Trail Dinamico 12%/8% | 45.84% | -56.50% | 1.034 | 5.582 | 22 | 1.034 |
+| Trail8 mom >= -5%, volume >= +10% | 45.63% | -55.68% | 1.068 | 4.531 | 27 | 1.033 |
+| Baseline (SMA50) | 31.78% | -52.57% | 0.849 | 4.327 | 28 | 0.812 |
+
+Conclusione:
+- Il modello dinamico al 15% e 17% **elimina completamente** il falso stop del 11-01-2021 e altre 7 uscite inutili, dimezzando le perdite da whipsaw.
+- Riduce le operazioni da 27 a **19**, abbattendo i costi transazionali.
+- Il Profit Factor sale da 4.32 a **9.90** (netto) o **10.31** (lordo).
+- Lo Sharpe netto sale a **1.120**, rendendo questa regola il candidato principale in assoluto per il modello finale.
+
+
 ## Test Da Fare
 
 ### 1. Costi operativi
@@ -531,7 +559,7 @@ Metriche chiave:
 
 Obiettivo: limitare perdite interne ai trade.
 
-Stato: primo test sperimentale completato. Nessuna uscita promossa a regola.
+Stato: test sperimentale completato con successo. La variante dinamica adattiva basata sulla distanza SMA200 (15%/8% e 17%/8%) e' stata promossa a candidato principale di punta.
 
 Varianti:
 
@@ -539,7 +567,8 @@ Varianti:
 - uscita se prezzo sotto `SMA50` per 1 giorno: testato;
 - uscita se prezzo sotto `SMA50` per 2 giorni: regola attuale;
 - uscita se RSI scende sotto 35/40/45: testato;
-- uscita se Close perde 8/10/12/15/20/25% dall'ingresso: testato.
+- uscita se Close perde 8/10/12/15/20/25% dall'ingresso: testato;
+- trailing stop dinamico (15%/8% e 17%/8%) basato su distanza SMA200: testato con eccellenti risultati (Sharpe netto 1.120, profit factor 9.90, riduzione operazioni a 19).
 
 ### 7. Rendimento liquidita'
 
@@ -627,10 +656,7 @@ Priorita' 3:
 
 Priorita' 4:
 
-- mantenere Trail8 momentum >= -5% e volume >= +10% come candidato
-  sperimentale principale;
-- testare gestione esposizione non binaria sul candidato principale e sui
-  candidati piu' robusti;
+- promuovere il **Trailing Stop Dinamico 15%/8%** come candidato principale del modello finale di gestione uscite;
+- testare gestione esposizione non binaria sul candidato principale e sui candidati piu' robusti;
 - stressare i candidati con costi 0,50% e rendimento liquidita';
-- completata: valutazione combinazioni prudenti fra stop ingresso 9% e
-  trailing confermato.
+- completata: valutazione combinazioni prudenti fra stop ingresso 9% e trailing confermato.

@@ -82,10 +82,17 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     """
     Classificazione stretta:
     ACQUISTA se TUTTE le condizioni rialziste sono vere.
-    VENDI se il prezzo chiude sotto SMA50 per due giorni consecutivi.
+    VENDI se scatta il Trailing Stop dell'8% dal picco massimo di Close registrato
+    da quando si è in posizione.
     Altrimenti MANTIENI.
     """
     df = df.copy()
+
+    if df.empty:
+        df["PeakClose"] = np.nan
+        df["StopLevel"] = np.nan
+        df["Segnale"] = np.array([], dtype=object)
+        return df
 
     close = df["Close"]
     sma50 = df["SMA50"]
@@ -94,7 +101,7 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     volume = df["Volume"]
     volume_avg20 = df["VolumeAvg20"]
     days = CFG.momentum_days
-    close_momentum = df[f"Close_{days}d_ago"]
+    close_momentum = df[f"Close_{days}d_ago"] if f"Close_{days}d_ago" in df.columns else pd.Series(np.nan, index=df.index)
 
     buy_cond = (
         (close > sma200) &
@@ -104,14 +111,56 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
         (volume > volume_avg20)
     )
 
-    below_sma50 = close < sma50
-    sell_cond = below_sma50 & below_sma50.shift(1).fillna(False)
+    signals = []
+    peak_closes = []
+    stop_levels = []
 
-    signal = np.full(len(df), "MANTIENI", dtype=object)
-    signal[buy_cond] = "ACQUISTA"
-    signal[sell_cond] = "VENDI"
-    
-    df["Segnale"] = signal
+    in_position = False
+    peak_close = np.nan
+    stop_level = np.nan
+
+    for idx, c_val in close.items():
+        is_buy = buy_cond.loc[idx]
+        if pd.isna(is_buy):
+            is_buy = False
+
+        sig = "MANTIENI"
+        if not in_position:
+            if is_buy:
+                in_position = True
+                peak_close = c_val
+                stop_level = peak_close * 0.92
+                sig = "ACQUISTA"
+            else:
+                peak_close = np.nan
+                stop_level = np.nan
+        else:
+            if pd.isna(peak_close):
+                peak_close = c_val
+            else:
+                peak_close = max(peak_close, c_val)
+            
+            stop_level = peak_close * 0.92
+            
+            if c_val <= stop_level:
+                in_position = False
+                sig = "VENDI"
+                peak_closes.append(peak_close)
+                stop_levels.append(stop_level)
+                signals.append(sig)
+                peak_close = np.nan
+                stop_level = np.nan
+                continue
+            else:
+                sig = "MANTIENI"
+
+        peak_closes.append(peak_close)
+        stop_levels.append(stop_level)
+        signals.append(sig)
+
+    df["PeakClose"] = peak_closes
+    df["StopLevel"] = stop_levels
+    df["Segnale"] = signals
     return df
 
 
@@ -252,7 +301,6 @@ def live_condition_statuses(
     df_with_signals: pd.DataFrame,
 ) -> tuple[list[bool], list[bool]]:
     row = df_with_signals.iloc[-1]
-    previous = df_with_signals.iloc[-2] if len(df_with_signals) >= 2 else None
     momentum_col = f"Close_{CFG.momentum_days}d_ago"
 
     buy_statuses = [
@@ -262,13 +310,13 @@ def live_condition_statuses(
         bool(row["Close"] > row[momentum_col]),
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
-    sell_statuses = [
-        bool(
-            row["Close"] < row["SMA50"]
-            and previous is not None
-            and previous["Close"] < previous["SMA50"]
-        )
-    ]
+    
+    stop_lvl = row.get("StopLevel")
+    if pd.isna(stop_lvl):
+        sell_statuses = [False]
+    else:
+        sell_statuses = [bool(row["Close"] <= stop_lvl)]
+        
     return buy_statuses, sell_statuses
 
 
@@ -342,14 +390,11 @@ def _buy_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
 
 
 def _sell_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
-    if len(df_with_signals) < 2:
-        return [False]
-
-    previous = df_with_signals.iloc[-2]
     row = df_with_signals.iloc[-1]
-    return [
-        bool(row["Close"] < row["SMA50"] and previous["Close"] < previous["SMA50"])
-    ]
+    stop_lvl = row.get("StopLevel")
+    if pd.isna(stop_lvl):
+        return [False]
+    return [bool(row["Close"] <= stop_lvl)]
 
 
 def explain_latest_row(

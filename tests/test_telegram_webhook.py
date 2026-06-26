@@ -105,7 +105,7 @@ class TelegramWebhookTests(unittest.TestCase):
                     ],
                     "sell": [
                         {
-                            "label": "prezzo sotto SMA50 per 2 giorni consecutivi",
+                            "label": "prezzo inferiore o uguale allo stop level di trailing (8% dal picco)",
                             "passed": True,
                         }
                     ],
