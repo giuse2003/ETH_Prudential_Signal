@@ -7,6 +7,7 @@ Generazione report:
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import matplotlib.dates as mdates
@@ -153,6 +154,7 @@ def save_backtest_json(
     out_path: str | Path,
     start_date=None,
     end_date=None,
+    cost_scenarios: dict | None = None,
 ) -> Path:
     """
     Salva le metriche di backtest usate dalla dashboard.
@@ -168,19 +170,11 @@ def save_backtest_json(
             "start_date": _json_date(start_date),
             "end_date": _json_date(end_date),
         },
-        "strategy": {
-            "total_return": _json_float(metrics_strategy.total_return),
-            "annualized_return": _json_float(metrics_strategy.annualized_return),
-            "max_drawdown": _json_float(metrics_strategy.max_drawdown),
-            "num_operations": int(metrics_strategy.num_operations),
-            "win_rate": _json_float(metrics_strategy.win_rate),
-            "sharpe_ratio": _json_float(metrics_strategy.sharpe_ratio),
-        },
-        "buy_hold": {
-            "total_return": _json_float(metrics_bh.total_return),
-            "annualized_return": _json_float(metrics_bh.annualized_return),
-            "max_drawdown": _json_float(metrics_bh.max_drawdown),
-            "sharpe_ratio": _json_float(metrics_bh.sharpe_ratio),
+        "strategy": _metrics_payload(metrics_strategy),
+        "buy_hold": _metrics_payload(metrics_bh),
+        "cost_scenarios": {
+            label: _metrics_payload(metrics)
+            for label, metrics in (cost_scenarios or {}).items()
         },
         "last_update": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
     }
@@ -188,10 +182,37 @@ def save_backtest_json(
     return out_path
 
 
+def _metrics_payload(metrics) -> dict:
+    payload = {
+        "total_return": _json_float(metrics.total_return),
+        "annualized_return": _json_float(metrics.annualized_return),
+        "max_drawdown": _json_float(metrics.max_drawdown),
+        "num_operations": int(metrics.num_operations),
+        "win_rate": _json_float(metrics.win_rate),
+        "sharpe_ratio": _json_float(metrics.sharpe_ratio),
+        "profit_factor": _json_float(metrics.profit_factor),
+        "average_trade_return": _json_float(metrics.average_trade_return),
+        "median_trade_return": _json_float(metrics.median_trade_return),
+        "average_win": _json_float(metrics.average_win),
+        "average_loss": _json_float(metrics.average_loss),
+        "best_trade": _json_float(metrics.best_trade),
+        "worst_trade": _json_float(metrics.worst_trade),
+        "average_trade_days": _json_float(metrics.average_trade_days),
+        "median_trade_days": _json_float(metrics.median_trade_days),
+        "exposure_ratio": _json_float(metrics.exposure_ratio),
+        "turnover": _json_float(metrics.turnover),
+        "transaction_cost_rate": _json_float(metrics.transaction_cost_rate),
+    }
+    return payload
+
+
 def _json_float(value) -> float | None:
     if value is None or pd.isna(value):
         return None
-    return float(value)
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    return number
 
 
 def _json_date(value) -> str | None:
@@ -273,6 +294,11 @@ def save_text_report(
     lines.append(f"- Numero operazioni: {metrics_strategy.num_operations}")
     lines.append(f"- % operazioni vincenti: {metrics_strategy.win_rate*100:.1f}%")
     lines.append(f"- Sharpe Ratio: {metrics_strategy.sharpe_ratio:.3f}")
+    lines.append(f"- Profit factor: {metrics_strategy.profit_factor:.3f}")
+    lines.append(f"- Rendimento medio trade: {fmt_pct(metrics_strategy.average_trade_return)}")
+    lines.append(f"- Trade migliore: {fmt_pct(metrics_strategy.best_trade)}")
+    lines.append(f"- Trade peggiore: {fmt_pct(metrics_strategy.worst_trade)}")
+    lines.append(f"- Esposizione media: {fmt_pct(metrics_strategy.exposure_ratio)}")
     lines.append("")
 
     lines.append("Buy & Hold")

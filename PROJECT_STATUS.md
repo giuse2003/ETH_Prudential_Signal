@@ -1,6 +1,6 @@
 # Project Status
 
-Ultimo aggiornamento: 2026-06-24
+Ultimo aggiornamento: 2026-06-26
 
 ## Obiettivo
 
@@ -15,6 +15,24 @@ Cloudflare.
 - Pipeline dati Yahoo Finance operativa per `ETH-USD` e `ETH-EUR`.
 - Backtest riallineato dalla prima data comune reale `ETH-USD` / `ETH-EUR`
   (`2017-11-11` nel run corrente), senza riempimento EUR all'indietro.
+- Backtest esteso con profit factor, metriche qualita' trade, turnover e
+  scenari costo/slippage.
+- Esperimenti modello isolati in `scripts/run_model_experiments.py`; non
+  modificano i segnali ufficiali.
+- Esperimenti uscite protettive isolati in `scripts/run_exit_experiments.py`;
+  non modificano i segnali ufficiali.
+- Approfondimento stop loss da ingresso isolato in
+  `scripts/run_stop_loss_experiments.py`; non modifica i segnali ufficiali.
+- Approfondimento trailing stop su Close isolato in
+  `scripts/run_trailing_stop_experiments.py`; non modifica i segnali ufficiali.
+- Esperimento trailing stop 8% con conferma momentum/volume isolato in
+  `scripts/run_confirmed_trailing_experiments.py`; non modifica i segnali
+  ufficiali.
+- Validazione candidati principali isolata in
+  `scripts/run_candidate_validation.py`; confronta periodo completo,
+  sottoperiodi e walk-forward senza modificare i segnali ufficiali.
+- Test combinazioni stop ingresso/trailing confermato isolato in
+  `scripts/run_combined_exit_experiments.py`; non modifica i segnali ufficiali.
 - Prezzi spot Coinbase disponibili in USD ed EUR.
 - Indicatori, strategia, rischio, report e dashboard implementati.
 - Backtest dashboard alimentato da `docs/backtest.json`, non piu hard-coded.
@@ -43,7 +61,7 @@ node --check cloudflare-worker\src\worker.js
 Risultato:
 
 ```text
-Ran 55 tests
+Ran 57 tests
 OK
 ```
 
@@ -74,6 +92,20 @@ Da completare:
 - `ETH_PROJECT_ROADMAP.md`: roadmap operativa aggiornata.
 - `MODEL_IMPROVEMENT_ROADMAP.md`: baseline e piano test per migliorare il
   modello.
+- `scripts/run_model_experiments.py`: runner sperimentale per confrontare
+  filtri senza variare la strategia produttiva.
+- `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
+  uscite protettive senza variare la strategia produttiva.
+- `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare
+  stop loss da ingresso senza variare la strategia produttiva.
+- `scripts/run_trailing_stop_experiments.py`: runner sperimentale per
+  analizzare trailing stop su Close senza variare la strategia produttiva.
+- `scripts/run_confirmed_trailing_experiments.py`: runner sperimentale per
+  analizzare trailing stop 8% confermato da momentum/volume.
+- `scripts/run_candidate_validation.py`: runner sperimentale per validare i
+  candidati principali su periodo completo, sottoperiodi e walk-forward.
+- `scripts/run_combined_exit_experiments.py`: runner sperimentale per combinare
+  stop ingresso e trailing confermato.
 - `config.py`: configurazione centralizzata.
 - `main.py`: esecuzione completa locale.
 - `hourly_monitor.py`: monitor GitHub Actions.
@@ -88,5 +120,5 @@ Da completare:
 ## Ambito Rinviato
 
 - Broadcast automatico a tutti gli iscritti Supabase.
-- Costi di transazione, spread, slippage e rendimento liquidita nel backtest.
+- Rendimento liquidita nel backtest.
 - Pulizia completa dei file legacy Render/FastAPI.

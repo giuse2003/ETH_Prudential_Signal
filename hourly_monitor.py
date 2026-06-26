@@ -35,7 +35,7 @@ from strategy.signals import (
 )
 from state.state_store import MonitorState, load_state, save_state
 from reports.generate import save_backtest_json, save_chart_data_json, save_live_status_json, save_status_json
-from backtest.backtest import run_backtest
+from backtest.backtest import run_backtest, run_transaction_cost_scenarios
 
 
 LIVE_STABILITY_MINUTES = 30
@@ -287,12 +287,14 @@ def main() -> None:
     save_status_json(df_sig, price_eur=spot_eur, price_usd=spot_usd, out_path=status_json_path)
     save_chart_data_json(df_sig, out_path=project_root / "reports" / "chart-data.json")
     equity_df, metrics_strategy, metrics_bh = run_backtest(df_sig[["Close", "Segnale"]].copy())
+    cost_scenarios = run_transaction_cost_scenarios(df_sig[["Close", "Segnale"]].copy())
     save_backtest_json(
         metrics_strategy=metrics_strategy,
         metrics_bh=metrics_bh,
         out_path=project_root / "reports" / "backtest.json",
         start_date=equity_df.index[0],
         end_date=equity_df.index[-1],
+        cost_scenarios=cost_scenarios,
     )
 
     # 7) Salvataggio stato

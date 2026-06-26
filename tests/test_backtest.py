@@ -62,6 +62,50 @@ class BacktestMetricsTests(unittest.TestCase):
         self.assertEqual(metrics.num_operations, 0)
         self.assertEqual(metrics.win_rate, 0.0)
 
+    def test_transaction_cost_is_charged_on_entry_and_exit(self) -> None:
+        index = pd.date_range("2026-01-01", periods=4, freq="D")
+        df = pd.DataFrame(
+            {
+                "Close": [100, 110, 110, 110],
+                "Segnale": ["ACQUISTA", "MANTIENI", "VENDI", "MANTIENI"],
+            },
+            index=index,
+        )
+
+        equity_gross, metrics_gross, _ = run_backtest(df)
+        equity_net, metrics_net, _ = run_backtest(df, transaction_cost_rate=0.01)
+
+        self.assertAlmostEqual(float(equity_gross["Turnover"].sum()), 2.0)
+        self.assertAlmostEqual(float(equity_net["Turnover"].sum()), 2.0)
+        self.assertAlmostEqual(metrics_net.transaction_cost_rate, 0.01)
+        self.assertLess(metrics_net.total_return, metrics_gross.total_return)
+        self.assertAlmostEqual(equity_net["EquityStrategy"].iloc[-1], 1.0791, places=6)
+
+    def test_profit_factor_uses_completed_trade_returns(self) -> None:
+        index = pd.date_range("2026-01-01", periods=7, freq="D")
+        df = pd.DataFrame(
+            {
+                "Close": [100, 100, 110, 110, 110, 99, 99],
+                "Segnale": [
+                    "ACQUISTA",
+                    "MANTIENI",
+                    "VENDI",
+                    "ACQUISTA",
+                    "MANTIENI",
+                    "VENDI",
+                    "MANTIENI",
+                ],
+            },
+            index=index,
+        )
+
+        _, metrics, _ = run_backtest(df)
+
+        self.assertEqual(metrics.num_operations, 2)
+        self.assertAlmostEqual(metrics.average_win, 0.10)
+        self.assertAlmostEqual(metrics.average_loss, -0.10)
+        self.assertAlmostEqual(metrics.profit_factor, 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

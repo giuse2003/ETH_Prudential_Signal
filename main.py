@@ -41,7 +41,7 @@ from reports.generate import (
     save_status_json,
 )
 from strategy.signals import compute_signals
-from backtest.backtest import run_backtest
+from backtest.backtest import run_backtest, run_transaction_cost_scenarios
 from notifications.telegram import TelegramConfig, send_telegram_message
 
 
@@ -97,6 +97,7 @@ def main() -> None:
     # 5) Backtest: strategia proposta vs Buy & Hold
     bt_input = df_signals[["Close", "Segnale"]].copy()
     equity_df, metrics_strategy, metrics_bh = run_backtest(bt_input, initial_capital=args.initial_capital)
+    cost_scenarios = run_transaction_cost_scenarios(bt_input, initial_capital=args.initial_capital)
     equity_df.to_csv(out_reports / "equity_timeseries.csv", index=True)
     save_backtest_json(
         metrics_strategy=metrics_strategy,
@@ -104,6 +105,7 @@ def main() -> None:
         out_path=out_reports / "backtest.json",
         start_date=equity_df.index[0],
         end_date=equity_df.index[-1],
+        cost_scenarios=cost_scenarios,
     )
 
     # 6) Output richiesti

@@ -33,6 +33,7 @@ const els = {
   strategyReturn: document.getElementById("strategyReturn"),
   strategyDrawdown: document.getElementById("strategyDrawdown"),
   strategySharpe: document.getElementById("strategySharpe"),
+  strategyProfitFactor: document.getElementById("strategyProfitFactor"),
   buyHoldDrawdown: document.getElementById("buyHoldDrawdown"),
   strategyComparisonReturn: document.getElementById("strategyComparisonReturn"),
   buyHoldComparisonReturn: document.getElementById("buyHoldComparisonReturn"),
@@ -248,11 +249,15 @@ async function loadBacktestMetrics() {
     const strategyDrawdown = Number(strategy.max_drawdown);
     const buyHoldDrawdown = Number(buyHold.max_drawdown);
     const strategySharpe = Number(strategy.sharpe_ratio);
+    const strategyProfitFactor = Number(strategy.profit_factor);
     const period = payload.period || {};
 
     els.strategyReturn.textContent = formatPercent(strategyReturn, { signed: true });
     els.strategyDrawdown.textContent = formatPercent(strategyDrawdown);
     els.strategySharpe.textContent = formatRatio(strategySharpe);
+    if (els.strategyProfitFactor) {
+      els.strategyProfitFactor.textContent = `Profit factor ${formatRatio(strategyProfitFactor)}`;
+    }
     els.buyHoldDrawdown.textContent =
       `Contro ${formatPercent(buyHoldDrawdown)} del Buy & Hold`;
     els.strategyComparisonReturn.textContent =

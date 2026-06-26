@@ -30,6 +30,24 @@ class BacktestMetrics:
     num_operations: int
     win_rate: float
     sharpe_ratio: float
+    profit_factor: float = float("nan")
+    average_trade_return: float = float("nan")
+    median_trade_return: float = float("nan")
+    average_win: float = float("nan")
+    average_loss: float = float("nan")
+    best_trade: float = float("nan")
+    worst_trade: float = float("nan")
+    average_trade_days: float = float("nan")
+    median_trade_days: float = float("nan")
+    exposure_ratio: float = 0.0
+    turnover: float = 0.0
+    transaction_cost_rate: float = 0.0
+
+
+@dataclass(frozen=True)
+class CompletedTrade:
+    total_return: float
+    days: int
 
 
 def _max_drawdown(equity: pd.Series) -> float:
@@ -62,10 +80,10 @@ def _sharpe_ratio(daily_returns: pd.Series, risk_free_rate: float = 0.0) -> floa
     return float(np.sqrt(CFG.periods_per_year) * mean_excess / std)
 
 
-def _completed_trade_returns(
+def _completed_trades(
     effective_exposure: pd.Series,
     daily_strategy_returns: pd.Series,
-) -> list[float]:
+) -> list[CompletedTrade]:
     """
     Restituisce i rendimenti dei soli trade long completati.
 
@@ -74,7 +92,7 @@ def _completed_trade_returns(
     entra nel numero operazioni ne' nel win rate.
     """
     active = effective_exposure.gt(0.0)
-    trade_returns: list[float] = []
+    trades: list[CompletedTrade] = []
     start_pos: int | None = None
 
     for pos, is_active in enumerate(active.to_numpy()):
@@ -82,10 +100,67 @@ def _completed_trade_returns(
             start_pos = pos
         elif not is_active and start_pos is not None:
             returns = daily_strategy_returns.iloc[start_pos:pos].fillna(0.0)
-            trade_returns.append(float((1.0 + returns).prod() - 1.0))
+            trades.append(
+                CompletedTrade(
+                    total_return=float((1.0 + returns).prod() - 1.0),
+                    days=pos - start_pos,
+                )
+            )
             start_pos = None
 
-    return trade_returns
+    return trades
+
+
+def _completed_trade_returns(
+    effective_exposure: pd.Series,
+    daily_strategy_returns: pd.Series,
+) -> list[float]:
+    return [
+        trade.total_return
+        for trade in _completed_trades(effective_exposure, daily_strategy_returns)
+    ]
+
+
+def _trade_quality_metrics(
+    completed_trades: list[CompletedTrade],
+) -> dict[str, float]:
+    if not completed_trades:
+        return {
+            "profit_factor": float("nan"),
+            "average_trade_return": float("nan"),
+            "median_trade_return": float("nan"),
+            "average_win": float("nan"),
+            "average_loss": float("nan"),
+            "best_trade": float("nan"),
+            "worst_trade": float("nan"),
+            "average_trade_days": float("nan"),
+            "median_trade_days": float("nan"),
+        }
+
+    returns = pd.Series([trade.total_return for trade in completed_trades], dtype=float)
+    durations = pd.Series([trade.days for trade in completed_trades], dtype=float)
+    wins = returns[returns > 0.0]
+    losses = returns[returns <= 0.0]
+    gross_profit = float(wins.sum())
+    gross_loss = float(losses.sum())
+    if gross_loss < 0.0:
+        profit_factor = gross_profit / abs(gross_loss)
+    elif gross_profit > 0.0:
+        profit_factor = float("inf")
+    else:
+        profit_factor = float("nan")
+
+    return {
+        "profit_factor": profit_factor,
+        "average_trade_return": float(returns.mean()),
+        "median_trade_return": float(returns.median()),
+        "average_win": float(wins.mean()) if not wins.empty else float("nan"),
+        "average_loss": float(losses.mean()) if not losses.empty else float("nan"),
+        "best_trade": float(returns.max()),
+        "worst_trade": float(returns.min()),
+        "average_trade_days": float(durations.mean()),
+        "median_trade_days": float(durations.median()),
+    }
 
 
 def exposure_from_signal(signals: pd.Series, exposure_map: dict[str, float]) -> pd.Series:
@@ -97,7 +172,11 @@ def exposure_from_signal(signals: pd.Series, exposure_map: dict[str, float]) -> 
     return signals.map(lambda s: exposure_map.get(s, default)).astype(float)
 
 
-def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.DataFrame, BacktestMetrics, BacktestMetrics]:
+def run_backtest(
+    df: pd.DataFrame,
+    initial_capital: float = 1.0,
+    transaction_cost_rate: float = 0.0,
+) -> tuple[pd.DataFrame, BacktestMetrics, BacktestMetrics]:
     """
     Parametri
     ----------
@@ -105,6 +184,9 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
         DataFrame con index datetime e colonne:
         - Close
         - Segnale
+    transaction_cost_rate:
+        Costo proporzionale applicato a ogni cambio di esposizione.
+        Esempio: 0.001 = 0,10% per ingresso o uscita completa.
 
     Returns
     -------
@@ -112,6 +194,8 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
     """
     if "Close" not in df.columns or "Segnale" not in df.columns:
         raise ValueError("df deve contenere 'Close' e 'Segnale'.")
+    if transaction_cost_rate < 0:
+        raise ValueError("transaction_cost_rate non puo' essere negativo.")
 
     df = df.sort_index().copy()
 
@@ -124,9 +208,10 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
     # se segnale(t) è calcolato a chiusura t, lo applichiamo a rendimenti t->t+1,
     # quindi per il rendimento del giorno t useremo desired_exposure(t-1).
     effective_exposure = desired_exposure.shift(1).fillna(0.0)
+    turnover = effective_exposure.diff().abs().fillna(effective_exposure.abs())
 
     eth_returns = df["Close"].pct_change()
-    daily_strategy_returns = effective_exposure * eth_returns
+    daily_strategy_returns = (effective_exposure * eth_returns) - (turnover * transaction_cost_rate)
 
     # Equity strategy
     equity_strategy = (1.0 + daily_strategy_returns.fillna(0.0)).cumprod() * float(initial_capital)
@@ -142,6 +227,7 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
             "DailyReturnStrategy": daily_strategy_returns,
             "DailyReturnBuyHold": eth_returns,
             "EffectiveExposure": effective_exposure,
+            "Turnover": turnover,
         },
         index=df.index,
     )
@@ -157,15 +243,19 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
     max_dd = _max_drawdown(equity_strategy)
 
     # Operazioni e win rate
-    completed_trade_returns = _completed_trade_returns(
+    completed_trades = _completed_trades(
         effective_exposure,
         daily_strategy_returns,
     )
+    completed_trade_returns = [trade.total_return for trade in completed_trades]
     num_operations = len(completed_trade_returns)
     wins = sum(trade_return > 0.0 for trade_return in completed_trade_returns)
     win_rate = wins / float(num_operations) if num_operations else 0.0
+    quality = _trade_quality_metrics(completed_trades)
 
     sharpe_strategy = _sharpe_ratio(equity_df["DailyReturnStrategy"])
+    exposure_ratio = float(effective_exposure.gt(0.0).mean())
+    total_turnover = float(turnover.sum())
 
     metrics_strategy = BacktestMetrics(
         total_return=total_return,
@@ -174,6 +264,10 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
         num_operations=num_operations,
         win_rate=win_rate,
         sharpe_ratio=sharpe_strategy,
+        exposure_ratio=exposure_ratio,
+        turnover=total_turnover,
+        transaction_cost_rate=float(transaction_cost_rate),
+        **quality,
     )
 
     # Metriche Buy & Hold (nessuna "operazione" significativa per questa metrica)
@@ -193,7 +287,37 @@ def run_backtest(df: pd.DataFrame, initial_capital: float = 1.0) -> tuple[pd.Dat
         num_operations=0,
         win_rate=0.0,
         sharpe_ratio=bh_sharpe,
+        exposure_ratio=1.0,
+        turnover=0.0,
+        transaction_cost_rate=0.0,
     )
 
     return equity_df, metrics_strategy, metrics_bh
+
+
+def run_transaction_cost_scenarios(
+    df: pd.DataFrame,
+    initial_capital: float = 1.0,
+    cost_rates: dict[str, float] | None = None,
+) -> dict[str, BacktestMetrics]:
+    """
+    Esegue scenari di costo sulla sola strategia.
+
+    Le etichette sono intenzionalmente esplicite per poterle esportare nel JSON
+    e confrontare nel tempo.
+    """
+    rates = cost_rates or {
+        "gross_0_00pct": 0.0,
+        "cost_0_10pct": 0.001,
+        "cost_0_25pct": 0.0025,
+        "stress_0_50pct": 0.005,
+    }
+    return {
+        label: run_backtest(
+            df,
+            initial_capital=initial_capital,
+            transaction_cost_rate=rate,
+        )[1]
+        for label, rate in rates.items()
+    }
 

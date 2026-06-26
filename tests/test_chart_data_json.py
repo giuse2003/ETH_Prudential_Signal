@@ -92,6 +92,7 @@ class ChartDataJsonTests(unittest.TestCase):
                 out_path=path,
                 start_date=pd.Timestamp("2017-11-09"),
                 end_date=pd.Timestamp("2026-06-23"),
+                cost_scenarios={"cost_0_10pct": metrics_strategy},
             )
             payload = json.loads(path.read_text(encoding="utf-8"))
 
@@ -99,6 +100,8 @@ class ChartDataJsonTests(unittest.TestCase):
         self.assertEqual(payload["period"]["end_date"], "2026-06-23")
         self.assertEqual(payload["strategy"]["total_return"], 9.8086)
         self.assertEqual(payload["strategy"]["num_operations"], 28)
+        self.assertIn("profit_factor", payload["strategy"])
+        self.assertEqual(payload["cost_scenarios"]["cost_0_10pct"]["total_return"], 9.8086)
         self.assertEqual(payload["buy_hold"]["max_drawdown"], -0.9396)
 
 
