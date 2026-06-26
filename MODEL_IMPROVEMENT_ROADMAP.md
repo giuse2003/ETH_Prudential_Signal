@@ -328,6 +328,14 @@ Conclusione:
 - confermare il trailing 8% con momentum/volume evita molte uscite inutili;
 - il candidato piu' efficiente per Sharpe e' momentum >= -5% e volume >= +10%;
 - il candidato piu' pulito e selettivo e' momentum >= -5% e volume >= +20%;
+- stato in progress: il candidato principale da seguire resta Trail8 momentum
+  >= -5% e volume >= +10%, perche' preserva meglio il capitale acquisito
+  rispetto ai filtri troppo selettivi;
+- test filtro ATR minimo: ATR/Close >= 3% elimina il falso stop del
+  2023-08-02, ma agisce su un solo evento storico; ATR/Close >= 6% elimina
+  anche uscite utili del 2024, lasciando il modello esposto a perdite
+  successive. Il filtro ATR non viene adottato come regola candidata in questa
+  fase;
 - il campione resta piccolo, quindi serve validazione walk-forward prima di
   considerare una modifica operativa.
 
@@ -387,6 +395,9 @@ Conclusione:
   della logica di ingresso reale del trade;
 - il walk-forward non boccia i candidati, ma mostra che il vantaggio non e'
   uniforme in ogni fase di mercato;
+- nota operativa in progress: fino a nuovi test, il riferimento sperimentale
+  rimane Trail8 momentum >= -5% e volume >= +10%. I test ATR restano archiviati
+  come controllo anti-falso-stop, non come modifica al modello;
 - nessun candidato viene promosso a regola operativa in questa fase.
 
 ### Combinazioni stop ingresso e trailing confermato
@@ -616,7 +627,10 @@ Priorita' 3:
 
 Priorita' 4:
 
-- testare gestione esposizione non binaria sui candidati piu' robusti;
+- mantenere Trail8 momentum >= -5% e volume >= +10% come candidato
+  sperimentale principale;
+- testare gestione esposizione non binaria sul candidato principale e sui
+  candidati piu' robusti;
 - stressare i candidati con costi 0,50% e rendimento liquidita';
 - completata: valutazione combinazioni prudenti fra stop ingresso 9% e
   trailing confermato.

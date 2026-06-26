@@ -28,6 +28,8 @@ Cloudflare.
 - Esperimento trailing stop 8% con conferma momentum/volume isolato in
   `scripts/run_confirmed_trailing_experiments.py`; non modifica i segnali
   ufficiali.
+- Candidato sperimentale principale in progress: Trail8 momentum >= -5% e
+  volume >= +10%. Non e' una regola operativa; resta un test da validare.
 - Validazione candidati principali isolata in
   `scripts/run_candidate_validation.py`; confronta periodo completo,
   sottoperiodi e walk-forward senza modificare i segnali ufficiali.

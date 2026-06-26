@@ -68,5 +68,11 @@ solo se la conferma momentum/volume e' vera.
 - Migliore Sharpe in griglia: `trail8_mom_ge_-5_vol_ge_10` con Sharpe 1.063, ann. 42.76%, max DD -46.50%.
 - La conferma momentum/volume evita molte uscite inutili del trailing 8%
   ma cattura solo una parte delle uscite utili.
+- Stato in progress: `trail8_mom_ge_-5_vol_ge_10` resta il candidato
+  sperimentale principale per la prossima fase di test.
+- Il filtro ATR minimo resta escluso dal candidato principale: ATR/Close >= 3%
+  elimina il falso stop del 2023-08-02, ma agisce su un solo evento storico;
+  ATR/Close >= 6% elimina anche uscite che preservavano capitale gia'
+  acquisito nel 2024.
 - Il candidato pratico resta da validare fuori campione; la dimensione
   eventi e' piccola e il rischio overfitting e' alto.
