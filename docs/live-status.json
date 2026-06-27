@@ -1,9 +1,9 @@
 {
   "signal": "MANTIENI",
-  "price_usd": 1589.47,
-  "price_eur": 1394.78,
-  "volume_24h_usd": 7885978785.0,
-  "last_update": "2026-06-27 14:11:26 UTC",
+  "price_usd": 1603.78,
+  "price_eur": 1408.39,
+  "volume_24h_usd": 7104170437.0,
+  "last_update": "2026-06-27 15:44:45 UTC",
   "status": "Attivo",
   "condition_groups": {
     "buy": [
