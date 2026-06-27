@@ -25,47 +25,39 @@ class SignalRulesTests(unittest.TestCase):
 
         self.assertEqual(result.iloc[-1]["Segnale"], "ACQUISTA")
 
-    def test_trailing_stop_triggers_sell_signal(self) -> None:
+    def test_price_below_sma50_for_two_days_triggers_sell_signal(self) -> None:
         df = pd.DataFrame(
             {
-                "Close": [100.0, 110.0, 100.0],
-                "SMA50": [90.0, 90.0, 90.0],
-                "SMA200": [80.0, 80.0, 80.0],
-                "RSI": [50.0, 50.0, 50.0],
-                "Volume": [1500.0, 1500.0, 1500.0],
-                "VolumeAvg20": [1000.0, 1000.0, 1000.0],
-                "Close_7d_ago": [95.0, 95.0, 95.0],
+                "Close": [120.0, 119.0],
+                "SMA50": [130.0, 128.0],
+                "SMA200": [100.0, 100.0],
+                "RSI": [55.0, 56.0],
+                "Volume": [800.0, 850.0],
+                "VolumeAvg20": [1000.0, 1000.0],
+                "Close_7d_ago": [110.0, 111.0],
             }
         )
 
         result = compute_signals(df)
 
-        self.assertEqual(result.iloc[0]["Segnale"], "ACQUISTA")
-        self.assertEqual(result.iloc[1]["Segnale"], "MANTIENI")
-        self.assertEqual(result.iloc[2]["Segnale"], "VENDI")
-        self.assertEqual(result.iloc[2]["PeakClose"], 110.0)
-        self.assertEqual(result.iloc[2]["StopLevel"], 101.2)
+        self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
 
-    def test_trailing_stop_not_triggered_below_eight_percent(self) -> None:
+    def test_single_close_below_sma50_does_not_trigger_sell_signal(self) -> None:
         df = pd.DataFrame(
             {
-                "Close": [100.0, 110.0, 105.0],
-                "SMA50": [90.0, 90.0, 90.0],
-                "SMA200": [80.0, 80.0, 80.0],
-                "RSI": [50.0, 50.0, 50.0],
-                "Volume": [1500.0, 1500.0, 1500.0],
-                "VolumeAvg20": [1000.0, 1000.0, 1000.0],
-                "Close_7d_ago": [95.0, 95.0, 95.0],
+                "Close": [132.0, 119.0],
+                "SMA50": [130.0, 128.0],
+                "SMA200": [100.0, 100.0],
+                "RSI": [55.0, 56.0],
+                "Volume": [800.0, 850.0],
+                "VolumeAvg20": [1000.0, 1000.0],
+                "Close_7d_ago": [110.0, 111.0],
             }
         )
 
         result = compute_signals(df)
 
-        self.assertEqual(result.iloc[0]["Segnale"], "ACQUISTA")
-        self.assertEqual(result.iloc[1]["Segnale"], "MANTIENI")
-        self.assertEqual(result.iloc[2]["Segnale"], "MANTIENI")
-        self.assertEqual(result.iloc[2]["PeakClose"], 110.0)
-        self.assertEqual(result.iloc[2]["StopLevel"], 101.2)
+        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI")
 
     def test_live_signal_recomputes_indicators_with_live_price_and_volume(self) -> None:
         dates = pd.date_range("2026-01-01", periods=210, freq="D")

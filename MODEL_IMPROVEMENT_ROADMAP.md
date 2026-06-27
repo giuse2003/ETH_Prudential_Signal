@@ -1,6 +1,6 @@
 # ETH Model Improvement Roadmap
 
-Ultimo aggiornamento: 2026-06-26
+Ultimo aggiornamento: 2026-06-27
 
 ## Obiettivo
 
@@ -495,6 +495,97 @@ Full History Metrics (2017-11-11 al 2026-06-25):
 
 Conclusione:
 - L'esecuzione alla chiusura giornaliera funge da potente filtro del rumore di mercato in ambito crypto, evitando falsi stop causati da "wicks" (ombre) profonde intraday che non riflettono la tendenza di chiusura.
+
+### Trailing Stop Adattivo RSI a Tre Livelli
+
+Run locale del 2026-06-27.
+
+Obiettivo: testare un trailing stop adattivo a tre livelli basato sulla combinazione di distanza dalla SMA200 (fase normale vs parabolica) e livello RSI (fase parabolica ipercomprata) per limitare i drawdown profondi causati da violente inversioni in ipercomprato, senza aumentare i whipsaw in fase normale.
+
+Regola testata:
+- `DistanceFromSMA200_Pct <= 60%` (fase normale) -> trailing stop = **8%**
+- `DistanceFromSMA200_Pct > 60%` e `RSI < soglia_rsi` (fase parabolica, non estesa) -> trailing stop = **15%**
+- `DistanceFromSMA200_Pct > 60%` e `RSI >= soglia_rsi` (fase parabolica + ipercomprato) -> trailing stop = **stop_stretto** (8% o 10%)
+- La conferma momentum/volume (`momentum_7d >= -5%` e `volume_rel >= +10%`) si applica a tutte le uscite. Una volta attivato lo `stop_stretto` in fase parabolica, rimane attivo per la durata del trade finché non viene venduta la posizione o si ritorna sotto la SMA200 (distanza <= 60%).
+
+Risultati del periodo completo (2017-11-11 al 2026-06-25, netti con commissioni 0.25%):
+
+| Variante | Ann. Lordo | Max DD Lordo | Sharpe Lordo | Sharpe Netto 0,25% | PF | Operazioni | Mediana Sharpe | Min Sharpe |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline (SMA50 2gg) | 31.77% | -52.57% | 0.849 | 0.812 | 4.327 | 28 | 0.960 | 0.309 |
+| Trail Dinamico 15%/8% (rif) | 54.04% | -56.50% | 1.143 | 1.120 | 10.306 | 19 | 1.121 | 0.638 |
+| rsi_adaptive_rsi_80_stop_8 | 47.66% | -55.68% | 1.068 | 1.041 | 5.333 | 22 | 1.085 | 0.619 |
+| rsi_adaptive_rsi_80_stop_10 | 46.47% | -60.38% | 1.045 | 1.018 | 5.263 | 22 | 1.085 | 0.638 |
+| rsi_adaptive_rsi_70_stop_10 | 46.06% | -60.38% | 1.040 | 1.010 | 4.554 | 24 | 1.064 | 0.638 |
+| rsi_adaptive_rsi_75_stop_10 | 46.06% | -60.38% | 1.040 | 1.010 | 4.554 | 24 | 1.064 | 0.638 |
+| rsi_adaptive_rsi_75_stop_8 | 45.33% | -55.68% | 1.039 | 1.008 | 4.285 | 25 | 0.969 | 0.530 |
+| rsi_adaptive_rsi_70_stop_8 | 42.38% | -55.68% | 1.006 | 0.972 | 4.045 | 27 | 0.969 | 0.530 |
+
+Conclusione:
+- Con gli ingressi determinati dalla baseline SMA50, nessuna delle varianti adattive RSI soddisfa tutti i criteri di accettazione (in particolare lo Sharpe Netto di `rsi_adaptive_rsi_80_stop_8` si ferma a `1.041` contro il target di `>= 1.050`, e il max drawdown peggiora a `-55.68%`).
+- Questo evidenzia che le ottime performance registrate nel test precedente dipendevano strettamente dal diverso percorso di ingressi tracciato dal trailing stop 8%. Sotto gli ingressi dettati dalla SMA50, le uscite basate su trailing stop soffrono di maggiore drawdown e minore efficienza. Il candidato principale di punta per la gestione uscite rimane temporaneamente `trail_dynamic_15_8`, pur non risolvendo il problema del peggioramento del drawdown rispetto alla baseline SMA50.
+
+### Esperimento Sistema Trailing Stop 8% + RSI Adattivo (Uscita Alternativa)
+
+Run locale del 2026-06-27.
+
+Obiettivo: testare formalmente il sistema combinato Trailing 8% + RSI Adattivo come regola di uscita alternativa completa, mantenendo invariata la regola di ingresso ufficiale (ACQUISTA con tutte e 5 le condizioni SMA50/SMA200/RSI/momentum/volume), per capire se batte la SMA50 a 2 giorni in modo robusto sull'intera storia o se il vantaggio era un artefatto degli ingressi diversi.
+In questo esperimento, a differenza dei precedenti, la conferma momentum/volume non viene applicata all'uscita.
+
+Risultati del periodo completo (2017-11-11 al 2026-06-26, netti con commissioni 0.25%):
+
+| Variante | Ann. Lordo | Max DD Lordo | Sharpe Lordo | Sharpe Netto 0,25% | PF | Operazioni | Mediana Sharpe | Min Sharpe | Periodi Positivi |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline (SMA50 2gg) | 31.77% | -52.57% | 0.849 | 0.812 | 4.327 | 28 | 0.926 | 0.235 | 4/4 |
+| trailing_8_pure | 24.31% | -50.38% | 0.771 | 0.699 | 2.280 | 46 | 0.344 | -0.020 | 3/4 |
+| **rsi_adaptive_system_rsi_70_stop_8** | **28.75%** | **-50.38%** | **0.860** | **0.794** | **2.529** | **43** | **0.318** | **-0.062** | **2/4** |
+| rsi_adaptive_system_rsi_75_stop_8 | 27.11% | -50.38% | 0.820 | 0.756 | 2.404 | 42 | 0.302 | -0.062 | 2/4 |
+| rsi_adaptive_system_rsi_80_stop_8 | 25.42% | -51.24% | 0.784 | 0.722 | 2.413 | 41 | 0.263 | -0.199 | 2/4 |
+| rsi_adaptive_system_rsi_70_stop_10 | 24.30% | -54.01% | 0.762 | 0.698 | 2.271 | 42 | 0.263 | -0.199 | 2/4 |
+| rsi_adaptive_system_rsi_75_stop_10 | 23.80% | -54.01% | 0.751 | 0.687 | 2.240 | 42 | 0.247 | -0.199 | 2/4 |
+| rsi_adaptive_system_rsi_80_stop_10 | 22.96% | -54.01% | 0.733 | 0.670 | 2.272 | 41 | 0.235 | -0.199 | 2/4 |
+
+Risultati del Walk-Forward (3 Split):
+- **Split 1 (Test 2021-2022)**: Variante `rsi_70_stop_8` -> Sharpe Test Netto: `1.819`
+- **Split 2 (Test 2023-2024)**: Variante `rsi_70_stop_8` -> Sharpe Test Netto: `-0.063`
+- **Split 3 (Test 2025-2026)**: Variante `rsi_70_stop_8` -> Sharpe Test Netto: `-0.061`
+
+Conclusione:
+- **Nessuna variante ha superato i criteri di accettazione**. La variante migliore `rsi_adaptive_system_rsi_70_stop_8` ottiene uno Sharpe Netto di `0.794` (sotto lo `0.812` della baseline), aumenta pesantemente le operazioni a `43` (limite 35), ed è estremamente instabile sia nei sottoperiodi (solo 2/4 positivi) sia nel Walk-Forward (solo 1 split positivo su 3).
+- Questo conferma in modo definitivo che il vantaggio prestazionale del trailing stop adattivo RSI emerso in precedenza era un **artefatto dovuto all'ordine degli ingressi diversi** (prodotti dall'allora baseline all'8%). Quando si mantengono gli ingressi ufficiali basati sulla SMA50, l'adozione del trailing stop all'8% o adattivo distrugge valore e raddoppia i costi operativi.
+- **La baseline SMA50 ufficiale rimane imbattuta e confermata.**
+
+### Esperimento Chandelier Exit (ATR-based)
+
+Run locale del 2026-06-27.
+
+Obiettivo: testare lo stop basato sulla volatilità storica reale (Chandelier Exit ATR-based) per verificare se l'adattabilità della percentuale di stop alla volatilità di mercato migliori le performance e i drawdown rispetto alla baseline SMA50 ufficiale.
+Formula utilizzata: `StopLevel = PeakClose - ATR(atr_period) * multiplier` (eseguito alla chiusura giornaliera, senza conferme momentum/volume).
+
+Risultati del periodo completo (2017-11-11 al 2026-06-26, netti con commissioni 0.25%):
+
+| Variante | Ann. Lordo | Max DD Lordo | Sharpe Lordo | Sharpe Netto 0,25% | PF | Operazioni | Mediana Sharpe | Min Sharpe | Periodi Positivi |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline (SMA50 2gg) | 31.77% | -52.57% | 0.849 | 0.812 | 4.327 | 28 | 0.926 | 0.235 | 4/4 |
+| Trail Dinamico 15%/8% (rif) | 54.04% | -56.50% | 1.143 | 1.120 | 10.306 | 19 | 1.100 | 0.594 | 4/4 |
+| **chandelier_exit_period_20_mult_3_5** | **33.64%** | **-65.72%** | **0.881** | **0.854** | **4.497** | **20** | **0.831** | **-0.107** | **3/4** |
+| chandelier_exit_period_20_mult_3_0 | 31.33% | -63.46% | 0.853 | 0.820 | 3.820 | 24 | 0.722 | -0.318 | 3/4 |
+| chandelier_exit_period_14_mult_3_5 | 31.86% | -67.10% | 0.842 | 0.815 | 5.258 | 21 | 0.750 | -0.300 | 3/4 |
+| chandelier_exit_period_14_mult_3_0 | 28.30% | -69.80% | 0.795 | 0.761 | 3.421 | 25 | 0.671 | -0.486 | 3/4 |
+| chandelier_exit_period_20_mult_2_5 | 25.86% | -62.45% | 0.765 | 0.718 | 2.695 | 33 | 0.205 | -0.492 | 2/4 |
+| chandelier_exit_period_20_mult_2_0 | 25.42% | -51.57% | 0.778 | 0.717 | 2.331 | 41 | 0.253 | -0.188 | 2/4 |
+| chandelier_exit_period_14_mult_2_0 | 25.04% | -54.26% | 0.767 | 0.708 | 2.417 | 40 | 0.260 | -0.185 | 2/4 |
+| chandelier_exit_period_14_mult_2_5 | 24.44% | -64.68% | 0.735 | 0.690 | 2.613 | 32 | 0.169 | -0.511 | 2/4 |
+
+Risultati del Walk-Forward (3 Split):
+- **Split 1 (Test 2021-2022)**: Variante `period_14_mult_3_0` -> Sharpe Test Netto: `1.435`
+- **Split 2 (Test 2023-2024)**: Variante `period_20_mult_3_0` -> Sharpe Test Netto: `-0.601`
+- **Split 3 (Test 2025-2026)**: Variante `period_20_mult_3_5` -> Sharpe Test Netto: `0.328`
+
+Conclusione:
+- **Nessuna variante soddisfa i criteri di accettazione**. Sebbene la variante `chandelier_exit_period_20_mult_3_5` ottenga uno Sharpe Netto di `0.854` (migliore dello `0.812` della baseline), essa **peggiora pesantemente il massimo drawdown storico** portandolo a `-66.74%` (rispetto al `-52.57%` della baseline SMA50). Inoltre, la stabilità fuori campione del Walk-Forward mostra un decadimento marcato nello split centrale (`-0.601`).
+- Questo conferma che per asset volatili ma con tendenze speculative cicliche come Ethereum, gli stop basati interamente sulla volatilità ATR senza filtri addizionali di trend finiscono per registrare drawdown inaccettabili durante le inversioni repentine.
+- **La baseline SMA50 ufficiale rimane confermata e imbattuta.**
 
 ## Test Da Fare
 

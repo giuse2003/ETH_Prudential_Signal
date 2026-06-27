@@ -18,7 +18,7 @@ const CONDITIONS_MESSAGE = [
   "5. volume sopra media 20 giorni.",
   "",
   "Per VENDI deve essere vera questa condizione:",
-  "1. prezzo inferiore o uguale allo stop level di trailing (8% dal picco).",
+  "1. prezzo sotto SMA50 per 2 giorni consecutivi.",
 ].join("\n");
 const PRIVACY_MESSAGE = [
   "PRIVACY",
@@ -494,11 +494,15 @@ function deriveConditionGroups(status) {
     ],
     sell: [
       {
-        label: "prezzo inferiore o uguale allo stop level di trailing (8% dal picco)",
+        label: "prezzo sotto SMA50 per 2 giorni consecutivi",
         passed:
-          typeof status.trailing_stop_triggered === "boolean"
-            ? status.trailing_stop_triggered
-            : false,
+          typeof status.below_sma50_2d === "boolean"
+            ? status.below_sma50_2d
+            :
+          close < sma50 &&
+          Number.isFinite(previousClose) &&
+          Number.isFinite(previousSma50) &&
+          previousClose < previousSma50,
       },
     ],
   };
