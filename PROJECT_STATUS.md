@@ -105,6 +105,10 @@ Da completare:
   ingressi Baseline, con feature al momento del segnale.
 - `scripts/run_entry_filter_hypotheses.py`: test sperimentale di filtri di
   ingresso derivati dall'analisi trade-by-trade.
+- `scripts/run_rsi_entry_filter_validation.py`: validazione dedicata del
+  filtro sperimentale RSI sugli ingressi, con soglie, costi, anni e trade.
+- `scripts/run_combined_entry_exit_validation.py`: validazione sperimentale
+  combinata tra filtro ingresso RSI e trailing stop 8% confermato.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare

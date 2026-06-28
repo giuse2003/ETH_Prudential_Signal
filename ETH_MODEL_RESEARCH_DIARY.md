@@ -471,3 +471,108 @@ Test da fare:
 - scenari costi 0,10%, 0,25%, 0,50%;
 - walk-forward;
 - verifica se la soglia 65 e' stabile o scelta casuale.
+
+## Registro Analisi - Prosecuzione 2026-06-28
+
+### Validazione filtro RSI sugli ingressi
+
+File generati:
+
+- `scripts/run_rsi_entry_filter_validation.py`;
+- `reports/rsi_entry_filter_validation.md`.
+
+Performance misurata in EUR con `Close_EUR`.
+
+Confronto principale:
+
+| Variante | Periodo | Ann. | Max DD | Sharpe | Profit factor |
+|---|---|---:|---:|---:|---:|
+| Baseline | completo | +30,26% | -49,73% | 0,828 | 4,215 |
+| RSI <= 65 | completo | +36,13% | -47,17% | 0,944 | 5,670 |
+| Baseline | 2022-oggi | +4,12% | -49,73% | 0,284 | n/a |
+| RSI <= 65 | 2022-oggi | +5,28% | -47,17% | 0,325 | n/a |
+
+Sweep soglie:
+
+- `RSI <= 62`, `RSI <= 65` e `RSI <= 68` producono risultati molto simili
+  sul periodo completo;
+- questo riduce il rischio che la soglia 65 sia solo un numero casuale;
+- `RSI <= 58` migliora di piu' il periodo 2022-oggi ma sacrifica troppo il
+  periodo completo;
+- `RSI <= 72` e `RSI <= 75` coincidono di fatto con la Baseline.
+
+Costi sul periodo completo:
+
+| Variante | Scenario | Ann. | Max DD | Sharpe |
+|---|---|---:|---:|---:|
+| Baseline | 0,25% | +28,16% | -51,46% | 0,791 |
+| RSI <= 65 | 0,25% | +34,02% | -49,00% | 0,907 |
+| Baseline | 0,50% stress | +26,10% | -53,21% | 0,753 |
+| RSI <= 65 | 0,50% stress | +31,93% | -50,85% | 0,870 |
+
+Decisione:
+
+- `RSI <= 65` diventa un filtro di ingresso candidato, ma non operativo;
+- migliora periodo completo, drawdown, Sharpe e costi;
+- non risolve da solo il problema del 2022-oggi;
+- va studiato insieme alle uscite protettive.
+
+### Validazione combinata ingresso + uscita
+
+File generati:
+
+- `scripts/run_combined_entry_exit_validation.py`;
+- `reports/combined_entry_exit_validation.md`.
+
+Test combinato:
+
+- filtro ingresso `RSI <= 65`;
+- trailing stop 8% sul massimo Close post-ingresso;
+- conferma uscita con momentum 7g >= -5%;
+- conferma volume relativo >= +10% o >= +20%.
+
+Risultati sul periodo completo:
+
+| Variante | Ann. | Max DD | Sharpe | Profit factor | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline | +30,26% | -49,73% | 0,828 | 4,215 | 28 |
+| RSI <= 65 | +36,13% | -47,17% | 0,944 | 5,670 | 27 |
+| Trail8 mom -5 vol +20 | +41,36% | -45,09% | 1,047 | 5,565 | 30 |
+| RSI65 + Trail8 mom -5 vol +20 | +51,41% | -40,69% | 1,265 | 6,747 | 28 |
+| RSI65 + Trail8 mom -5 vol +10 | +50,64% | -40,69% | 1,262 | 6,397 | 30 |
+
+Risultati 2022-oggi:
+
+| Variante | Ann. | Max DD | Sharpe |
+|---|---:|---:|---:|
+| Baseline | +4,12% | -49,73% | 0,284 |
+| RSI <= 65 | +5,28% | -47,17% | 0,325 |
+| Trail8 mom -5 vol +20 | +6,66% | -43,75% | 0,378 |
+| RSI65 + Trail8 mom -5 vol +20 | +7,92% | -40,69% | 0,428 |
+| RSI65 + Trail8 mom -5 vol +10 | +7,99% | -40,69% | 0,430 |
+
+Costi sul candidato `RSI65 + Trail8 mom -5 vol +20`:
+
+| Scenario | Ann. | Max DD | Sharpe | Profit factor |
+|---|---:|---:|---:|---:|
+| Lordo | +51,41% | -40,69% | 1,265 | 6,747 |
+| Costo 0,10% | +50,43% | -41,52% | 1,248 | 6,625 |
+| Costo 0,25% | +48,97% | -42,75% | 1,223 | 6,449 |
+| Stress 0,50% | +46,56% | -44,82% | 1,180 | 6,163 |
+
+Sottoperiodi:
+
+- 2017-2020: Baseline Sharpe 0,988; combinato vol +20 Sharpe 1,415;
+- 2021-2022: Baseline Sharpe 1,213; combinato vol +20 Sharpe 1,961;
+- 2023-2026: Baseline Sharpe 0,322; combinato vol +20 Sharpe 0,485;
+- 2025-2026: invariato tra varianti nel run corrente.
+
+Decisione:
+
+- la combinazione `RSI65 + Trail8 mom -5 vol +20` e' il miglior candidato
+  sperimentale emerso finora;
+- supera Sharpe 1 anche dopo costi 0,25% e nello stress 0,50%;
+- riduce il max drawdown dal -49,73% al -40,69% nel confronto EUR;
+- non va ancora promossa: serve controllo evento per evento e walk-forward piu'
+  severo;
+- il segnale ufficiale resta invariato.
