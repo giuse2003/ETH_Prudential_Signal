@@ -83,7 +83,9 @@ Risultati del backtest (con commissioni 0.25% ad operazione incluse):
 - **Migliore in assoluto:** `Trail Dinamico 15%/8%` (o `17%/8%`) con Sharpe lordo 1.143, Sharpe netto 1.120 e rendimento annualizzato netto del 52.37%.
 - **Riduzione del rumore:** Il modello dinamico riduce le operazioni da 27 a 19, consolidando i trade durante i trend prolungati del 2021 e 2025.
 - **Risoluzione falsi stop:** Questa variante evita del tutto le uscite inutili durante i ritracciamenti rialzisti (come il whipsaw del 11-01-2021), pur mantenendo la protezione dei grandi crash (Dicembre 2021, Gennaio 2025).
-- **Stato in progress:** Il trailing stop dinamico 15%/8% diventa il nuovo candidato di punta per la strategia di gestione del rischio, superando sia il trailing fisso all'8% sia la baseline SMA50.
+- **Stato in progress:** Il trailing stop dinamico 15%/8% resta un candidato
+  sperimentale ad alto rendimento. Non viene promosso a regola operativa
+  perche' peggiora il drawdown rispetto alla baseline SMA50 ufficiale.
 
 ---
 

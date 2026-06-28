@@ -1,6 +1,6 @@
 # Project Status
 
-Ultimo aggiornamento: 2026-06-26
+Ultimo aggiornamento: 2026-06-28
 
 ## Obiettivo
 
@@ -17,6 +17,8 @@ Cloudflare.
   (`2017-11-11` nel run corrente), senza riempimento EUR all'indietro.
 - Backtest esteso con profit factor, metriche qualita' trade, turnover e
   scenari costo/slippage.
+- Strategia ufficiale corrente: baseline SMA50 a 2 giorni. Il segnale `VENDI`
+  scatta se il Close resta sotto SMA50 per due giorni consecutivi.
 - Esperimenti modello isolati in `scripts/run_model_experiments.py`; non
   modificano i segnali ufficiali.
 - Esperimenti uscite protettive isolati in `scripts/run_exit_experiments.py`;
@@ -28,8 +30,9 @@ Cloudflare.
 - Esperimento trailing stop 8% con conferma momentum/volume isolato in
   `scripts/run_confirmed_trailing_experiments.py`; non modifica i segnali
   ufficiali.
-- Candidato sperimentale principale in progress: Trail8 momentum >= -5% e
-  volume >= +10%. Non e' una regola operativa; resta un test da validare.
+- Candidati sperimentali in progress: Trail8 momentum >= -5% e volume >= +10%
+  e trailing dinamico 15%/8%. Nessuno dei due e' una regola operativa; entrambi
+  restano test da validare contro drawdown, costi e robustezza temporale.
 - Validazione candidati principali isolata in
   `scripts/run_candidate_validation.py`; confronta periodo completo,
   sottoperiodi e walk-forward senza modificare i segnali ufficiali.

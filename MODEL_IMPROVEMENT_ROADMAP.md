@@ -328,9 +328,9 @@ Conclusione:
 - confermare il trailing 8% con momentum/volume evita molte uscite inutili;
 - il candidato piu' efficiente per Sharpe e' momentum >= -5% e volume >= +10%;
 - il candidato piu' pulito e selettivo e' momentum >= -5% e volume >= +20%;
-- stato in progress: il candidato principale da seguire resta Trail8 momentum
-  >= -5% e volume >= +10%, perche' preserva meglio il capitale acquisito
-  rispetto ai filtri troppo selettivi;
+- stato in progress: Trail8 momentum >= -5% e volume >= +10% resta un
+  candidato sperimentale da seguire, perche' preserva meglio il capitale
+  acquisito rispetto ai filtri troppo selettivi;
 - test filtro ATR minimo: ATR/Close >= 3% elimina il falso stop del
   2023-08-02, ma agisce su un solo evento storico; ATR/Close >= 6% elimina
   anche uscite utili del 2024, lasciando il modello esposto a perdite
@@ -430,8 +430,8 @@ Conclusione:
 - la combinazione migliore e' Stop9 + Trail8 mom >= -5%, volume >= +10%;
 - rispetto al Trail8 confermato puro, riduce il max drawdown da -46,50% a
   -44,93%, ma abbassa Sharpe da 1,063 a 1,052;
-- la combinazione non sostituisce il candidato principale, ma resta utile se
-  la priorita' diventa ridurre ulteriormente il drawdown;
+- la combinazione non sostituisce i candidati gia' in studio, ma resta utile
+  se la priorita' diventa ridurre ulteriormente il drawdown;
 - nessuna combinazione viene promossa a regola operativa in questa fase.
 
 ### Trailing stop dinamico adattivo su SMA200
@@ -459,7 +459,9 @@ Conclusione:
 - Il modello dinamico al 15% e 17% **elimina completamente** il falso stop del 11-01-2021 e altre 7 uscite inutili, dimezzando le perdite da whipsaw.
 - Riduce le operazioni da 27 a **19**, abbattendo i costi transazionali.
 - Il Profit Factor sale da 4.32 a **9.90** (netto) o **10.31** (lordo).
-- Lo Sharpe netto sale a **1.120**, rendendo questa regola il candidato principale in assoluto per il modello finale.
+- Lo Sharpe netto sale a **1.120**, ma il max drawdown peggiora a **-56,50%**
+  rispetto alla baseline ufficiale **-52,57%**. La variante resta quindi un
+  candidato sperimentale ad alto rendimento, non una regola promossa.
 
 ### Analisi Trailing Stop Stretti (4% e 6%) vs 8% (Periodo Novembre 2021)
 
@@ -523,7 +525,8 @@ Risultati del periodo completo (2017-11-11 al 2026-06-25, netti con commissioni 
 
 Conclusione:
 - Con gli ingressi determinati dalla baseline SMA50, nessuna delle varianti adattive RSI soddisfa tutti i criteri di accettazione (in particolare lo Sharpe Netto di `rsi_adaptive_rsi_80_stop_8` si ferma a `1.041` contro il target di `>= 1.050`, e il max drawdown peggiora a `-55.68%`).
-- Questo evidenzia che le ottime performance registrate nel test precedente dipendevano strettamente dal diverso percorso di ingressi tracciato dal trailing stop 8%. Sotto gli ingressi dettati dalla SMA50, le uscite basate su trailing stop soffrono di maggiore drawdown e minore efficienza. Il candidato principale di punta per la gestione uscite rimane temporaneamente `trail_dynamic_15_8`, pur non risolvendo il problema del peggioramento del drawdown rispetto alla baseline SMA50.
+- Questo evidenzia che le ottime performance registrate nel test precedente dipendevano strettamente dal diverso percorso di ingressi tracciato dal trailing stop 8%. Sotto gli ingressi dettati dalla SMA50, le uscite basate su trailing stop soffrono di maggiore drawdown e minore efficienza.
+- Stato corretto: la baseline SMA50 a 2 giorni resta la strategia ufficiale. `trail_dynamic_15_8` resta solo un candidato sperimentale da studiare, perche' non risolve il peggioramento del drawdown rispetto alla baseline SMA50.
 
 ### Esperimento Sistema Trailing Stop 8% + RSI Adattivo (Uscita Alternativa)
 
@@ -684,7 +687,10 @@ Metriche chiave:
 
 Obiettivo: limitare perdite interne ai trade.
 
-Stato: test sperimentale completato con successo. La variante dinamica adattiva basata sulla distanza SMA200 (15%/8% e 17%/8%) e' stata promossa a candidato principale di punta.
+Stato: test sperimentale completato. La variante dinamica adattiva basata sulla
+distanza SMA200 (15%/8% e 17%/8%) ha prodotto il miglior Sharpe netto tra i
+test di uscita, ma non viene promossa a regola operativa perche' peggiora il
+drawdown rispetto alla baseline SMA50.
 
 Varianti:
 
@@ -693,7 +699,9 @@ Varianti:
 - uscita se prezzo sotto `SMA50` per 2 giorni: regola attuale;
 - uscita se RSI scende sotto 35/40/45: testato;
 - uscita se Close perde 8/10/12/15/20/25% dall'ingresso: testato;
-- trailing stop dinamico (15%/8% e 17%/8%) basato su distanza SMA200: testato con eccellenti risultati (Sharpe netto 1.120, profit factor 9.90, riduzione operazioni a 19).
+- trailing stop dinamico (15%/8% e 17%/8%) basato su distanza SMA200: testato
+  con Sharpe netto 1.120, profit factor 9.90 e riduzione operazioni a 19, ma
+  con drawdown peggiore della baseline.
 
 Teorie future da sviluppare per mitigare le candele rosse profonde senza aumentare i falsi segnali (whipsaw):
 - **Trailing Stop Dinamico basato sull'Estensione (RSI/Distanza SMA)**: stringere temporaneamente lo stop (es. da 8% a 4%) quando il mercato è estremamente esteso (es. RSI >= 70 o prezzo distante > 40% dalla SMA50/200) per proteggere i profitti massimi prima di un ritracciamento repentino, mantenendo uno stop largo in condizioni di trend normale.
@@ -786,7 +794,10 @@ Priorita' 3:
 
 Priorita' 4:
 
-- promuovere il **Trailing Stop Dinamico 15%/8%** come candidato principale del modello finale di gestione uscite;
-- testare gestione esposizione non binaria sul candidato principale e sui candidati piu' robusti;
+- mantenere la baseline SMA50 a 2 giorni come strategia ufficiale finche' una
+  variante non migliora Sharpe senza peggiorare materialmente il drawdown;
+- studiare `trail_dynamic_15_8` solo come candidato sperimentale ad alto
+  rendimento, con focus specifico sulla riduzione del drawdown;
+- testare gestione esposizione non binaria sui candidati piu' robusti;
 - stressare i candidati con costi 0,50% e rendimento liquidita';
 - completata: valutazione combinazioni prudenti fra stop ingresso 9% e trailing confermato.
