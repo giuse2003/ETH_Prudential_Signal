@@ -1,5 +1,7 @@
 # ETH Prudential Signal
 
+Ultimo aggiornamento: 2026-06-28
+
 ETH Prudential Signal is a transparent Ethereum risk-management model based on
 daily technical indicators: SMA50, SMA200, RSI and volume confirmation. It
 generates three signals — `ACQUISTA`, `MANTIENI`, `VENDI` — and publishes the

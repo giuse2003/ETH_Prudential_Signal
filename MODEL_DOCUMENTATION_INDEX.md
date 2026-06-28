@@ -39,6 +39,17 @@ Prudential Signal.
 - `reports/signal_component_analysis.md`: separazione tra modelli di ingresso,
   uscita e combinazioni.
 
+## Cronologia Sintetica
+
+| Data | Fase | Dove leggere i dettagli |
+|---|---|---|
+| 2026-06-23 | Creazione progetto ETH, dashboard, primo backtest e correzione metriche copiate dal progetto BTC | `ETH_PROJECT_ROADMAP.md`, `PROJECT_OVERVIEW.md` |
+| 2026-06-24 | Configurazione Worker Cloudflare, Telegram, Supabase e automazioni operative | `ETH_PROJECT_ROADMAP.md`, `PROJECT_STATUS.md`, `DECISION_LOG.md` |
+| 2026-06-26 | Prime analisi di miglioramento: costi, qualita' trade, filtri ingresso, uscite protettive, stop e trailing | `MODEL_IMPROVEMENT_ROADMAP.md`, `reports/` |
+| 2026-06-27 | Analisi trailing/ATR/RSI piu' avanzate e scarto delle varianti deboli o troppo complesse | `MODEL_IMPROVEMENT_ROADMAP.md`, `reports/` |
+| 2026-06-28 | Analisi separata ingressi/uscite, validazione combinata, gate finale e promozione nuova Baseline ufficiale | `ETH_MODEL_RESEARCH_DIARY.md`, `reports/final_promotion_gate.md`, `reports/official_baseline_implementation.md`, `DECISION_LOG.md` |
+| 2026-06-28 | Allineamento Telegram `/conditions`, dashboard, legenda RSI 40/65 e documentazione cronologica | `ETH_MODEL_RESEARCH_DIARY.md`, `README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_STATUS.md` |
+
 ## Regole Ufficiali Del Modello
 
 ### Acquisto

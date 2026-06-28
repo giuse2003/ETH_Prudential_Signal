@@ -5,6 +5,15 @@ Ultimo aggiornamento: 2026-06-28
 Questo file e' il diario operativo del lavoro sul miglioramento del modello
 ETH Prudential Signal.
 
+Nota cronologica:
+
+- le sezioni iniziali riassumono lo stato ufficiale corrente dopo la
+  promozione del 2026-06-28;
+- le sezioni `Registro Analisi` documentano in ordine la sequenza dei test,
+  delle esclusioni e delle decisioni;
+- quando una regola passa da candidata a ufficiale, la decisione viene
+  registrata anche in `DECISION_LOG.md` e nel report dedicato in `reports/`.
+
 Regola di lavoro:
 
 - ogni test deve restare separato dalla strategia ufficiale finche' non viene

@@ -255,3 +255,10 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Supabase ETH collegato | Progetto rinominato `crypto-prudential-signal`, secret `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` caricati nel Worker; `/subscribers/health` configurato true e `/subscribers/count` restituisce `0`. |
 | 2026-06-24 | Iscrizione Telegram ETH verificata | Dopo `/iscrivimi` dal bot ETH, `/subscribers/count` restituisce `1`, confermando scrittura su `telegram_subscribers_eth`. |
 | 2026-06-24 | Disiscrizione Telegram ETH verificata | Dopo `/disiscrivimi` dal bot ETH, `/subscribers/count` torna a `0`, confermando disattivazione iscrizione. |
+| 2026-06-26 | Avvio miglioramento modello | Testati costi, qualita' trade, filtri ingresso, uscite protettive, stop loss e trailing stop in ambiente sperimentale. |
+| 2026-06-27 | Approfondimento uscite alternative | Testati ATR, Chandelier, trailing RSI/adattivi e varianti piu' strette; nessuna promossa in questa fase. |
+| 2026-06-28 | Validazione ingressi | `RSI <= 65` validato come miglior filtro sui soli nuovi ingressi. |
+| 2026-06-28 | Validazione uscite | `Trail8 -5 / vol +20` validato come uscita protettiva principale. |
+| 2026-06-28 | Promozione nuova Baseline | Promosso il combinato `RSI <= 65` in ingresso + `Trail8 -5 / vol +20` in uscita; variante `trade return >= 15%` non promossa. |
+| 2026-06-28 | Allineamento operativo | Aggiornati codice, test, report, Worker Telegram `/conditions`, dashboard e legenda RSI 40/65. |
+| 2026-06-28 | Audit documentazione | Aggiunto `MODEL_DOCUMENTATION_INDEX.md` e riallineati README, overview, status, roadmap, diario e decision log alla Baseline ufficiale. |
