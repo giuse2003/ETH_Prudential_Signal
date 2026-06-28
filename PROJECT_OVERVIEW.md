@@ -1,6 +1,6 @@
 # ETH Prudential Signal - Documento di progetto
 
-Ultimo aggiornamento: 2026-06-19
+Ultimo aggiornamento: 2026-06-28
 
 Questo documento descrive l'intero progetto ETH Prudential Signal: cosa fa,
 come genera i segnali Ethereum, quali dati usa per backtest e monitoraggio,
@@ -17,7 +17,7 @@ segnali:
 
 - `ACQUISTA`: le condizioni tecniche di ingresso sono tutte vere.
 - `MANTIENI`: non ci sono condizioni sufficienti per acquistare o vendere.
-- `VENDI`: il prezzo ha chiuso sotto SMA50 per due giorni consecutivi.
+- `VENDI`: e' vera almeno una condizione di uscita ufficiale.
 
 Il sistema pubblica lo stato su una dashboard GitHub Pages e risponde via bot
 Telegram ai comandi manuali. Il webhook Telegram e servito da Cloudflare
@@ -35,21 +35,29 @@ Per generare `ACQUISTA` devono essere vere tutte queste condizioni:
 1. prezzo `Close` sopra `SMA200`;
 2. `SMA50` sopra `SMA200`;
 3. `RSI(14)` uguale o maggiore di `40`;
-4. prezzo `Close` sopra quello di 7 giorni prima;
-5. volume giornaliero sopra la media dei volumi a 20 giorni.
+4. `RSI(14)` uguale o minore di `65`;
+5. prezzo `Close` sopra quello di 7 giorni prima;
+6. volume giornaliero sopra la media dei volumi a 20 giorni.
+
+Nota: `RSI <= 65` vale solo per i nuovi ingressi. Se la posizione e' gia'
+aperta, il superamento di RSI 65 non genera da solo un'uscita.
 
 Nel codice queste regole sono in `strategy/signals.py`, funzione
 `compute_strict_signal`.
 
 ### Condizione di vendita
 
-Per generare `VENDI` deve essere vera questa condizione:
+Per generare `VENDI` deve essere vera almeno una di queste condizioni:
 
 1. prezzo `Close` sotto `SMA50` per due giorni consecutivi.
+2. trailing stop 8% dal massimo `Close` raggiunto dopo l'ingresso, confermato
+   da:
+   - momentum 7 giorni uguale o maggiore di `-5%`;
+   - volume relativo almeno `+20%` sopra la media a 20 giorni.
 
-Questa regola ha sostituito le vecchie 5 condizioni di vendita perche, nei
-backtest, riduceva molto il drawdown e aumentava il rendimento rispetto alla
-vendita tardiva basata su condizioni ribassiste piu lente.
+La regola sotto SMA50 a 2 giorni resta la vendita ufficiale storica. Il
+trailing stop confermato e' stato promosso dopo la validazione del candidato
+combinato con filtro ingresso `RSI <= 65`.
 
 ### Mantieni
 
@@ -178,27 +186,22 @@ Il backtest non include:
 
 ### Risultato backtest della strategia corrente
 
-Con dati storici dal 2015 fino all'ultima candela chiusa disponibile nel run
-locale del 2026-06-22:
+La promozione della Baseline ufficiale e' registrata in
+`reports/official_baseline_implementation.md`. Nel run di verifica in EUR fino
+alla candela `2026-06-27`, la nuova Baseline ufficiale ha restituito:
 
 ```text
 Strategia corrente
-Rendimento totale:        +980,86%
-Rendimento annualizzato:  +31,80%
-Drawdown massimo:         -52,57%
+Rendimento annualizzato:  +42,74%
+Drawdown massimo:         -45,09%
 Operazioni completate:    28
-Win rate:                 39,3%
-Sharpe Ratio:             0,849
-
-Buy & Hold
-Rendimento totale:        +438,05%
-Rendimento annualizzato:  +21,55%
-Drawdown massimo:         -93,96%
-Sharpe Ratio:             0,659
+Profit factor:            5,999
+Sharpe Ratio:             1,079
 ```
 
-Questi numeri sono prodotti da `python main.py` e scritti in
-`reports/report.txt`.
+Le metriche operative della dashboard possono differire leggermente per valuta
+e data dell'ultima candela disponibile, ma le regole ufficiali del modello sono
+quelle descritte sopra.
 
 ## Output generati
 

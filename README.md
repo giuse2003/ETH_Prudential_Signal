@@ -27,12 +27,18 @@ tecnici giornalieri, dashboard web e notifiche Telegram.
 - Close above SMA200.
 - SMA50 above SMA200.
 - RSI(14) >= 40.
+- RSI(14) <= 65 for new entries.
 - Close above the close of 7 days ago.
 - Daily volume above 20-day average volume.
 
 ### SELL / VENDI
 
 - Close below SMA50 for two consecutive days.
+- Or trailing stop 8% from the highest close reached after entry, confirmed by
+  7-day momentum >= -5% and volume at least 20% above the 20-day average.
+
+`RSI <= 65` is an entry filter only: it blocks new overheated entries, but it
+does not force an exit from an already open position.
 
 ### HOLD / MANTIENI
 
@@ -58,6 +64,14 @@ Il progetto genera tre possibili segnali:
 - `ACQUISTA`: tutte le condizioni rialziste richieste sono confermate.
 - `MANTIENI`: non ci sono conferme sufficienti per una nuova operazione.
 - `VENDI`: le condizioni di debolezza previste dalla strategia sono confermate.
+
+Le regole ufficiali correnti sono:
+
+- acquisto: prezzo sopra SMA200, SMA50 sopra SMA200, RSI tra 40 e 65,
+  momentum 7 giorni positivo e volume sopra la media 20 giorni;
+- vendita: prezzo sotto SMA50 per 2 giorni consecutivi oppure trailing stop
+  8% dal massimo Close post-ingresso, confermato da momentum 7 giorni >= -5%
+  e volume almeno +20% sopra la media 20 giorni.
 
 Il segnale e il livello di rischio sono strumenti informativi e non
 costituiscono consulenza finanziaria.
@@ -106,7 +120,8 @@ Una operazione e definita come un trade long completato, dall'entrata
 all'uscita. Il numero operazioni e il win rate considerano soltanto trade
 chiusi; una posizione ancora aperta alla fine del periodo non viene inclusa.
 
-Il backtest attuale non considera commissioni, spread o slippage.
+Il backtest operativo e lordo. Nel progetto sono presenti anche report di
+stress separati con costi/slippage per validare la robustezza del modello.
 
 ## Requisiti
 

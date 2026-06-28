@@ -1,6 +1,6 @@
 # ETH Prudential Signal - Roadmap Operativa
 
-Ultimo aggiornamento: 2026-06-24
+Ultimo aggiornamento: 2026-06-28
 
 Questo file tiene traccia delle problematiche riscontrate durante la creazione
 del progetto Ethereum e delle attivita ancora da completare. Va aggiornato a
@@ -18,8 +18,13 @@ ogni avanzamento rilevante.
   `https://eth-prudential-signal.giuse2003.workers.dev/`
 - Bot Telegram ETH dedicato creato e collegato via webhook:
   `@ETH_Prudential_Signal_bot`
-- Test Python: 54 test passati.
-- Ultimo backtest ETH generato su candela chiusa `2026-06-22`.
+- Test Python: 60 test passati nell'ultima verifica completa di promozione
+  modello.
+- Nuova Baseline ufficiale promossa il 2026-06-28:
+  - ingresso storico + `RSI <= 65` sui nuovi ingressi;
+  - vendita sotto SMA50 per 2 giorni consecutivi oppure `Trail8 -5 / vol +20`.
+- Ultima verifica modello registrata in
+  `reports/official_baseline_implementation.md`.
 
 ## Problemi Riscontrati
 
@@ -193,11 +198,14 @@ Correzioni applicate:
 
 ### E. Pulizia Documentazione
 
-- [ ] Rileggere `README.md` e rimuovere eventuali affermazioni che dicono
+- [x] Rileggere `README.md` e rimuovere eventuali affermazioni che dicono
       "operativo" prima che bot e Supabase siano davvero completati.
-- [ ] Aggiornare `PROJECT_STATUS.md` con lo stato reale ETH.
-- [ ] Aggiornare `DECISION_LOG.md` separando decisioni copiate dal progetto BTC
+- [x] Aggiornare `PROJECT_STATUS.md` con lo stato reale ETH.
+- [x] Aggiornare `DECISION_LOG.md` separando decisioni copiate dal progetto BTC
       da decisioni effettivamente validate su ETH.
+- [x] Allineare `README.md`, `PROJECT_OVERVIEW.md`,
+      `MODEL_IMPROVEMENT_ROADMAP.md`, `PROJECT_STATUS.md` e diario alla nuova
+      Baseline ufficiale.
 - [ ] Valutare se mantenere `RENDER_DEPLOYMENT.md` come legacy o archiviarlo.
 
 ### F. Verifiche finali prima di considerare il progetto completo

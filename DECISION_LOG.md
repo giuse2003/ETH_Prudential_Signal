@@ -2,6 +2,44 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-06-28 - Promozione nuova Baseline ufficiale
+
+**Decisione:** promuovere il candidato combinato a nuova Baseline ufficiale
+del modello ETH.
+
+**Regole ufficiali di acquisto:**
+
+- `Close > SMA200`;
+- `SMA50 > SMA200`;
+- `RSI(14) >= 40`;
+- `RSI(14) <= 65` solo sui nuovi ingressi;
+- `Close > Close_7d_ago`;
+- `Volume > VolumeAvg20`.
+
+**Regole ufficiali di vendita:**
+
+- `Close < SMA50` per 2 giorni consecutivi;
+- oppure trailing stop 8% dal massimo `Close` post-ingresso, confermato da:
+  - momentum 7 giorni >= -5%;
+  - volume relativo >= +20% rispetto alla media 20 giorni.
+
+**Decisioni collegate:**
+
+- `RSI <= 65` non e' una regola di uscita: se la posizione e' gia' aperta,
+  il superamento di RSI 65 non vende da solo.
+- La variante `trade return >= 15%` non viene promossa per rischio overfit su
+  un solo evento.
+- Le varianti `momentum -6%`, `RSI <= 62`, `volume +10%` e trailing dinamico
+  15%/8% restano storiche/sperimentali, non operative.
+
+**Motivazione:** il candidato combinato migliora rendimento annualizzato,
+drawdown, Sharpe e profit factor rispetto alla Baseline precedente, mantenendo
+regole semplici e verificabili.
+
+**Riferimenti:** `ETH_MODEL_RESEARCH_DIARY.md`,
+`reports/final_promotion_gate.md`,
+`reports/official_baseline_implementation.md`.
+
 ## 2026-06-11 - Iscrizione visibile nella dashboard
 
 **Decisione:** aggiungere alla dashboard pubblica una card Telegram con deep

@@ -1,6 +1,6 @@
 # ETH Model Improvement Roadmap
 
-Ultimo aggiornamento: 2026-06-27
+Ultimo aggiornamento: 2026-06-28
 
 ## Obiettivo
 
@@ -13,6 +13,30 @@ Ratio, esposizione al mercato, numero operazioni, win rate e robustezza dopo
 costi realistici.
 
 ## Baseline Attuale
+
+Stato dopo promozione ufficiale del 2026-06-28:
+
+- ingresso ufficiale: condizioni storiche Baseline + `RSI <= 65` sui soli
+  nuovi ingressi;
+- uscita ufficiale: `Close < SMA50` per 2 giorni consecutivi oppure `Trail8
+  -5 / vol +20`;
+- varianti non promosse: `trade return >= 15%`, `momentum -6%`, `RSI <= 62`,
+  trailing dinamico 15%/8%, volume +10%;
+- report canonico della promozione:
+  `reports/official_baseline_implementation.md`.
+
+Metriche di promozione in EUR fino alla candela `2026-06-27`:
+
+| Metrica | Nuova Baseline ufficiale |
+|---|---:|
+| Rendimento annualizzato | 42,74% |
+| Max drawdown | -45,09% |
+| Sharpe Ratio | 1,079 |
+| Profit factor | 5,999 |
+| Operazioni chiuse | 28 |
+
+Le sezioni sotto restano come storico dei test che hanno portato alla
+promozione.
 
 Periodo backtest effettivo:
 

@@ -17,8 +17,12 @@ Cloudflare.
   (`2017-11-11` nel run corrente), senza riempimento EUR all'indietro.
 - Backtest esteso con profit factor, metriche qualita' trade, turnover e
   scenari costo/slippage.
-- Strategia ufficiale corrente: baseline SMA50 a 2 giorni. Il segnale `VENDI`
-  scatta se il Close resta sotto SMA50 per due giorni consecutivi.
+- Strategia ufficiale corrente: Baseline promossa il 2026-06-28.
+  - `ACQUISTA`: condizioni storiche + filtro `RSI <= 65` sui soli nuovi
+    ingressi.
+  - `VENDI`: `Close < SMA50` per 2 giorni consecutivi oppure trailing stop 8%
+    dal massimo Close post-ingresso, confermato da momentum 7 giorni >= -5% e
+    volume relativo >= +20%.
 - Esperimenti modello isolati in `scripts/run_model_experiments.py`; non
   modificano i segnali ufficiali.
 - Esperimenti uscite protettive isolati in `scripts/run_exit_experiments.py`;
@@ -27,12 +31,11 @@ Cloudflare.
   `scripts/run_stop_loss_experiments.py`; non modifica i segnali ufficiali.
 - Approfondimento trailing stop su Close isolato in
   `scripts/run_trailing_stop_experiments.py`; non modifica i segnali ufficiali.
-- Esperimento trailing stop 8% con conferma momentum/volume isolato in
-  `scripts/run_confirmed_trailing_experiments.py`; non modifica i segnali
-  ufficiali.
-- Candidati sperimentali in progress: Trail8 momentum >= -5% e volume >= +10%
-  e trailing dinamico 15%/8%. Nessuno dei due e' una regola operativa; entrambi
-  restano test da validare contro drawdown, costi e robustezza temporale.
+- Storico esperimenti trailing stop 8% con conferma momentum/volume isolato in
+  `scripts/run_confirmed_trailing_experiments.py`.
+- Decisione finale: promosso solo `Trail8 momentum >= -5% e volume >= +20%`;
+  restano non ufficiali le varianti `volume +10%`, `momentum -6%`, trailing
+  dinamico 15%/8% e conferma aggiuntiva `trade return >= 15%`.
 - Validazione candidati principali isolata in
   `scripts/run_candidate_validation.py`; confronta periodo completo,
   sottoperiodi e walk-forward senza modificare i segnali ufficiali.
@@ -153,10 +156,10 @@ Da completare:
   promozione del candidato combinato a nuova Baseline ufficiale.
 - `reports/official_baseline_implementation.md`: registrazione della
   promozione effettiva del candidato combinato a Baseline ufficiale.
-- Analisi ingressi chiusa provvisoriamente: `RSI <= 65` resta candidato
-  principale, non ufficiale.
-- Analisi uscite chiusa provvisoriamente: `Trail8 confermato -5 / vol +20`
-  resta candidato uscita principale, non ufficiale.
+- Analisi ingressi chiusa: `RSI <= 65` promosso a filtro ufficiale sui soli
+  nuovi ingressi.
+- Analisi uscite chiusa: `Trail8 confermato -5 / vol +20` promosso a uscita
+  ufficiale aggiuntiva.
 - Comparazione finale completata: il combinato migliora la Baseline ufficiale
   su periodo completo, costi e anni principali, ma resta candidato in
   validazione per audit residuo 2023.
@@ -166,9 +169,9 @@ Da completare:
 - Validazione cronologica completata: il candidato combinato principale batte
   la Baseline in 3 finestre su 4 e resta invariato nella quarta; la variante
   `trade return >= 15%` non viene promossa per beneficio marginale.
-- Gate decisionale finale completato: il candidato principale e' tecnicamente
-  promuovibile; la Baseline ufficiale resta invariata fino a conferma esplicita
-  di implementazione.
+- Gate decisionale finale completato: il candidato principale e' stato
+  promosso a nuova Baseline ufficiale con conferma esplicita di
+  implementazione.
 - Nuova Baseline ufficiale implementata: ingresso Baseline + `RSI <= 65` sui
   soli nuovi ingressi, uscita ufficiale + `Trail8 -5 / vol +20`.
 - Worker Telegram deployato dopo l'implementazione per aggiornare `/conditions`

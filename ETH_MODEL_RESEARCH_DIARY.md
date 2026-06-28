@@ -1908,3 +1908,34 @@ Decisione:
 
 - nessuna modifica ai segnali;
 - intervento solo di allineamento grafico/documentale della dashboard.
+
+### Audit documentazione modello
+
+Motivo:
+
+- verificare che la costruzione del modello, le decisioni prese, le regole
+  promosse e le varianti scartate siano memorizzate nei file `.md` del
+  progetto;
+- evitare che file di sintesi mostrino ancora la vecchia Baseline dopo la
+  promozione del modello.
+
+File riallineati:
+
+- `README.md`;
+- `PROJECT_OVERVIEW.md`;
+- `PROJECT_STATUS.md`;
+- `MODEL_IMPROVEMENT_ROADMAP.md`;
+- `ETH_PROJECT_ROADMAP.md`;
+- `DECISION_LOG.md`.
+
+File aggiunto:
+
+- `MODEL_DOCUMENTATION_INDEX.md`, indice dei documenti rilevanti per stato
+  ufficiale, diario, decisioni, report di validazione e reversibilita'.
+
+Esito:
+
+- le regole ufficiali correnti sono documentate nei file di sintesi;
+- la promozione del candidato combinato e' registrata nel decision log;
+- le varianti non promosse restano tracciate come storiche/sperimentali;
+- nessuna modifica ai segnali o al codice operativo del modello.
