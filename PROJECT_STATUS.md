@@ -115,6 +115,8 @@ Da completare:
   candidato combinato su RSI, momentum, volume e walk-forward.
 - `scripts/run_top_candidate_comparison.py`: confronto diretto tra Baseline e
   i migliori candidati combinati emersi dallo stress test.
+- `scripts/run_false_exit_recurrence_analysis.py`: analisi della ricorrenza
+  delle false uscite tipo gennaio 2021.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare

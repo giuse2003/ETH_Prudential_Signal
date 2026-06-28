@@ -784,3 +784,51 @@ Decisione:
 - nessuna variante viene promossa;
 - prossimo test: cercare una conferma anti-falsa-uscita per gennaio 2021 senza
   perdere le uscite protettive del 2021-05, 2021-09, 2024-03 e 2024-12.
+
+### Ricorrenza falsa uscita gennaio 2021
+
+File generati:
+
+- `scripts/run_false_exit_recurrence_analysis.py`;
+- `reports/false_exit_recurrence.md`.
+
+Definizione di evento tipo gennaio 2021:
+
+- uscita trailing confermata;
+- `VENDI` ufficiale successivo a prezzo piu' alto;
+- rientro candidato a prezzo piu' alto;
+- saldo del segmento peggiore della Baseline di almeno 5 punti percentuali.
+
+Risultato:
+
+| Variante | Uscite | Segmenti peggiori | Eventi tipo gennaio 2021 |
+|---|---:|---:|---:|
+| RSI62 mom -6 vol +20 | 7 | 2 | 1 |
+| RSI65 mom -5 vol +20 | 5 | 1 | 0 |
+| RSI65 mom -6 vol +20 | 7 | 2 | 1 |
+| Trail only mom -6 vol +20 | 8 | 3 | 1 |
+
+Eventi tipo gennaio 2021:
+
+| Variante | Uscita | Segmento Baseline | Delta segmento | Rientro | Delta rientro |
+|---|---|---|---:|---|---:|
+| RSI62 mom -6 vol +20 | 2021-01-11 | 2020-10-21 -> 2021-02-26 | -42,55% | 2021-01-22 | +13,32% |
+| RSI65 mom -6 vol +20 | 2021-01-12 | 2020-10-21 -> 2021-02-26 | -57,44% | 2021-01-22 | +18,86% |
+| Trail only mom -6 vol +20 | 2021-01-12 | 2020-10-21 -> 2021-02-26 | -89,30% | 2021-01-19 | +32,75% |
+
+Falsi segnali minori:
+
+- 2023-04-20: peggiora il segmento di circa -0,48%;
+- 2024-06-17 nella variante senza filtro RSI: peggiora di circa -0,28%.
+
+Decisione:
+
+- il comportamento grave del gennaio 2021 appare isolato;
+- il problema nasce dalla soglia `momentum >= -6%`;
+- la variante `momentum >= -5%` evita questa falsa uscita grave;
+- quindi gennaio 2021 va trattato come fenomeno raro di trend parabolico, non
+  come errore ricorrente ordinario;
+- questo rende `RSI65 mom -5 vol +20` meno aggressiva ma piu' pulita;
+- `RSI62/65 mom -6 vol +20` resta statisticamente superiore, ma richiede una
+  protezione anti-trend-parabolico prima di essere considerata candidata
+  promuovibile.
