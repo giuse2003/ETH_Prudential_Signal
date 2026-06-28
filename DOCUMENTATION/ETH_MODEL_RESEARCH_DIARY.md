@@ -1948,3 +1948,35 @@ Esito:
 - la promozione del candidato combinato e' registrata nel decision log;
 - le varianti non promosse restano tracciate come storiche/sperimentali;
 - nessuna modifica ai segnali o al codice operativo del modello.
+
+### Riordino documentazione in cartella dedicata
+
+Motivo:
+
+- rendere piu' ordinata la root del progetto;
+- separare la documentazione progettuale stabile dalla dashboard pubblica in
+  `docs/` e dai report tecnici rigenerabili in `reports/`;
+- mantenere piu' chiaro il percorso cronologico delle decisioni.
+
+Modifica eseguita:
+
+- creata cartella `DOCUMENTATION/`;
+- spostati nella nuova cartella i documenti `.md` progettuali:
+  - diario modello;
+  - roadmap;
+  - decision log;
+  - overview;
+  - status;
+  - guide Cloudflare, Supabase, Telegram e Render;
+  - log di verifica regole;
+- lasciato `README.md` nella root come pagina iniziale standard del
+  repository;
+- lasciati i report in `../reports/`, perche' sono output tecnici generati dagli
+  script.
+
+Decisione:
+
+- da ora la documentazione progettuale da leggere deve stare in
+  `DOCUMENTATION/`;
+- i nuovi report di test possono restare in `../reports/` se sono generati da
+  script o collegati direttamente alle analisi quantitative.

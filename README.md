@@ -254,7 +254,8 @@ Il deploy e il collegamento Telegram sono stati verificati su Cloudflare Worker:
 - webhook Telegram registrato su `/webhook`;
 - comando `/segnale` verificato con risposta immediata.
 
-Guida completa: [CLOUDFLARE_WORKER_DEPLOYMENT.md](CLOUDFLARE_WORKER_DEPLOYMENT.md).
+Guida completa:
+[CLOUDFLARE_WORKER_DEPLOYMENT.md](DOCUMENTATION/CLOUDFLARE_WORKER_DEPLOYMENT.md).
 
 Il workflow `Telegram command menu` serve solo ad aggiornare il menu dei
 comandi Telegram. Il workflow `Hourly ETH monitor (Telegram)` deve restare
@@ -286,6 +287,7 @@ data/           download, caricamento e filtro candele chiuse
 indicators/     indicatori tecnici
 live/           prezzi spot Coinbase
 notifications/  invio Telegram
+DOCUMENTATION/  documentazione progettuale e decisioni
 reports/        generazione degli output
 state/          stato persistente del monitor
 strategy/       punteggio, segnale e rischio
@@ -297,7 +299,8 @@ render.yaml          configurazione legacy Render
 
 Per lo stato corrente e le decisioni progettuali:
 
-- [PROJECT_STATUS.md](PROJECT_STATUS.md)
-- [DECISION_LOG.md](DECISION_LOG.md)
-- [TELEGRAM_SUBSCRIBERS_ROADMAP.md](TELEGRAM_SUBSCRIBERS_ROADMAP.md)
-- [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
+- [MODEL_DOCUMENTATION_INDEX.md](DOCUMENTATION/MODEL_DOCUMENTATION_INDEX.md)
+- [PROJECT_STATUS.md](DOCUMENTATION/PROJECT_STATUS.md)
+- [DECISION_LOG.md](DOCUMENTATION/DECISION_LOG.md)
+- [TELEGRAM_SUBSCRIBERS_ROADMAP.md](DOCUMENTATION/TELEGRAM_SUBSCRIBERS_ROADMAP.md)
+- [SUPABASE_SETUP.md](DOCUMENTATION/SUPABASE_SETUP.md)
