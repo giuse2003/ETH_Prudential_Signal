@@ -109,6 +109,8 @@ Da completare:
   filtro sperimentale RSI sugli ingressi, con soglie, costi, anni e trade.
 - `scripts/run_combined_entry_exit_validation.py`: validazione sperimentale
   combinata tra filtro ingresso RSI e trailing stop 8% confermato.
+- `scripts/run_combined_candidate_event_audit.py`: audit evento-per-evento del
+  candidato combinato, con ingressi bloccati, uscite trailing e trade.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare

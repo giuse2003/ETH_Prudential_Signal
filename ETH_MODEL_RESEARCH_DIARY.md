@@ -576,3 +576,77 @@ Decisione:
 - non va ancora promossa: serve controllo evento per evento e walk-forward piu'
   severo;
 - il segnale ufficiale resta invariato.
+
+### Audit evento per evento del candidato combinato
+
+File generati:
+
+- `scripts/run_combined_candidate_event_audit.py`;
+- `reports/combined_candidate_event_audit.md`.
+
+Candidato auditato:
+
+- ingresso filtrato con `RSI <= 65`;
+- trailing stop 8%;
+- conferma momentum 7g >= -5%;
+- conferma volume relativo >= +20%.
+
+Eventi rilevati:
+
+| Tipo evento | Conteggio |
+|---|---:|
+| Segnali `ACQUISTA` bloccati da RSI > 65 | 189 |
+| Nuovi ingressi effettivamente bloccati | 16 |
+| Episodi distinti di nuovo ingresso bloccato | 7 |
+| `ACQUISTA` bloccati mentre gia' esposti | 173 |
+| Uscite trailing confermate | 5 |
+
+Episodi di nuovo ingresso bloccato:
+
+| Periodo | Giorni | Lettura |
+|---|---:|---|
+| 2020-02-16 -> 2020-02-18 | 3 | RSI 71-77, distanza SMA200 47-59%, momentum alto |
+| 2020-05-30 | 1 | RSI 70, distanza SMA200 37% |
+| 2020-06-01 | 1 | RSI 68, momentum 20% |
+| 2021-05-13 -> 2021-05-14 | 2 | distanza SMA200 156-177%, fase estremamente estesa |
+| 2024-05-20 -> 2024-05-24 | 5 | RSI 68-73, volume relativo molto alto |
+| 2024-05-27 -> 2024-05-28 | 2 | RSI 69-72, distanza SMA200 36-38% |
+| 2024-12-05 -> 2024-12-06 | 2 | RSI 69-73, distanza SMA200 27-34% |
+
+Uscite trailing confermate:
+
+| Uscita | Entry | Return da entry | VENDI ufficiale successivo | Delta vs VENDI ufficiale | Rientro candidato | Delta rientro |
+|---|---|---:|---|---:|---|---:|
+| 2020-09-04 | 2020-07-21 | +54,42% | 2020-09-06 | -8,96% | 2020-10-12 | +0,08% |
+| 2021-05-12 | 2021-03-31 | +91,62% | 2021-05-22 | -39,87% | 2021-07-26 | -39,64% |
+| 2021-09-07 | 2021-07-26 | +52,91% | 2021-09-21 | -18,48% | 2021-10-01 | -1,38% |
+| 2023-04-20 | 2023-03-13 | +13,06% | 2023-05-08 | -5,09% | 2023-05-05 | +0,45% |
+| 2024-03-15 | 2024-02-06 | +55,53% | 2024-04-03 | -10,92% | 2024-04-08 | -0,81% |
+
+Saldo sul segmento Baseline contenente l'uscita trailing:
+
+| Uscita trailing | Segmento Baseline | Return Baseline | Return candidato stesso intervallo | Delta candidato |
+|---|---|---:|---:|---:|
+| 2020-09-04 | 2020-07-21 -> 2020-09-06 | +40,58% | +54,42% | +13,84% |
+| 2021-05-12 | 2021-03-31 -> 2021-05-22 | +15,22% | +91,62% | +76,40% |
+| 2021-09-07 | 2021-07-26 -> 2021-09-21 | +24,64% | +52,91% | +28,26% |
+| 2023-04-20 | 2023-03-13 -> 2023-05-08 | +7,30% | +6,82% | -0,48% |
+| 2024-03-15 | 2024-02-06 -> 2024-04-03 | +38,55% | +55,53% | +16,98% |
+
+Decisione:
+
+- 4 uscite trailing su 5 migliorano il segmento Baseline;
+- 1 uscita peggiora lievemente il segmento, nel caso 2023-04-20;
+- tutte le uscite anticipano un `VENDI` ufficiale successivo a prezzo piu'
+  basso;
+- il rientro puo' essere leggermente piu' alto in 2 casi, ma il saldo di
+  protezione resta favorevole in 4 casi su 5;
+- il candidato resta sperimentale ma supera il primo audit evento-per-evento.
+
+Prossimo controllo:
+
+- walk-forward piu' severo;
+- verificare quanto il risultato dipende dai parametri `RSI 65`, `momentum -5`
+  e `volume +20`;
+- controllare il caso 2023-04-20 per capire se esiste una conferma aggiuntiva
+  che elimini l'unica uscita leggermente inefficiente senza perdere le altre 4.
