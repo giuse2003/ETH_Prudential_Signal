@@ -2001,3 +2001,64 @@ Decisione:
 - nessuna modifica al modello;
 - nessuna modifica ai segnali;
 - solo correzione della formulazione pubblica della condizione di acquisto.
+
+### Test sperimentale Trail8 prima delle condizioni BUY
+
+Motivo:
+
+- e' emerso che, nella Baseline attuale, il trailing stop viene valutato solo
+  dopo le condizioni di acquisto;
+- in una fase forte/parabolica il prezzo puo' rompere il Trail8 mentre le
+  condizioni BUY restano ancora vere;
+- serve verificare se conviene uscire comunque quando il Trail8 e' confermato.
+
+Regola testata:
+
+- Baseline invariata per gli ingressi;
+- `VENDI` ufficiale sotto SMA50 resta invariato;
+- quando la posizione e' gia' aperta, il Trail8 confermato viene valutato
+  prima delle condizioni BUY;
+- se Trail8 e' colpito e confermato da momentum 7g >= -5% e volume relativo
+  >= +20%, il sistema esce anche se le condizioni BUY sono ancora vere.
+
+Risultati USD sul periodo completo:
+
+| Modello | Ann. | Max DD | Sharpe | PF | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 43,61% | -44,93% | 1,084 | 5,889 | 28 |
+| Trail8 priority | 46,35% | -42,79% | 1,207 | 4,708 | 34 |
+
+Stress costi:
+
+- con costo 0,25% per cambio esposizione:
+  - Baseline ufficiale: ann. 41,30%, max DD -45,07%, Sharpe 1,045;
+  - Trail8 priority: ann. 43,49%, max DD -44,78%, Sharpe 1,154;
+- con stress 1,00%:
+  - Baseline ufficiale: ann. 34,55%, Sharpe 0,925;
+  - Trail8 priority: ann. 35,21%, Sharpe 0,992.
+
+Eventi:
+
+- uscite Trail8 priority totali: 12;
+- uscite Trail8 priority mentre le condizioni BUY erano ancora vere: 10;
+- caso 2025:
+  - entrata 2025-07-07 a 2543,01 USD;
+  - uscita Trail8 priority 2025-08-18 a 4312,50 USD;
+  - rendimento trade +69,58%;
+  - nella Baseline ufficiale lo stesso trade restava aperto fino al VENDI del
+    2025-09-23.
+
+File generati:
+
+- `scripts/run_trail_priority_validation.py`;
+- `reports/trail_priority_validation.md`;
+- `reports/trail_priority_events.csv`;
+- `reports/trail_priority_trades.csv`.
+
+Decisione provvisoria:
+
+- la variante migliora rendimento annualizzato, max drawdown e Sharpe;
+- aumenta pero' le operazioni da 28 a 34 e riduce il profit factor;
+- non viene promossa automaticamente;
+- prossimo controllo consigliato: analisi evento-per-evento delle 12 uscite
+  Trail8 priority, distinguendo uscite utili da falsi stop.
