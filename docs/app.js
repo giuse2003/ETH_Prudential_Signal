@@ -384,20 +384,44 @@ function drawCompositeGrid(ctx, rows, xFor, width, height, padding, scale) {
     ctx.fillText(compactUsd(value), 8, y + 4);
   }
 
-  [40, 70].forEach((level) => {
-    const y = scale.rsiYFor(level);
-    const isSignalThreshold = level === 40;
+  [
+    {
+      level: 40,
+      label: "RSI 40",
+      stroke: "rgba(14,165,233,0.95)",
+      fill: "rgba(125,211,252,0.98)",
+      lineWidth: 2,
+      labelX: 16,
+    },
+    {
+      level: 65,
+      label: "RSI 65",
+      stroke: "rgba(167,139,250,0.95)",
+      fill: "rgba(196,181,253,0.98)",
+      lineWidth: 2,
+      labelX: 16,
+      dash: [8, 6],
+    },
+    {
+      level: 70,
+      label: "70",
+      stroke: "rgba(255,255,255,0.08)",
+      fill: "rgba(248,250,252,0.68)",
+      lineWidth: 1,
+      labelX: 26,
+    },
+  ].forEach((threshold) => {
+    const y = scale.rsiYFor(threshold.level);
     ctx.save();
-    if (isSignalThreshold) {
-      ctx.strokeStyle = "rgba(14,165,233,0.95)";
-      ctx.lineWidth = 2;
-      ctx.fillStyle = "rgba(125,211,252,0.98)";
-    }
+    ctx.strokeStyle = threshold.stroke;
+    ctx.lineWidth = threshold.lineWidth;
+    ctx.fillStyle = threshold.fill;
+    if (threshold.dash) ctx.setLineDash(threshold.dash);
     ctx.beginPath();
     ctx.moveTo(padding.left, y);
     ctx.lineTo(width - padding.right, y);
     ctx.stroke();
-    ctx.fillText(isSignalThreshold ? "RSI 40" : String(level), isSignalThreshold ? 16 : 26, y + 4);
+    ctx.fillText(threshold.label, threshold.labelX, y + 4);
     ctx.restore();
   });
 

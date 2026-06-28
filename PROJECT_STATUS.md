@@ -179,6 +179,8 @@ Da completare:
   Cloudflare: `8557d497-04f3-4580-90c5-00f191331514`.
 - Dashboard statica e `live-status.json` allineati alle nuove condizioni.
   Ultimo Version ID Cloudflare: `4aecc8cd-e00e-4120-ab1f-cb6180cc4d87`.
+- Grafico dashboard allineato visivamente al filtro RSI ufficiale: legenda e
+  pannello RSI mostrano sia `Soglia RSI 40` sia `Soglia RSI 65`.
 - Analisi corrente del modello: commit e push delle modifiche; poi monitoraggio
   del primo run operativo e del comando `/conditions`.
   Benchmark operativo: `Baseline ufficiale`; i confronti con benchmark passivi

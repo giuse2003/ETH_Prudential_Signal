@@ -444,6 +444,9 @@ h1 {
 .legend-rsi-threshold {
   background: #0ea5e9;
 }
+.legend-rsi-upper-threshold {
+  background: #a78bfa;
+}
 .legend-volume { background: #38bdf8; opacity: 0.7; }
 
 .chart-wrap {

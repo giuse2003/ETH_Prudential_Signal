@@ -1883,3 +1883,26 @@ Nuovo deploy Worker:
 - comando: `npx wrangler deploy`;
 - Worker: `eth-prudential-signal`;
 - Version ID Cloudflare: `4aecc8cd-e00e-4120-ab1f-cb6180cc4d87`.
+
+### Allineamento visuale dashboard RSI 65
+
+Motivo:
+
+- la logica ufficiale e i testi erano gia' aggiornati con `RSI <= 65` sugli
+  ingressi;
+- il grafico della dashboard mostrava ancora solo la linea `RSI 40`, creando
+  ambiguita' visiva sul filtro di ingresso superiore.
+
+Modifica eseguita:
+
+- aggiunta in legenda la voce `Soglia RSI 65`;
+- aggiunta nel pannello RSI una linea dedicata a quota 65;
+- mantenuta la linea `RSI 40`, che resta la soglia minima del filtro RSI;
+- aggiornati i parametri cache degli asset dashboard:
+  - `style.css?v=8`;
+  - `app.js?v=9`.
+
+Decisione:
+
+- nessuna modifica ai segnali;
+- intervento solo di allineamento grafico/documentale della dashboard.
