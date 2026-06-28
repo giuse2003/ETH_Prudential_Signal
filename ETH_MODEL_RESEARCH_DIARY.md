@@ -650,3 +650,63 @@ Prossimo controllo:
   e `volume +20`;
 - controllare il caso 2023-04-20 per capire se esiste una conferma aggiuntiva
   che elimini l'unica uscita leggermente inefficiente senza perdere le altre 4.
+
+### Stress test parametri del candidato combinato
+
+File generati:
+
+- `scripts/run_combined_parameter_stress.py`;
+- `reports/combined_parameter_stress.md`.
+
+Griglia testata:
+
+- RSI massimo: 60, 62, 65, 68, 70;
+- momentum 7g minimo: -6%, -5%, -4%;
+- volume relativo minimo: +10%, +20%, +30%, +40%;
+- trailing stop fisso: 8%.
+
+Risultato principale:
+
+- il candidato non dipende da un singolo punto;
+- esiste una zona forte con RSI 60-65, momentum -6/-5 e volume +10/+20;
+- 18 combinazioni superano contemporaneamente:
+  - Sharpe completo >= 1,15;
+  - max drawdown non peggiore di -45%;
+  - Sharpe 2022-oggi sopra Baseline.
+
+Top per Sharpe completo:
+
+| Variante | Ann. | Max DD | Sharpe | Sharpe 2022-oggi | PF |
+|---|---:|---:|---:|---:|---:|
+| RSI62 + Trail8 mom -6 vol +20 | +50,83% | -33,99% | 1,289 | 0,525 | 6,660 |
+| RSI60 + Trail8 mom -6 vol +20 | +49,44% | -32,90% | 1,287 | 0,484 | 6,391 |
+| RSI65 + Trail8 mom -6 vol +20 | +50,26% | -33,99% | 1,272 | 0,525 | 6,554 |
+| RSI65 + Trail8 mom -5 vol +20 | +51,41% | -40,69% | 1,265 | 0,428 | 6,747 |
+| RSI65 + Trail8 mom -5 vol +10 | +50,64% | -40,69% | 1,262 | 0,430 | 6,397 |
+
+Lettura:
+
+- la variante iniziale `RSI65 + mom -5 + vol +20` resta forte;
+- la zona `mom -6 + vol +20` migliora nettamente il drawdown;
+- `RSI62 + mom -6 + vol +20` diventa la migliore variante statistica della
+  griglia: Sharpe 1,289 e max drawdown -33,99%;
+- la scelta tra `RSI65/mom -5` e `RSI62/mom -6` non va fatta solo sul numero
+  migliore: va verificata sugli eventi e sui trade persi/aggiunti.
+
+Walk-forward:
+
+| Train | Test | Parametri selezionati | Test Sharpe | Baseline Sharpe | Delta |
+|---|---|---|---:|---:|---:|
+| 2017-2020 | 2021-2022 | RSI68 mom -5 vol +10 | 1,392 | 1,213 | +0,179 |
+| 2017-2022 | 2023-2026 | RSI65 mom -6 vol +30 | 0,437 | 0,322 | +0,115 |
+| 2017-2024 | 2025-2026 | RSI62 mom -6 vol +20 | 0,857 | 0,857 | 0,000 |
+
+Decisione:
+
+- il candidato combinato supera lo stress test parametrico iniziale;
+- la robustezza migliora se allarghiamo la conferma momentum da -5% a -6%;
+- volume +20% resta un punto solido;
+- RSI 62-65 e' la zona piu' interessante;
+- nessuna regola viene promossa: serve audit evento-per-evento della nuova
+  variante migliore `RSI62 + mom -6 + vol +20` e confronto diretto con
+  `RSI65 + mom -5 + vol +20`.
