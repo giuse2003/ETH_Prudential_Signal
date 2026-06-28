@@ -1980,3 +1980,24 @@ Decisione:
   `DOCUMENTATION/`;
 - i nuovi report di test possono restare in `../reports/` se sono generati da
   script o collegati direttamente alle analisi quantitative.
+
+### Correzione README su range RSI acquisto
+
+Motivo:
+
+- la formulazione `RSI(14) <= 65 for new entries` era corretta tecnicamente,
+  ma meno chiara nella sezione pubblica `BUY / ACQUISTA`;
+- la frase aggiuntiva che spiegava che il filtro non forzava uscite era
+  fuorviante in una sezione dedicata alle condizioni di acquisto.
+
+Modifica eseguita:
+
+- rimossa dal README la frase esplicativa sulle uscite;
+- sostituite le due condizioni RSI separate con una sola formula:
+  - `40 <= RSI(14) <= 65`.
+
+Decisione:
+
+- nessuna modifica al modello;
+- nessuna modifica ai segnali;
+- solo correzione della formulazione pubblica della condizione di acquisto.
