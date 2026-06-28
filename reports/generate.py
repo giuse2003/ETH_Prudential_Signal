@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from config import CFG
-from strategy.signals import explain_latest_row
+from strategy.signals import ENTRY_RSI_MAX, explain_latest_row
 
 
 def save_historical_csv(df: pd.DataFrame, out_path: str | Path) -> Path:
@@ -121,10 +121,14 @@ def save_live_status_json(
         "prezzo live sopra SMA200 live",
         "SMA50 live sopra SMA200 live",
         "RSI live uguale o maggiore di 40",
+        f"RSI live uguale o minore di {ENTRY_RSI_MAX:.0f}",
         "prezzo live sopra quello di 7 giorni prima",
         "volume 24h live sopra media 20 giorni",
     ]
-    sell_labels = ["prezzo live sotto SMA50 live per 2 giorni consecutivi"]
+    sell_labels = [
+        "prezzo live sotto SMA50 live per 2 giorni consecutivi",
+        "trailing stop 8% confermato da momentum e volume",
+    ]
     payload = {
         "signal": signal,
         "price_usd": float(price_usd),
@@ -414,6 +418,10 @@ def save_status_json(
                 "passed": bool(latest["RSI"] >= 40),
             },
             {
+                "label": f"RSI uguale o minore di {ENTRY_RSI_MAX:.0f}",
+                "passed": bool(latest["RSI"] <= ENTRY_RSI_MAX),
+            },
+            {
                 "label": f"prezzo sopra quello di {CFG.momentum_days} giorni prima",
                 "passed": bool(latest["Close"] > latest[momentum_col]),
             },
@@ -426,6 +434,10 @@ def save_status_json(
             {
                 "label": "prezzo sotto SMA50 per 2 giorni consecutivi",
                 "passed": sell_below_sma50_2d,
+            },
+            {
+                "label": "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
+                "passed": bool(latest.get("Trail8_Confirmed", False)),
             },
         ],
     }
@@ -448,6 +460,9 @@ def save_status_json(
         "previous_close": float(prev.get("Close")) if prev is not None and not pd.isna(prev.get("Close")) else None,
         "previous_sma50": float(prev.get("SMA50")) if prev is not None and not pd.isna(prev.get("SMA50")) else None,
         "below_sma50_2d": sell_below_sma50_2d,
+        "trail8_stop_hit": bool(latest.get("Trail8_Stop_Hit", False)),
+        "trail8_confirmed": bool(latest.get("Trail8_Confirmed", False)),
+        "entry_rsi_filter_passed": bool(latest.get("Entry_RSI_Filter_Passed", False)),
         "condition_groups": condition_groups,
     }
     

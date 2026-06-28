@@ -19,6 +19,12 @@ import pandas as pd
 from config import CFG
 
 
+ENTRY_RSI_MAX = 65.0
+TRAILING_STOP_PCT = 0.08
+TRAILING_MOMENTUM_MIN = -0.05
+TRAILING_VOLUME_REL_MIN = 0.20
+
+
 def _distance_from_sma200_pct(close: pd.Series, sma200: pd.Series) -> pd.Series:
     """
     Distanza (%): (Close - SMA200) / SMA200 * 100
@@ -100,23 +106,103 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     days = CFG.momentum_days
     close_momentum = df[f"Close_{days}d_ago"] if f"Close_{days}d_ago" in df.columns else pd.Series(np.nan, index=df.index)
 
-    buy_cond = (
+    entry_rsi_filter = rsi <= ENTRY_RSI_MAX
+    official_buy_cond = (
         (close > sma200) &
         (sma50 > sma200) &
         (rsi >= 40) &
         (close > close_momentum) &
         (volume > volume_avg20)
     )
+    filtered_new_entry_cond = official_buy_cond & entry_rsi_filter
 
     below_sma50 = close < sma50
-    sell_cond = below_sma50 & below_sma50.shift(1).fillna(False)
+    official_sell_cond = below_sma50 & below_sma50.shift(1).fillna(False)
 
-    signal = np.full(len(df), "MANTIENI", dtype=object)
-    signal[buy_cond] = "ACQUISTA"
-    signal[sell_cond] = "VENDI"
-    
+    signal, trail_stop_hit, trail_confirmed = _stateful_signals(
+        df=df,
+        official_buy_cond=official_buy_cond,
+        filtered_new_entry_cond=filtered_new_entry_cond,
+        official_sell_cond=official_sell_cond,
+    )
+
+    df["Entry_RSI_Filter_Passed"] = entry_rsi_filter
+    df["Official_Sell"] = official_sell_cond
+    df["Trail8_Stop_Hit"] = trail_stop_hit
+    df["Trail8_Confirmed"] = trail_confirmed
     df["Segnale"] = signal
     return df
+
+
+def _stateful_signals(
+    *,
+    df: pd.DataFrame,
+    official_buy_cond: pd.Series,
+    filtered_new_entry_cond: pd.Series,
+    official_sell_cond: pd.Series,
+) -> tuple[np.ndarray, pd.Series, pd.Series]:
+    """
+    Applica la Baseline ufficiale con il trailing stop confermato.
+
+    Il trailing richiede stato di posizione: massimo Close raggiunto da quando
+    la posizione e' aperta. Lo stato viene ricostruito scorrendo la serie.
+    """
+    signal = np.full(len(df), "MANTIENI", dtype=object)
+    trail_stop_hit = pd.Series(False, index=df.index)
+    trail_confirmed = pd.Series(False, index=df.index)
+
+    exposure = False
+    peak_close: float | None = None
+
+    for pos, (date, row) in enumerate(df.iterrows()):
+        close_value = float(row["Close"])
+        official_buy = bool(official_buy_cond.loc[date])
+        filtered_new_entry = bool(filtered_new_entry_cond.loc[date])
+        should_official_sell = bool(official_sell_cond.loc[date])
+        should_trail_sell = False
+
+        if should_official_sell:
+            signal[pos] = "VENDI"
+            exposure = False
+            peak_close = None
+            continue
+
+        if official_buy:
+            if not exposure and filtered_new_entry:
+                signal[pos] = "ACQUISTA"
+                exposure = True
+                peak_close = close_value
+            elif exposure:
+                peak_close = max(peak_close if peak_close is not None else close_value, close_value)
+            continue
+
+        if exposure:
+            peak_close = max(peak_close if peak_close is not None else close_value, close_value)
+            stop_hit = close_value <= peak_close * (1.0 - TRAILING_STOP_PCT)
+            trail_stop_hit.loc[date] = bool(stop_hit)
+            if stop_hit:
+                close_ago = row.get(f"Close_{CFG.momentum_days}d_ago", np.nan)
+                volume_avg = row.get("VolumeAvg20", np.nan)
+                momentum_7d = close_value / float(close_ago) - 1.0 if pd.notna(close_ago) and float(close_ago) != 0.0 else np.nan
+                volume_rel = (
+                    float(row["Volume"]) / float(volume_avg) - 1.0
+                    if pd.notna(volume_avg) and float(volume_avg) != 0.0
+                    else np.nan
+                )
+                should_trail_sell = bool(
+                    pd.notna(momentum_7d)
+                    and pd.notna(volume_rel)
+                    and momentum_7d >= TRAILING_MOMENTUM_MIN
+                    and volume_rel >= TRAILING_VOLUME_REL_MIN
+                )
+                trail_confirmed.loc[date] = should_trail_sell
+
+        if should_trail_sell:
+            signal[pos] = "VENDI"
+            exposure = False
+            peak_close = None
+
+    return signal, trail_stop_hit, trail_confirmed
 
 
 def compute_risk_level(df: pd.DataFrame) -> pd.Series:
@@ -245,10 +331,10 @@ def condition_key_from_statuses(buy_statuses: list[bool], sell_statuses: list[bo
 
 
 def signal_from_condition_statuses(buy_statuses: list[bool], sell_statuses: list[bool]) -> str:
-    if all(buy_statuses):
-        return "ACQUISTA"
     if any(sell_statuses):
         return "VENDI"
+    if all(buy_statuses):
+        return "ACQUISTA"
     return "MANTIENI"
 
 
@@ -263,6 +349,7 @@ def live_condition_statuses(
         bool(row["Close"] > row["SMA200"]),
         bool(row["SMA50"] > row["SMA200"]),
         bool(row["RSI"] >= 40),
+        bool(row["RSI"] <= ENTRY_RSI_MAX),
         bool(row["Close"] > row[momentum_col]),
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
@@ -271,7 +358,8 @@ def live_condition_statuses(
             row["Close"] < row["SMA50"]
             and previous is not None
             and previous["Close"] < previous["SMA50"]
-        )
+        ),
+        bool(row.get("Trail8_Confirmed", False)),
     ]
     return buy_statuses, sell_statuses
 
@@ -340,6 +428,7 @@ def _buy_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
         bool(row["Close"] > row["SMA200"]),
         bool(row["SMA50"] > row["SMA200"]),
         bool(row["RSI"] >= 40),
+        bool(row["RSI"] <= ENTRY_RSI_MAX),
         bool(row["Close"] > row[momentum_col]),
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
@@ -352,7 +441,8 @@ def _sell_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
     previous = df_with_signals.iloc[-2]
     row = df_with_signals.iloc[-1]
     return [
-        bool(row["Close"] < row["SMA50"] and previous["Close"] < previous["SMA50"])
+        bool(row["Close"] < row["SMA50"] and previous["Close"] < previous["SMA50"]),
+        bool(row.get("Trail8_Confirmed", False)),
     ]
 
 

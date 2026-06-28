@@ -14,11 +14,15 @@ const CONDITIONS_MESSAGE = [
   "1. prezzo sopra SMA200;",
   "2. SMA50 sopra SMA200;",
   "3. RSI uguale o maggiore di 40;",
-  "4. prezzo sopra quello di 7 giorni prima;",
-  "5. volume sopra media 20 giorni.",
+  "4. RSI uguale o minore di 65;",
+  "5. prezzo sopra quello di 7 giorni prima;",
+  "6. volume sopra media 20 giorni.",
   "",
-  "Per VENDI deve essere vera questa condizione:",
-  "1. prezzo sotto SMA50 per 2 giorni consecutivi.",
+  "Per VENDI deve essere vera almeno una di queste condizioni:",
+  "1. prezzo sotto SMA50 per 2 giorni consecutivi;",
+  "2. trailing stop 8% dal massimo post-ingresso, confermato da:",
+  "   - momentum 7 giorni uguale o maggiore di -5%;",
+  "   - volume almeno 20% sopra la media 20 giorni.",
 ].join("\n");
 const PRIVACY_MESSAGE = [
   "PRIVACY",
@@ -347,6 +351,7 @@ function buildLiveSnapshot(rows, market) {
     { label: "prezzo sopra SMA200", passed: market.priceUsd > sma200 },
     { label: "SMA50 sopra SMA200", passed: sma50 > sma200 },
     { label: "RSI uguale o maggiore di 40", passed: rsi >= 40 },
+    { label: "RSI uguale o minore di 65", passed: rsi <= 65 },
     {
       label: "prezzo sopra quello di 7 giorni prima",
       passed: market.priceUsd > close7dAgo,
@@ -365,13 +370,17 @@ function buildLiveSnapshot(rows, market) {
         Number.isFinite(previous?.sma50) &&
         previous.close < previous.sma50,
     },
+    {
+      label: "trailing stop 8% confermato da momentum e volume",
+      passed: false,
+    },
   ];
 
   return {
-    signal: buy.every((condition) => condition.passed)
-      ? "ACQUISTA"
-      : sell.some((condition) => condition.passed)
+    signal: sell.some((condition) => condition.passed)
         ? "VENDI"
+        : buy.every((condition) => condition.passed)
+          ? "ACQUISTA"
         : "MANTIENI",
     conditionGroups: { buy, sell },
   };
@@ -486,6 +495,7 @@ function deriveConditionGroups(status) {
       { label: "prezzo sopra SMA200", passed: close > sma200 },
       { label: "SMA50 sopra SMA200", passed: sma50 > sma200 },
       { label: "RSI uguale o maggiore di 40", passed: rsi >= 40 },
+      { label: "RSI uguale o minore di 65", passed: rsi <= 65 },
       {
         label: "prezzo sopra quello di 7 giorni prima",
         passed: close > close7dAgo,
@@ -503,6 +513,10 @@ function deriveConditionGroups(status) {
           Number.isFinite(previousClose) &&
           Number.isFinite(previousSma50) &&
           previousClose < previousSma50,
+      },
+      {
+        label: "trailing stop 8% confermato da momentum e volume",
+        passed: Boolean(status.trail8_confirmed),
       },
     ],
   };

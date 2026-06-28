@@ -100,6 +100,7 @@ class TelegramWebhookTests(unittest.TestCase):
                         {"label": "prezzo sopra SMA200", "passed": False},
                         {"label": "SMA50 sopra SMA200", "passed": False},
                         {"label": "RSI uguale o maggiore di 40", "passed": True},
+                        {"label": "RSI uguale o minore di 65", "passed": True},
                         {"label": "prezzo sopra quello di 7 giorni prima", "passed": False},
                         {"label": "volume sopra media 20 giorni", "passed": False},
                     ],
@@ -107,7 +108,11 @@ class TelegramWebhookTests(unittest.TestCase):
                         {
                             "label": "prezzo sotto SMA50 per 2 giorni consecutivi",
                             "passed": True,
-                        }
+                        },
+                        {
+                            "label": "trailing stop 8% confermato da momentum e volume",
+                            "passed": False,
+                        },
                     ],
                 },
             }
@@ -117,6 +122,7 @@ class TelegramWebhookTests(unittest.TestCase):
         self.assertIn("Segnale: MANTIENI", message)
         self.assertIn("54.169 EUR", message)
         self.assertIn("✅ 3.", message)
+        self.assertIn("✅ 4.", message)
         self.assertIn("VENDI:\n✅ 1.", message)
         self.assertNotIn("Rischio", message)
         self.assertNotIn("USD", message)
@@ -141,13 +147,13 @@ class TelegramWebhookTests(unittest.TestCase):
         )
 
         self.assertTrue(message.startswith("ETH MONITOR LIVE!"))
-        self.assertIn("Segnale: ACQUISTA", message)
+        self.assertIn("Segnale: MANTIENI", message)
         self.assertIn("130 EUR", message)
         self.assertIn("✅ 1.", message)
         self.assertIn("✅ 2.", message)
         self.assertIn("✅ 3.", message)
-        self.assertIn("✅ 4.", message)
         self.assertIn("✅ 5.", message)
+        self.assertIn("✅ 6.", message)
 
     @patch("telegram_webhook.requests.get")
     def test_fetches_status_from_mandatory_github_raw_url(self, mock_get: Mock) -> None:

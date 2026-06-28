@@ -55,8 +55,8 @@ class ChartDataJsonTests(unittest.TestCase):
                 price_usd=64000.0,
                 price_eur=56000.0,
                 volume_24h_usd=27000000000.0,
-                buy_statuses=[False, False, True, False, False],
-                sell_statuses=[True],
+                buy_statuses=[False, False, True, True, False, False],
+                sell_statuses=[True, False],
                 out_path=path,
             )
             payload = json.loads(path.read_text(encoding="utf-8"))

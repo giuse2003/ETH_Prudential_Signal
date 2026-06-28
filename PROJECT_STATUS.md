@@ -121,9 +121,66 @@ Da completare:
   modelli di uscita, filtri di ingresso e combinazioni.
 - `scripts/run_entry_signal_analysis.py`: analisi dedicata ai soli filtri di
   ingresso, con uscita ufficiale invariata.
-- Analisi corrente del modello: solo ingressi. Benchmark operativo:
-  `Baseline ufficiale`; i confronti con benchmark passivi restano fuori dalla
-  selezione dei segnali.
+- `scripts/run_rsi65_blocked_entry_audit.py`: audit evento-per-evento degli
+  ingressi bloccati dal filtro sperimentale `RSI <= 65`.
+- `scripts/run_entry_trade_comparison.py`: confronto trade-by-trade tra
+  Baseline e ingresso sperimentale `RSI <= 65`, con uscita ufficiale invariata.
+- `scripts/run_entry_yearly_validation.py`: validazione annuale Baseline vs
+  ingresso sperimentale `RSI <= 65`, incluse operazioni per anno.
+- `scripts/run_entry_cost_stress.py`: stress test costi/slippage Baseline vs
+  ingresso sperimentale `RSI <= 65`.
+- `scripts/run_entry_threshold_robustness.py`: robustezza soglia RSI per i
+  soli ingressi, testando da `RSI <= 63` a `RSI <= 70`.
+- `scripts/run_exit_signal_analysis.py`: analisi dedicata ai soli segnali di
+  uscita, con ingressi Baseline invariati.
+- `scripts/run_trail5_exit_event_audit.py`: audit evento-per-evento del
+  candidato uscita `Trail8 confermato -5 / vol +20`.
+- `scripts/run_exit_trade_comparison.py`: confronto completo trade-by-trade
+  tra Baseline e candidato uscita `Trail8 confermato -5 / vol +20`.
+- `scripts/run_exit_segment_impact.py`: impatto netto dei segmenti Baseline
+  modificati dal candidato uscita `Trail8 confermato -5 / vol +20`.
+- `scripts/run_exit_candidate_validation.py`: validazione costi/slippage e
+  anno per anno del candidato uscita `Trail8 confermato -5 / vol +20`.
+- `scripts/run_final_combined_candidate_validation.py`: comparazione finale
+  tra Baseline ufficiale e candidato combinato `RSI <= 65` in ingresso +
+  `Trail8 confermato -5 / vol +20` in uscita.
+- `scripts/run_2023_residual_exit_audit.py`: audit del peggioramento residuo
+  2023 e test dei filtri secondari `trade return >= 15%` e `max gain >= 35%`.
+- `scripts/run_combined_walkforward_validation.py`: validazione cronologica
+  del candidato combinato principale e della variante secondaria
+  `trade return >= 15%`.
+- `reports/final_promotion_gate.md`: gate decisionale finale per valutare la
+  promozione del candidato combinato a nuova Baseline ufficiale.
+- `reports/official_baseline_implementation.md`: registrazione della
+  promozione effettiva del candidato combinato a Baseline ufficiale.
+- Analisi ingressi chiusa provvisoriamente: `RSI <= 65` resta candidato
+  principale, non ufficiale.
+- Analisi uscite chiusa provvisoriamente: `Trail8 confermato -5 / vol +20`
+  resta candidato uscita principale, non ufficiale.
+- Comparazione finale completata: il combinato migliora la Baseline ufficiale
+  su periodo completo, costi e anni principali, ma resta candidato in
+  validazione per audit residuo 2023.
+- Audit residuo 2023 completato: il peggioramento e' piccolo e circoscritto;
+  `trade return >= 15%` e' candidato secondario, ma non viene promosso per
+  rischio overfit su un solo evento.
+- Validazione cronologica completata: il candidato combinato principale batte
+  la Baseline in 3 finestre su 4 e resta invariato nella quarta; la variante
+  `trade return >= 15%` non viene promossa per beneficio marginale.
+- Gate decisionale finale completato: il candidato principale e' tecnicamente
+  promuovibile; la Baseline ufficiale resta invariata fino a conferma esplicita
+  di implementazione.
+- Nuova Baseline ufficiale implementata: ingresso Baseline + `RSI <= 65` sui
+  soli nuovi ingressi, uscita ufficiale + `Trail8 -5 / vol +20`.
+- Worker Telegram deployato dopo l'implementazione per aggiornare `/conditions`
+  alla nuova Baseline. Version ID Cloudflare:
+  `e61c4c42-9738-4c82-bacc-b5e50c8aafbb`.
+- Testo `/conditions` aggiornato per esplicitare le soglie Trail8:
+  momentum 7 giorni >= -5% e volume >= media 20 giorni +20%. Version ID
+  Cloudflare: `8557d497-04f3-4580-90c5-00f191331514`.
+- Analisi corrente del modello: commit e push delle modifiche; poi monitoraggio
+  del primo run operativo e del comando `/conditions`.
+  Benchmark operativo: `Baseline ufficiale`; i confronti con benchmark passivi
+  restano fuori dalla selezione dei segnali.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare

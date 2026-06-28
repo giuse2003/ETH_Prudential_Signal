@@ -933,3 +933,937 @@ Decisione provvisoria sugli ingressi:
 - `RSI <= 60` e' troppo restrittivo rispetto al beneficio;
 - il prossimo approfondimento deve restare sugli ingressi, evento per evento,
   prima di tornare ai modelli di uscita.
+
+### Audit ingressi bloccati da RSI <= 65
+
+File generati:
+
+- `scripts/run_rsi65_blocked_entry_audit.py`;
+- `reports/rsi65_blocked_entry_audit.md`.
+
+Metodo:
+
+- analisi solo sugli ingressi;
+- uscita ufficiale invariata;
+- soglia testata: blocco dei nuovi `ACQUISTA` quando `RSI > 65`;
+- confronto evento-per-evento tra ingresso Baseline e successivo comportamento
+  del filtro RSI65.
+
+Risultato:
+
+| Misura | Valore |
+|---|---:|
+| Segnali giornalieri bloccati | 14 |
+| Finestre operative bloccate | 6 |
+| Trade Baseline unici coinvolti | 4 |
+| Trade Baseline unici perdenti | 4 |
+| Finestre utili | 6 |
+| Finestre miste | 0 |
+| Finestre costose | 0 |
+
+Eventi principali:
+
+| Blocco | Return Baseline | Max DD trade | Nuovo ingresso RSI65 | Delta ingresso | Return trade RSI65 | Lettura |
+|---|---:|---:|---|---:|---:|---|
+| 2020-02-16 -> 2020-02-18 | -26,07% | -32,52% | 2020-06-02 | -11,53% | -3,95% | salta trade perdente |
+| 2020-05-30 | -6,66% | -10,48% | 2020-06-02 | -2,82% | -3,95% | ritarda ingresso perdente |
+| 2020-06-01 | -6,66% | -10,48% | 2020-06-02 | -4,47% | -3,95% | ritarda ingresso perdente |
+| 2024-05-20 -> 2024-05-24 | -7,47% | -12,88% | 2024-06-20 | -2,79% | -4,81% | ritarda ingresso perdente |
+| 2024-05-27 -> 2024-05-28 | -7,47% | -12,88% | 2024-06-20 | -8,48% | -4,81% | ritarda ingresso perdente |
+| 2024-12-05 -> 2024-12-06 | -12,74% | -17,15% | 2024-12-09 | -2,12% | -10,84% | ritarda ingresso perdente |
+
+Conclusione:
+
+- l'evidenza evento-per-evento conferma il filtro `RSI <= 65`;
+- il filtro intercetta solo trade Baseline perdenti nei casi analizzati;
+- quando rientra, il prezzo di rientro e' sempre piu' basso del prezzo
+  bloccato;
+- non sono emersi casi in cui il filtro taglia un trade Baseline vincente;
+- la regola resta sperimentale: prima di promuoverla servono validazione
+  annuale, costi/slippage e controllo della dipendenza da pochi eventi.
+
+### Confronto trade-by-trade Baseline vs RSI <= 65
+
+File generati:
+
+- `scripts/run_entry_trade_comparison.py`;
+- `reports/entry_trade_comparison.md`.
+
+Periodo:
+
+- inizio serie comune ETH/EUR -> candela del 2026-06-27.
+
+Regole:
+
+- Baseline ufficiale invariata;
+- modello sperimentale: Baseline + filtro nuovo ingresso `RSI <= 65`;
+- uscita invariata: `VENDI` sotto SMA50 per 2 giorni consecutivi;
+- prezzi e rendimenti calcolati su `Close_EUR` della candela del segnale.
+
+Sintesi:
+
+| Modello | Trade | Ann. | Max DD sistema | Sharpe | PF | Win rate | Loss medio | DD medio trade |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 28 | +30,26% | -49,73% | 0,828 | 4,215 | 39,29% | -7,64% | -13,96% |
+| RSI <= 65 ingresso | 27 | +36,13% | -47,17% | 0,944 | 5,670 | 40,74% | -6,03% | -12,92% |
+
+Trade modificati dal filtro:
+
+| Ingresso RSI65 | Prezzo | Uscita | Return | DD subito | DD evitato vs Baseline | Lettura |
+|---|---:|---|---:|---:|---:|---|
+| 2020-06-02 | 212,07 | 2020-07-17 | -3,95% | -8,78% | +1,69% | ritarda ingresso Baseline perdente |
+| 2024-06-20 | 3279,52 | 2024-06-24 | -4,81% | -5,07% | +7,81% | ritarda ingresso Baseline perdente |
+| 2024-12-09 | 3523,42 | 2024-12-22 | -10,84% | -17,15% | 0,00% | migliora entry/return, non riduce DD interno |
+
+Conclusione:
+
+- il filtro `RSI <= 65` modifica solo 3 trade effettivi rispetto alla Baseline;
+- non elimina trade vincenti;
+- riduce il loss medio e migliora profit factor, Sharpe e rendimento
+  annualizzato;
+- la riduzione del drawdown di sistema e' moderata, quindi il filtro migliora
+  soprattutto la qualita' degli ingressi, non risolve da solo il problema del
+  drawdown;
+- prossimo passo: validazione annuale e stress con costi/slippage prima di
+  promuovere il filtro.
+
+### Validazione annuale Baseline vs RSI <= 65
+
+File generati:
+
+- `scripts/run_entry_yearly_validation.py`;
+- `reports/entry_yearly_validation.md`.
+
+Metodo:
+
+- confronto anno per anno;
+- uscita ufficiale invariata;
+- conteggio operazioni diviso in:
+  - ingressi aperti nell'anno;
+  - trade chiusi nell'anno.
+
+Risultati annuali:
+
+| Anno | Baseline Ret | RSI65 Ret | Delta Ret | Baseline DD | RSI65 DD | Delta DD | Entry B/R | Chiusi B/R |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2017 | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0/0 | 0/0 |
+| 2018 | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0/0 | 0/0 |
+| 2019 | +60,32% | +60,32% | 0,00% | -19,32% | -19,32% | 0,00% | 1/1 | 1/1 |
+| 2020 | +69,85% | +136,42% | +66,57% | -38,20% | -29,21% | +8,99% | 5/4 | 4/3 |
+| 2021 | +201,42% | +201,42% | 0,00% | -45,09% | -45,09% | 0,00% | 5/5 | 6/6 |
+| 2022 | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0/0 | 0/0 |
+| 2023 | +0,09% | +0,09% | 0,00% | -22,67% | -22,67% | 0,00% | 6/6 | 5/5 |
+| 2024 | -14,58% | -10,22% | +4,36% | -47,85% | -45,19% | +2,66% | 7/7 | 8/8 |
+| 2025 | +35,98% | +35,98% | 0,00% | -26,08% | -26,08% | 0,00% | 4/4 | 4/4 |
+| 2026 | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0,00% | 0/0 | 0/0 |
+
+Lettura:
+
+- il numero di operazioni cambia solo nel 2020;
+- il rendimento cambia in modo reale nel 2020 e nel 2024;
+- `RSI <= 65` non peggiora nessun anno in modo materiale;
+- il vantaggio principale e' concentrato nel 2020, con supporto minore nel
+  2024;
+- questo e' favorevole, ma non basta ancora per promuovere il filtro: serve
+  stress con costi/slippage e controllo di robustezza soglia.
+
+### Stress costi/slippage Baseline vs RSI <= 65
+
+File generati:
+
+- `scripts/run_entry_cost_stress.py`;
+- `reports/entry_cost_stress.md`.
+
+Metodo:
+
+- confronto solo sugli ingressi;
+- uscita ufficiale invariata;
+- costi applicati a ogni cambio esposizione, quindi ingresso e uscita;
+- scenari: 0,00%, 0,10%, 0,25%, 0,50%, 1,00% per cambio esposizione.
+
+Risultati periodo completo:
+
+| Scenario | Baseline Ann. | RSI65 Ann. | Delta Ann. | Baseline DD | RSI65 DD | Delta DD | Delta Sharpe | Delta PF |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| lordo 0,00% | +30,26% | +36,13% | +5,87% | -49,73% | -47,17% | +2,56% | +0,116 | +1,455 |
+| costo 0,10% | +29,42% | +35,28% | +5,86% | -50,43% | -47,91% | +2,52% | +0,116 | +1,414 |
+| costo 0,25% | +28,16% | +34,02% | +5,85% | -51,46% | -49,00% | +2,46% | +0,116 | +1,355 |
+| stress 0,50% | +26,10% | +31,93% | +5,83% | -53,21% | -50,85% | +2,36% | +0,116 | +1,261 |
+| stress 1,00% | +22,05% | +27,84% | +5,79% | -56,61% | -54,44% | +2,17% | +0,117 | +1,098 |
+
+Lettura:
+
+- il vantaggio di `RSI <= 65` resta stabile anche con costi molto severi;
+- il delta annuo resta circa +5,8 punti;
+- il max drawdown resta meno profondo in tutti gli scenari;
+- RSI65 fa una operazione in meno, ma il vantaggio non deriva solo dal
+  risparmio costi: deriva soprattutto dagli ingressi evitati o ritardati;
+- dopo audit eventi, validazione annuale e stress costi, il filtro `RSI <= 65`
+  e' un candidato ingresso robusto, ancora non promosso a segnale ufficiale.
+
+### Robustezza soglia RSI fino a 70
+
+File generati:
+
+- `scripts/run_entry_threshold_robustness.py`;
+- `reports/entry_threshold_robustness.md`.
+
+Metodo:
+
+- confronto solo sugli ingressi;
+- uscita ufficiale invariata;
+- soglie testate: `RSI <= 63`, `64`, `65`, `66`, `67`, `68`, `69`, `70`;
+- Baseline ufficiale come benchmark operativo.
+
+Risultati:
+
+| Variante | Ann. | Max DD | Sharpe | PF | Ops | Nuovi ingressi bloccati | 2022+ Ann. |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | 4,215 | 28 | 0 | +4,12% |
+| RSI <= 63 | +36,13% | -47,17% | 0,944 | 5,670 | 27 | 14 | +5,28% |
+| RSI <= 64 | +36,13% | -47,17% | 0,944 | 5,670 | 27 | 14 | +5,28% |
+| RSI <= 65 | +36,13% | -47,17% | 0,944 | 5,670 | 27 | 14 | +5,28% |
+| RSI <= 66 | +36,13% | -47,17% | 0,944 | 5,670 | 27 | 14 | +5,28% |
+| RSI <= 67 | +36,13% | -47,17% | 0,944 | 5,670 | 27 | 14 | +5,28% |
+| RSI <= 68 | +35,41% | -47,17% | 0,931 | 5,428 | 27 | 13 | +5,28% |
+| RSI <= 69 | +34,35% | -50,61% | 0,910 | 5,115 | 27 | 8 | +3,71% |
+| RSI <= 70 | +34,27% | -50,88% | 0,909 | 5,092 | 27 | 6 | +3,59% |
+
+Lettura:
+
+- la zona `RSI <= 63` fino a `RSI <= 67` e' perfettamente stabile: stessi
+  risultati, stessi ingressi bloccati, stesse metriche;
+- `RSI <= 68` resta positivo ma inizia a perdere rendimento e profit factor;
+- `RSI <= 69` e `RSI <= 70` peggiorano il max drawdown rispetto alla Baseline;
+- quindi il limite superiore non deve essere portato a 69/70;
+- `RSI <= 65` resta una scelta equilibrata e spiegabile dentro una fascia
+  robusta, non un punto fragile ottimizzato.
+
+### Decisione di chiusura provvisoria sugli ingressi
+
+Decisione:
+
+- `RSI <= 65` e' il miglior candidato disponibile per filtrare i nuovi
+  ingressi;
+- non diventa ancora segnale ufficiale della Baseline;
+- resta appuntato come candidato ingresso principale nel diario di ricerca;
+- la Baseline ufficiale resta invariata;
+- il filtro potra' diventare ufficiale solo dopo test combinato con il futuro
+  candidato di uscita.
+
+Motivazione:
+
+- il filtro affianca le condizioni di acquisto Baseline, non le sostituisce;
+- formula candidata:
+  `Close > SMA200`, `SMA50 > SMA200`, `RSI >= 40`, `RSI <= 65`,
+  `Close > Close_7d_ago`, `Volume > VolumeAvg20`;
+- ha superato audit evento-per-evento, validazione annuale, stress
+  costi/slippage e robustezza soglia;
+- il beneficio sul drawdown e' reale ma moderato, quindi il problema principale
+  resta il segnale di uscita.
+
+Regola operativa per i prossimi test:
+
+- da ora si procede sul segnale di uscita;
+- durante i test di uscita gli ingressi restano quelli Baseline ufficiali;
+- il candidato `RSI <= 65` verra' riutilizzato solo nella fase successiva di
+  test combinato ingresso + uscita.
+
+### Ripresa analisi uscite: confronto iniziale
+
+File generati:
+
+- `scripts/run_exit_signal_analysis.py`;
+- `reports/exit_signal_analysis.md`.
+
+Metodo:
+
+- analisi solo sulle uscite;
+- ingressi Baseline ufficiali invariati;
+- nessun filtro RSI65 sugli ingressi;
+- benchmark operativo: `Baseline ufficiale`;
+- periodo: 2017-11-11 -> 2026-06-27.
+
+Risultati:
+
+| Modello uscita | Ann. | Max DD | Sharpe | PF | Ops | Uscite forzate | 2022+ Ann. | 2022+ DD |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | 4,215 | 28 | 0 | +4,12% | -49,73% |
+| SMA50 1 giorno | +32,49% | -48,09% | 0,880 | 4,506 | 32 | 26 | +10,15% | -40,94% |
+| Trailing 8% puro | +20,61% | -40,24% | 0,698 | 2,157 | 48 | 31 | +2,00% | -40,24% |
+| Trail8 confermato -5 / vol +20 | +41,36% | -45,09% | 1,047 | 5,565 | 30 | 6 | +6,66% | -43,75% |
+| Trail8 confermato -6 / vol +20 | +38,50% | -45,09% | 1,004 | 5,133 | 31 | 8 | +9,24% | -37,39% |
+
+Lettura:
+
+- `Trailing 8% puro` riduce il drawdown ma peggiora rendimento, Sharpe e
+  profit factor: resta scartato;
+- `SMA50 1 giorno` migliora il periodo recente ma forza troppe uscite e non
+  offre il miglior equilibrio;
+- `Trail8 confermato -5 / vol +20` migliora rendimento, drawdown, Sharpe e
+  profit factor con solo 6 uscite forzate;
+- `Trail8 confermato -6 / vol +20` sembra forte sul recente, ma ripropone il
+  falso stop grave del 2021-01-12;
+- quindi il candidato uscita principale da approfondire e' `Trail8 confermato
+  -5 / vol +20`.
+
+Decisione provvisoria sulle uscite:
+
+- nessuna uscita viene promossa a regola ufficiale;
+- prossimo test: audit evento-per-evento del solo `Trail8 confermato -5 / vol
+  +20`, distinguendo uscite utili, neutre e dannose rispetto all'uscita
+  ufficiale e al rientro successivo.
+
+### Audit evento-per-evento Trail8 -5 / vol +20
+
+File generati:
+
+- `scripts/run_trail5_exit_event_audit.py`;
+- `reports/trail5_exit_event_audit.md`.
+
+Metodo:
+
+- analisi solo sulle uscite;
+- ingressi Baseline ufficiali invariati;
+- candidato testato: `Trail8 confermato -5 / vol +20`;
+- per ogni uscita sono misurati:
+  - data e prezzo di uscita;
+  - data e prezzo del rientro successivo;
+  - rendimento dal precedente ingresso alla data di uscita;
+  - drawdown subito nel trade;
+  - drawdown evitato tra uscita e rientro successivo;
+  - upside perso tra uscita e rientro successivo.
+
+Risultati:
+
+| Uscita | Prezzo uscita | Rientro | Prezzo rientro | Return trade | DD subito | DD evitato | Upside perso | Lettura |
+|---|---:|---|---:|---:|---:|---:|---:|---|
+| 2020-02-20 | 239,11 | 2020-05-30 | 218,23 | -0,25% | -8,45% | +58,55% | +5,64% | utile |
+| 2020-09-04 | 327,96 | 2020-10-12 | 328,23 | +54,42% | -18,58% | +16,00% | +0,10% | utile |
+| 2021-09-07 | 2892,82 | 2021-10-01 | 2852,80 | +52,91% | -13,00% | +18,48% | +5,74% | utile |
+| 2023-04-20 | 1771,60 | 2023-05-05 | 1779,61 | +13,06% | -8,39% | +5,93% | +0,45% | utile |
+| 2024-03-15 | 3429,87 | 2024-04-08 | 3402,13 | +55,53% | -7,80% | +15,24% | +0,00% | utile |
+| 2024-06-17 | 3269,43 | 2024-06-20 | 3279,52 | -3,09% | -9,83% | +0,78% | +1,30% | dannosa |
+
+Sintesi:
+
+- uscite forzate: 6;
+- trade positivi al momento dell'uscita: 4;
+- trade negativi al momento dell'uscita: 2;
+- uscite utili: 5;
+- uscite dannose: 1;
+- nessuna uscita neutra.
+
+Lettura:
+
+- il candidato protegge bene capitale acquisito in 5 casi su 6;
+- la principale anomalia e' il 2024-06-17: esce in perdita, evita poco
+  drawdown e rientra leggermente piu' alto dopo 3 giorni;
+- il candidato resta valido da approfondire, ma prima della promozione serve
+  capire se l'uscita dannosa del 2024-06-17 puo' essere filtrata senza perdere
+  le cinque uscite utili.
+
+### Confronto completo operazioni Baseline vs Trail8 -5 / vol +20
+
+File generati:
+
+- `scripts/run_exit_trade_comparison.py`;
+- `reports/exit_trade_comparison.md`.
+
+Correzione metodologica:
+
+- l'audit precedente sulle 6 uscite anticipate non basta per giudicare il
+  modello;
+- serve confrontare tutte le operazioni Baseline con tutte le operazioni del
+  candidato;
+- alcune uscite anticipate spezzano un trade Baseline e generano nuovi trade
+  successivi.
+
+Sintesi:
+
+| Misura | Baseline | Trail8 -5 / vol +20 |
+|---|---:|---:|
+| Operazioni chiuse | 28 | 30 |
+| Rendimento annualizzato | +30,26% | +41,36% |
+| Max DD sistema | -49,73% | -45,09% |
+| Sharpe | 0,828 | 1,047 |
+| Profit factor | 4,215 | 5,565 |
+| Win rate | 39,29% | 36,67% |
+
+Operazioni:
+
+- operazioni identiche per ingresso e uscita: 22;
+- uscite anticipate Trail8 confermate: 6;
+- trade Baseline modificati: 6;
+- trade candidati diversi rispetto alla Baseline: 8;
+- operazioni candidato con drawdown minore del riferimento Baseline: 8.
+
+Trade candidati modificati principali:
+
+| # | Ingresso | Uscita | Tipo uscita | Return | DD subito | DD evitato vs Baseline | Delta return vs Baseline | Rif. Baseline |
+|---:|---|---|---|---:|---:|---:|---:|---|
+| 2 | 2020-02-16 | 2020-02-20 | trail8 | -0,25% | -8,45% | +24,07% | +25,82% | 2020-02-16 -> 2020-03-09 |
+| 4 | 2020-07-21 | 2020-09-04 | trail8 | +54,42% | -18,58% | +10,63% | +13,84% | 2020-07-21 -> 2020-09-06 |
+| 9 | 2021-07-26 | 2021-09-07 | trail8 | +52,91% | -13,00% | +16,08% | +28,26% | 2021-07-26 -> 2021-09-21 |
+| 13 | 2023-03-13 | 2023-04-20 | trail8 | +13,06% | -8,39% | +5,26% | +5,75% | 2023-03-13 -> 2023-05-08 |
+| 14 | 2023-05-05 | 2023-05-08 | ufficiale | -5,52% | -5,52% | +8,13% | -12,82% | 2023-03-13 -> 2023-05-08 |
+| 20 | 2024-02-06 | 2024-03-15 | trail8 | +55,53% | -7,80% | +14,05% | +16,98% | 2024-02-06 -> 2024-04-03 |
+| 22 | 2024-05-20 | 2024-06-17 | trail8 | -3,09% | -9,83% | +3,05% | +4,38% | 2024-05-20 -> 2024-06-24 |
+| 23 | 2024-06-20 | 2024-06-24 | ufficiale | -4,81% | -5,07% | +7,81% | +2,65% | 2024-05-20 -> 2024-06-24 |
+
+Lettura:
+
+- il confronto serio conferma che il candidato migliora le metriche aggregate;
+- i trade identici sono 22, quindi il candidato interviene in modo mirato;
+- il caso 2023-03 genera un'uscita anticipata positiva ma anche un rientro
+  successivo negativo: il saldo va valutato sul segmento completo;
+- il caso 2024-06 resta da studiare, ma nel confronto con l'intero trade
+  Baseline il segmento candidato riduce sia perdita sia drawdown;
+- prossima analisi: valutare i 6 segmenti modificati come blocchi completi,
+  non solo come singoli trade, per capire il contributo netto di ogni modifica.
+
+### Impatto netto dei 6 segmenti modificati
+
+File generati:
+
+- `scripts/run_exit_segment_impact.py`;
+- `reports/exit_segment_impact.md`.
+
+Metodo:
+
+- ogni segmento e' un trade Baseline originale modificato dal candidato;
+- il candidato puo' spezzare il segmento in piu' trade;
+- il confronto viene fatto sul saldo completo del segmento.
+
+Sintesi:
+
+| Misura | Valore |
+|---|---:|
+| Segmenti modificati | 6 |
+| Segmenti con delta rendimento positivo | 4 |
+| Segmenti con delta rendimento negativo | 2 |
+| Rendimento composto Baseline sui segmenti | +78,22% |
+| Rendimento composto candidato sui segmenti | +260,97% |
+| Delta composto candidato - Baseline | +182,75% |
+
+Dettaglio:
+
+| # | Segmento Baseline | Return Baseline | DD Baseline | Return candidato | DD candidato | DD evitato | Delta return | Lettura |
+|---:|---|---:|---:|---:|---:|---:|---:|---|
+| 1 | 2020-02-16 -> 2020-03-09 | -26,07% | -32,52% | -0,25% | -8,45% | +24,07% | +25,82% | migliora rendimento e DD |
+| 2 | 2020-07-21 -> 2020-09-06 | +40,58% | -29,21% | +54,42% | -18,58% | +10,63% | +13,84% | migliora rendimento e DD |
+| 3 | 2021-07-26 -> 2021-09-21 | +24,64% | -29,08% | +52,91% | -13,00% | +16,08% | +28,26% | migliora rendimento e DD |
+| 4 | 2023-03-13 -> 2023-05-08 | +7,30% | -13,65% | +6,82% | -8,39% | +5,26% | -0,48% | riduce DD, perde poco rendimento |
+| 5 | 2024-02-06 -> 2024-04-03 | +38,55% | -21,86% | +55,53% | -7,80% | +14,05% | +16,98% | migliora rendimento e DD |
+| 6 | 2024-05-20 -> 2024-06-24 | -7,47% | -12,88% | -7,75% | -9,83% | +3,05% | -0,28% | riduce DD, perde poco rendimento |
+
+Conclusione:
+
+- il candidato `Trail8 confermato -5 / vol +20` e' valido sui segmenti
+  modificati;
+- 4 segmenti su 6 migliorano sia rendimento sia drawdown;
+- 2 segmenti peggiorano il rendimento di poco, ma riducono il drawdown;
+- il saldo composto dei segmenti modificati e' nettamente favorevole;
+- il candidato resta il principale candidato uscita.
+
+Prossimo passo:
+
+- stress costi/slippage dedicato al candidato uscita;
+- validazione anno per anno;
+- solo dopo test combinato con il candidato ingresso `RSI <= 65`.
+
+### Validazione candidato uscita: costi e anni
+
+File generati:
+
+- `scripts/run_exit_candidate_validation.py`;
+- `reports/exit_candidate_validation.md`;
+- `reports/exit_candidate_cost_stress.csv`;
+- `reports/exit_candidate_yearly_validation.csv`.
+
+Metodo:
+
+- candidato uscita: `Trail8 confermato -5 / vol +20`;
+- ingressi Baseline ufficiali invariati;
+- stress costi/slippage da 0,00% a 1,00% per cambio esposizione;
+- validazione anno per anno.
+
+Stress costi:
+
+| Scenario | Baseline Ann. | Candidato Ann. | Delta Ann. | Baseline DD | Candidato DD | Delta DD | Delta Sharpe | Delta PF |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| lordo 0,00% | +30,26% | +41,36% | +11,10% | -49,73% | -45,09% | +4,64% | +0,219 | +1,351 |
+| costo 0,10% | +29,42% | +40,38% | +10,96% | -50,43% | -45,15% | +5,28% | +0,217 | +1,309 |
+| costo 0,25% | +28,16% | +38,92% | +10,76% | -51,46% | -45,95% | +5,51% | +0,214 | +1,250 |
+| stress 0,50% | +26,10% | +36,52% | +10,42% | -53,21% | -48,16% | +5,05% | +0,209 | +1,156 |
+| stress 1,00% | +22,05% | +31,83% | +9,78% | -56,61% | -52,41% | +4,20% | +0,199 | +0,997 |
+
+Validazione annuale:
+
+| Anno | Baseline Ret | Candidato Ret | Delta Ret | Baseline DD | Candidato DD | Delta DD |
+|---:|---:|---:|---:|---:|---:|---:|
+| 2019 | +60,32% | +60,32% | 0,00% | -19,32% | -19,32% | 0,00% |
+| 2020 | +69,85% | +151,72% | +81,87% | -38,20% | -22,08% | +16,12% |
+| 2021 | +201,42% | +269,77% | +68,34% | -45,09% | -45,09% | 0,00% |
+| 2023 | +0,09% | -0,36% | -0,45% | -22,67% | -23,02% | -0,35% |
+| 2024 | -14,58% | -4,40% | +10,17% | -47,85% | -41,64% | +6,21% |
+| 2025 | +35,98% | +35,98% | 0,00% | -26,08% | -26,08% | 0,00% |
+
+Conclusione:
+
+- il candidato uscita supera lo stress costi/slippage;
+- anche con costo 1,00% per cambio esposizione resta sopra Baseline di circa
+  +9,78 punti annui;
+- migliora in modo materiale 2020, 2021 e 2024;
+- peggiora lievemente il 2023: -0,45% rendimento e -0,35% drawdown;
+- il peggioramento 2023 e' contenuto e coerente con il segmento 2023-03 gia'
+  identificato;
+- il candidato `Trail8 confermato -5 / vol +20` resta candidato uscita
+  principale.
+
+Prossimo passo:
+
+- test combinato fra candidato ingresso `RSI <= 65` e candidato uscita `Trail8
+  confermato -5 / vol +20`;
+- confronto contro Baseline ufficiale su periodo completo, anni, costi e
+  segmenti critici;
+- solo dopo si potra' discutere una possibile promozione a segnale ufficiale.
+
+### Comparazione finale candidato combinato
+
+File generati:
+
+- `scripts/run_final_combined_candidate_validation.py`;
+- `reports/final_combined_candidate_validation.md`;
+- `reports/final_combined_cost_stress.csv`;
+- `reports/final_combined_yearly_validation.csv`;
+- `reports/final_combined_trades.csv`.
+
+Metodo:
+
+- Baseline ufficiale invariata;
+- ingresso candidato: Baseline + `RSI <= 65` sui nuovi acquisti;
+- uscita candidata: uscita ufficiale + `Trail8 confermato -5 / vol +20`;
+- periodo completo: `2017-11-11` -> `2026-06-27`;
+- stress costi/slippage da 0,00% a 1,00% per cambio esposizione;
+- validazione anno per anno.
+
+Risultato lordo periodo completo:
+
+| Modello | Ann. | Max DD | Sharpe | Profit factor | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | 4,215 | 28 |
+| Combinato RSI65 + Trail8 -5/vol20 | +42,74% | -45,09% | 1,079 | 5,999 | 28 |
+| Delta | +12,48% | +4,64% | +0,251 | +1,784 | 0 |
+
+Stress costi:
+
+| Scenario | Delta Ann. | Delta DD | Delta Sharpe | Delta PF |
+|---|---:|---:|---:|---:|
+| lordo 0,00% | +12,48% | +4,64% | +0,251 | +1,784 |
+| costo 0,10% | +12,40% | +5,28% | +0,250 | +1,737 |
+| costo 0,25% | +12,28% | +6,23% | +0,248 | +1,671 |
+| stress 0,50% | +12,08% | +7,84% | +0,246 | +1,564 |
+| stress 1,00% | +11,68% | +7,75% | +0,240 | +1,379 |
+
+Validazione annuale:
+
+| Anno | Delta rendimento | Delta drawdown | Lettura |
+|---:|---:|---:|---|
+| 2020 | +89,84% | +16,12% | migliora molto |
+| 2021 | +68,34% | 0,00% | migliora rendimento, DD invariato |
+| 2023 | -0,45% | -0,35% | unico peggioramento residuo |
+| 2024 | +15,36% | +9,38% | migliora rendimento e DD |
+| 2025 | 0,00% | 0,00% | invariato |
+
+Eventi:
+
+- ingressi bloccati da `RSI <= 65`: 14 segnali giornalieri;
+- uscite forzate Trail8 confermate nel combinato: 4;
+- operazioni totali: 28, come la Baseline.
+
+Conclusione:
+
+- il candidato combinato e' il migliore test disponibile finora;
+- migliora rendimento annualizzato, drawdown, Sharpe e profit factor;
+- resta robusto anche con costi/slippage elevati;
+- non aumenta il numero totale di operazioni rispetto alla Baseline;
+- il 2023 resta l'unico anno con peggioramento residuo, piccolo ma da non
+  ignorare;
+- il combinato non diventa ancora segnale ufficiale: resta candidato finale in
+  validazione.
+
+Decisione:
+
+- mantenere la Baseline ufficiale invariata;
+- tenere `RSI <= 65` come candidato ingresso principale;
+- tenere `Trail8 confermato -5 / vol +20` come candidato uscita principale;
+- usare il combinato come candidato finale da valutare al prossimo gate
+  decisionale.
+
+Prossimo passo:
+
+- audit dedicato del peggioramento residuo 2023;
+- verificare se il segmento 2023 va accettato come costo fisiologico del
+  modello oppure se esiste una regola generale che lo evita senza danneggiare
+  2020, 2021 e 2024;
+- solo dopo decidere se promuovere il combinato a nuova Baseline ufficiale.
+
+### Audit peggioramento residuo 2023
+
+File generati:
+
+- `scripts/run_2023_residual_exit_audit.py`;
+- `reports/residual_2023_exit_audit.md`;
+- `reports/residual_2023_exit_audit.csv`;
+- `reports/residual_2023_exit_filter_tests.csv`;
+- `reports/residual_2023_exit_variant_metrics.csv`.
+
+Obiettivo:
+
+- capire se il peggioramento del 2023 puo' essere eliminato con una regola
+  generale;
+- evitare una regola costruita solo su una singola uscita storica;
+- mantenere invariata la Baseline ufficiale.
+
+Caso analizzato:
+
+- segmento Baseline: `2023-03-13 -> 2023-05-08`;
+- uscita Trail8 candidata: `2023-04-20` a EUR 1771,60;
+- rendimento del trade al momento dell'uscita: +13,06%;
+- rendimento segmento Baseline: +7,30%;
+- rendimento segmento candidato: +6,82%;
+- delta candidato - Baseline: -0,48%;
+- drawdown subito fino all'uscita Trail8: -8,39%.
+
+Confronto uscite Trail8 nel combinato:
+
+| Uscita | Return trade | Max gain | RSI | Mom 7d | Vol rel | Delta segmento | Lettura |
+|---|---:|---:|---:|---:|---:|---:|---|
+| 2020-09-04 | +54,42% | +88,37% | 47,50 | -1,93% | +33,66% | +13,84% | utile |
+| 2021-09-07 | +52,91% | +75,76% | 51,35 | -0,21% | +85,80% | +28,26% | utile |
+| 2023-04-20 | +13,06% | +23,16% | 52,68 | -3,46% | +21,08% | -0,48% | costo residuo |
+| 2024-03-15 | +55,53% | +68,70% | 60,75 | -4,03% | +39,74% | +16,98% | utile |
+
+Filtri provati:
+
+| Filtro | Esclude 2023 | Uscite utili escluse | Lettura |
+|---|---|---:|---|
+| `trade return >= 15%` | si | 0 | promettente ma modifica un solo evento |
+| `max gain >= 35%` | si | 0 | equivalente nel campione |
+| `RSI uscita >= 55` | si | 2 | scarta troppe uscite utili |
+| `volume relativo >= 40%` | si | 2 | scarta troppe uscite utili |
+| `giorni in trade >= 40` | si | 1 | scarta una uscita utile |
+
+Impatto delle due varianti promettenti:
+
+| Modello | Ann. | Max DD | Sharpe | PF | Operazioni | Uscite Trail8 |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | 4,215 | 28 | 0 |
+| Combinato attuale | +42,74% | -45,09% | 1,079 | 5,999 | 28 | 4 |
+| Combinato + `trade return >= 15%` | +42,81% | -45,09% | 1,079 | 6,282 | 27 | 3 |
+| Combinato + `max gain >= 35%` | +42,81% | -45,09% | 1,079 | 6,282 | 27 | 3 |
+
+Conclusione:
+
+- il peggioramento 2023 e' piccolo e circoscritto: -0,48% sul segmento;
+- il candidato combinato resta molto superiore alla Baseline anche accettando
+  quel costo;
+- `trade return >= 15%` e `max gain >= 35%` eliminano il 2023 senza perdere le
+  uscite utili presenti nel campione;
+- pero' entrambe le regole modificano un solo evento storico: rischio overfit
+  alto;
+- non ci sono prove sufficienti per trasformare subito questi filtri in
+  regola ufficiale.
+
+Decisione:
+
+- non modificare la Baseline ufficiale;
+- non modificare il candidato combinato principale per ora;
+- accettare provvisoriamente il costo 2023 come costo fisiologico del modello;
+- annotare `trade return >= 15%` come candidato secondario coerente con la
+  logica "proteggere capitale acquisito";
+- validare il candidato secondario solo con test walk-forward/out-of-sample e
+  stress parametrico, non con ottimizzazione sul singolo evento 2023.
+
+Prossimo passo:
+
+- validazione walk-forward del candidato combinato attuale;
+- confronto walk-forward anche con la variante secondaria `trade return >= 15%`;
+- se la variante secondaria resta utile fuori dal segmento 2023, potra' essere
+  rivalutata; altrimenti resta scartata come filtro troppo ottimizzato.
+
+### Validazione cronologica / walk-forward del combinato
+
+File generati:
+
+- `scripts/run_combined_walkforward_validation.py`;
+- `reports/combined_walkforward_validation.md`;
+- `reports/combined_walkforward_full_metrics.csv`;
+- `reports/combined_walkforward_windows.csv`;
+- `reports/combined_walkforward_yearly.csv`;
+- `reports/combined_walkforward_events.csv`.
+
+Metodo:
+
+- Baseline ufficiale invariata;
+- candidato principale: `RSI <= 65` in ingresso + `Trail8 -5 / vol +20` in
+  uscita;
+- variante secondaria: candidato principale + `trade return >= 15%` per
+  attivare l'uscita Trail8;
+- confronto su finestre cronologiche successive:
+  - `2019-2020`;
+  - `2021-2022`;
+  - `2023-2024`;
+  - `2025-2026`.
+
+Periodo completo:
+
+| Modello | Ann. | Max DD | Sharpe | PF | Operazioni | Ingressi bloccati | Uscite Trail8 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | 4,215 | 28 | 0 | 0 |
+| Combinato principale | +42,74% | -45,09% | 1,079 | 5,999 | 28 | 14 | 4 |
+| Combinato + `trade return >= 15%` | +42,81% | -45,09% | 1,079 | 6,282 | 27 | 14 | 3 |
+
+Finestre cronologiche:
+
+| Finestra | Baseline Return | Combinato Return | Delta Return | Delta DD | Delta Sharpe |
+|---|---:|---:|---:|---:|---:|
+| 2019-2020 | +172,30% | +316,33% | +144,03% | +21,83% | +0,537 |
+| 2021-2022 | +201,42% | +269,77% | +68,34% | 0,00% | +0,185 |
+| 2023-2024 | -11,83% | +3,55% | +15,38% | +9,38% | +0,221 |
+| 2025-2026 | +35,98% | +35,98% | 0,00% | 0,00% | 0,000 |
+
+Lettura:
+
+- il candidato principale batte la Baseline in 3 finestre su 4;
+- nella quarta finestra, `2025-2026`, resta identico perche' non interviene;
+- non esiste una finestra cronologica in cui il candidato principale peggiora
+  materialmente la Baseline;
+- il miglioramento piu' importante e' nel `2019-2020`;
+- il miglioramento recente `2023-2024` e' positivo: trasforma una finestra
+  negativa della Baseline in una finestra leggermente positiva;
+- la variante `trade return >= 15%` migliora appena il periodo completo, ma il
+  beneficio aggiuntivo dipende dal singolo caso 2023.
+
+Decisione:
+
+- il candidato principale supera la validazione cronologica;
+- non promuovere la variante `trade return >= 15%`, perche' aggiunge
+  complessita' e il suo beneficio incrementale e' troppo legato a un singolo
+  evento;
+- mantenere il candidato principale come modello da portare al gate
+  decisionale finale;
+- la Baseline ufficiale resta invariata fino a decisione esplicita.
+
+Prossimo passo:
+
+- gate decisionale finale: decidere se promuovere il candidato principale a
+  nuova Baseline ufficiale;
+- se promosso, implementare la modifica in `strategy/signals.py` con test
+  dedicati;
+- se non promosso, mantenere tutto come report sperimentale e continuare con
+  altri filtri solo dopo nuova ipotesi chiara.
+
+### Gate decisionale finale
+
+File generato:
+
+- `reports/final_promotion_gate.md`.
+
+Decisione tecnica:
+
+- il candidato combinato principale e' tecnicamente promuovibile a nuova
+  Baseline ufficiale;
+- la variante secondaria `trade return >= 15%` non viene promossa;
+- la Baseline ufficiale resta invariata fino a decisione esplicita di
+  implementazione.
+
+Candidato promuovibile:
+
+- ingresso: condizioni Baseline attuali + `RSI <= 65`;
+- uscita: uscita ufficiale attuale + `Trail8 -5 / vol +20`.
+
+Criteri superati:
+
+| Criterio | Esito |
+|---|---|
+| rendimento annualizzato | superato: +42,74% vs +30,26% |
+| max drawdown | superato: -45,09% vs -49,73% |
+| Sharpe | superato: 1,079 vs 0,828 |
+| profit factor | superato: 5,999 vs 4,215 |
+| operazioni totali | superato: 28 vs 28 |
+| stress costi/slippage | superato anche con 1,00% |
+| validazione cronologica | superato: migliora 3 finestre su 4, invariato nella quarta |
+| rischio overfit | controllato: variante piu' complessa non promossa |
+
+Rischi residui:
+
+- campione operativo limitato a 28 operazioni chiuse;
+- vantaggio concentrato in pochi eventi importanti, anche se non in uno solo;
+- piccola sottoperformance 2023 accettata come costo fisiologico;
+- implementazione operativa del trailing richiede stato post-ingresso:
+  massimo Close raggiunto durante la posizione.
+
+Raccomandazione:
+
+- promuovere il candidato principale;
+- non promuovere `trade return >= 15%`;
+- implementare solo dopo conferma esplicita, con test unitari dedicati e
+  verifica del monitor live.
+
+### Implementazione ufficiale nuova Baseline
+
+File generato:
+
+- `reports/official_baseline_implementation.md`.
+
+Decisione implementata:
+
+- il candidato combinato principale e' stato promosso a Baseline ufficiale;
+- la variante `trade return >= 15%` non e' stata implementata;
+- il diario resta nel root del progetto come parte integrante della
+  reversibilita' delle decisioni.
+
+Regole ufficiali ora in codice:
+
+- nuovo ingresso solo se:
+  - `Close > SMA200`;
+  - `SMA50 > SMA200`;
+  - `RSI >= 40`;
+  - `RSI <= 65`;
+  - `Close > Close_7d_ago`;
+  - `Volume > VolumeAvg20`;
+- vendita se:
+  - `Close < SMA50` per 2 giorni consecutivi;
+  - oppure trailing stop 8% dal massimo Close post-ingresso, confermato da
+    momentum 7 giorni >= -5% e volume relativo >= +20%.
+
+Nota tecnica importante:
+
+- `RSI <= 65` filtra solo i nuovi ingressi;
+- non viene usato per chiudere o indebolire una posizione gia' aperta;
+- se una posizione e' gia' aperta e le condizioni ufficiali di acquisto
+  storiche restano vere, il sistema mantiene la posizione e non valuta il
+  trailing in quel giorno;
+- questa distinzione replica il candidato validato e impedisce di ottenere per
+  errore la variante piu' aggressiva da +51,41%.
+
+File modificati:
+
+- `strategy/signals.py`;
+- `reports/generate.py`;
+- `cloudflare-worker/src/worker.js`;
+- `tests/test_signal_rules.py`;
+- `tests/test_chart_data_json.py`;
+- `tests/test_telegram_message.py`;
+- `tests/test_telegram_webhook.py`;
+- `PROJECT_STATUS.md`;
+- `ETH_MODEL_RESEARCH_DIARY.md`.
+
+Metriche di verifica dopo implementazione:
+
+| Metrica | Valore |
+|---|---:|
+| Annualizzato | +42,74% |
+| Max drawdown | -45,09% |
+| Sharpe | 1,079 |
+| Profit factor | 5,999 |
+| Operazioni | 28 |
+| Uscite Trail8 confermate | 4 |
+
+Uscite Trail8 confermate:
+
+- `2020-09-04`;
+- `2021-09-07`;
+- `2023-04-20`;
+- `2024-03-15`.
+
+Test eseguiti:
+
+- `python -m py_compile strategy\signals.py reports\generate.py telegram_webhook.py`;
+- `node --check cloudflare-worker\src\worker.js`;
+- `python -m unittest discover -s tests -v`.
+
+Risultato:
+
+- 60 test OK;
+- warning Yahoo noto e non bloccante durante i test.
+
+Prossimo passo:
+
+- commit e push;
+- dopo il push, monitorare il primo aggiornamento operativo di dashboard,
+  `status.json`, `live-status.json` e Telegram.
+
+### Deploy Worker Telegram dopo nuova Baseline
+
+Motivo:
+
+- il comando Telegram `/conditions` risponde tramite Cloudflare Worker;
+- dopo l'implementazione locale della nuova Baseline il Worker deployato
+  mostrava ancora il testo vecchio:
+  - 5 condizioni di acquisto;
+  - 1 sola condizione di vendita;
+- quindi era necessario deployare il Worker aggiornato.
+
+Azioni eseguite:
+
+- allineati localmente i file dashboard:
+  - `docs/status.json`;
+  - `docs/chart-data.json`;
+  - `docs/backtest.json`;
+  - `docs/live-status.json`;
+- deploy Cloudflare Worker eseguito con:
+  - `npx wrangler deploy`.
+
+Esito deploy:
+
+- Worker: `eth-prudential-signal`;
+- URL: `https://eth-prudential-signal.giuse2003.workers.dev`;
+- Version ID: `e61c4c42-9738-4c82-bacc-b5e50c8aafbb`.
+
+Risultato atteso su Telegram `/conditions`:
+
+- ACQUISTA:
+  1. prezzo sopra SMA200;
+  2. SMA50 sopra SMA200;
+  3. RSI uguale o maggiore di 40;
+  4. RSI uguale o minore di 65;
+  5. prezzo sopra quello di 7 giorni prima;
+  6. volume sopra media 20 giorni.
+- VENDI:
+  1. prezzo sotto SMA50 per 2 giorni consecutivi;
+  2. trailing stop 8% confermato da momentum e volume.
+
+Nota:
+
+- il deploy Worker aggiorna subito `/conditions`;
+- il push GitHub resta comunque necessario per rendere persistenti repository,
+  docs e workflow.
+
+### Chiarimento testo `/conditions` su momentum e volume
+
+Motivo:
+
+- il messaggio Telegram `/conditions` indicava genericamente
+  "trailing stop 8% confermato da momentum e volume";
+- serviva esplicitare le soglie operative reali della nuova uscita.
+
+Modifica eseguita:
+
+- aggiornato `cloudflare-worker/src/worker.js`;
+- aggiornato `reports/generate.py` per rendere coerenti anche le condizioni
+  esportate nei JSON del monitor.
+
+Nuovo testo vendita Trail8:
+
+- trailing stop 8% dal massimo post-ingresso, confermato da:
+  - momentum 7 giorni uguale o maggiore di -5%;
+  - volume almeno 20% sopra la media 20 giorni.
+
+Deploy:
+
+- comando: `npx wrangler deploy`;
+- Worker: `eth-prudential-signal`;
+- Version ID Cloudflare: `8557d497-04f3-4580-90c5-00f191331514`.
