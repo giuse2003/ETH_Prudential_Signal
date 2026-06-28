@@ -710,3 +710,77 @@ Decisione:
 - nessuna regola viene promossa: serve audit evento-per-evento della nuova
   variante migliore `RSI62 + mom -6 + vol +20` e confronto diretto con
   `RSI65 + mom -5 + vol +20`.
+
+### Confronto diretto candidati migliori
+
+File generati:
+
+- `scripts/run_top_candidate_comparison.py`;
+- `reports/top_candidate_comparison.md`.
+
+Varianti confrontate:
+
+- Baseline ufficiale;
+- `RSI65 + Trail8 mom -5 vol +20`;
+- `RSI62 + Trail8 mom -6 vol +20`;
+- `RSI65 + Trail8 mom -6 vol +20`.
+
+Risultati periodo completo:
+
+| Variante | Ann. | Max DD | Sharpe | PF | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline | +30,26% | -49,73% | 0,828 | 4,215 | 28 |
+| RSI65 mom -5 vol +20 | +51,41% | -40,69% | 1,265 | 6,747 | 28 |
+| RSI62 mom -6 vol +20 | +50,83% | -33,99% | 1,289 | 6,660 | 29 |
+| RSI65 mom -6 vol +20 | +50,26% | -33,99% | 1,272 | 6,554 | 29 |
+
+Risultati 2022-oggi:
+
+| Variante | Ann. | Max DD | Sharpe |
+|---|---:|---:|---:|
+| Baseline | +4,12% | -49,73% | 0,284 |
+| RSI65 mom -5 vol +20 | +7,92% | -40,69% | 0,428 |
+| RSI62 mom -6 vol +20 | +10,53% | -33,99% | 0,525 |
+| RSI65 mom -6 vol +20 | +10,53% | -33,99% | 0,525 |
+
+Costi 0,25%:
+
+| Variante | Ann. | Max DD | Sharpe |
+|---|---:|---:|---:|
+| Baseline | +28,16% | -51,46% | 0,791 |
+| RSI65 mom -5 vol +20 | +48,97% | -42,75% | 1,223 |
+| RSI62 mom -6 vol +20 | +48,32% | -36,28% | 1,244 |
+| RSI65 mom -6 vol +20 | +47,75% | -36,28% | 1,227 |
+
+Stress costi 0,50%:
+
+| Variante | Ann. | Max DD | Sharpe |
+|---|---:|---:|---:|
+| Baseline | +26,10% | -53,21% | 0,753 |
+| RSI65 mom -5 vol +20 | +46,56% | -44,82% | 1,180 |
+| RSI62 mom -6 vol +20 | +45,84% | -38,59% | 1,198 |
+| RSI65 mom -6 vol +20 | +45,28% | -38,59% | 1,181 |
+
+Criticita' evento-per-evento:
+
+- `mom -6` aggiunge un'uscita nel gennaio 2021 che non era presente nella
+  variante `mom -5`;
+- questa uscita e' una falsa uscita in trend forte:
+  - `RSI62 mom -6 vol +20`: uscita 2021-01-11, rientro 2021-01-22 a +13,32%;
+    saldo sul segmento Baseline 2020-10-21 -> 2021-02-26: -42,55%;
+  - `RSI65 mom -6 vol +20`: uscita 2021-01-12, rientro 2021-01-22 a +18,86%;
+    saldo sullo stesso segmento: -57,44%;
+- nonostante questo, le metriche globali restano migliori grazie al drawdown
+  molto piu' basso e ad altre uscite protettive;
+- questa criticita' rende la variante `mom -6` piu' forte statisticamente ma
+  meno pulita concettualmente.
+
+Decisione:
+
+- `RSI62 mom -6 vol +20` e' il migliore per Sharpe e drawdown;
+- `RSI65 mom -6 vol +20` e' quasi equivalente ma blocca meno ingressi;
+- `RSI65 mom -5 vol +20` e' meno performante ma evita la falsa uscita di
+  gennaio 2021;
+- nessuna variante viene promossa;
+- prossimo test: cercare una conferma anti-falsa-uscita per gennaio 2021 senza
+  perdere le uscite protettive del 2021-05, 2021-09, 2024-03 e 2024-12.

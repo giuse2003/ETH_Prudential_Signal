@@ -113,6 +113,8 @@ Da completare:
   candidato combinato, con ingressi bloccati, uscite trailing e trade.
 - `scripts/run_combined_parameter_stress.py`: stress test parametrico del
   candidato combinato su RSI, momentum, volume e walk-forward.
+- `scripts/run_top_candidate_comparison.py`: confronto diretto tra Baseline e
+  i migliori candidati combinati emersi dallo stress test.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare
