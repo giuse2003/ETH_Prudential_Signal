@@ -28,8 +28,7 @@ tecnici giornalieri, dashboard web e notifiche Telegram.
 
 - Close above SMA200.
 - SMA50 above SMA200.
-- RSI(14) >= 40.
-- RSI(14) <= 65 for new entries.
+- 40 <= RSI(14) <= 65.
 - Close above the close of 7 days ago.
 - Daily volume above 20-day average volume.
 
@@ -38,9 +37,6 @@ tecnici giornalieri, dashboard web e notifiche Telegram.
 - Close below SMA50 for two consecutive days.
 - Or trailing stop 8% from the highest close reached after entry, confirmed by
   7-day momentum >= -5% and volume at least 20% above the 20-day average.
-
-`RSI <= 65` is an entry filter only: it blocks new overheated entries, but it
-does not force an exit from an already open position.
 
 ### HOLD / MANTIENI
 
