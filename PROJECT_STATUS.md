@@ -101,6 +101,10 @@ Da completare:
   con test fatti, decisioni, regole respinte e prossime verifiche.
 - `scripts/run_model_experiments.py`: runner sperimentale per confrontare
   filtri senza variare la strategia produttiva.
+- `scripts/run_entry_quality_analysis.py`: analisi trade-by-trade degli
+  ingressi Baseline, con feature al momento del segnale.
+- `scripts/run_entry_filter_hypotheses.py`: test sperimentale di filtri di
+  ingresso derivati dall'analisi trade-by-trade.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare

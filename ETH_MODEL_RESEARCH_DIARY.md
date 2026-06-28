@@ -338,6 +338,110 @@ Da testare solo in ambiente sperimentale:
 - filtro anti-rientro se il prezzo rientra troppo vicino o troppo sopra il
   prezzo di uscita.
 
+## Registro Analisi - 2026-06-28
+
+Analisi avviata sugli ingressi Baseline dal 2022 a oggi.
+
+File generati:
+
+- `scripts/run_entry_quality_analysis.py`;
+- `reports/entry_quality_analysis.md`;
+- `scripts/run_entry_filter_hypotheses.py`;
+- `reports/entry_filter_hypotheses.md`.
+
+Nota: i CSV generati dagli script restano ignorati da Git come gli altri output
+tabellari in `reports/*.csv`; sono rigenerabili.
+
+### Qualita' ingressi 2022-oggi
+
+Periodo: 2022-01-01 -> 2026-06-27.
+
+Risultati:
+
+| Metrica | Valore |
+|---|---:|
+| Trade chiusi analizzati | 17 |
+| Trade vincenti | 5 |
+| Trade perdenti | 12 |
+| Win rate | 29,41% |
+| Rendimento medio trade | +2,49% |
+| Rendimento mediano trade | -2,90% |
+| Drawdown medio interno trade | -9,49% |
+
+Migliori trade:
+
+| Entry signal | Exit signal | Return |
+|---|---|---:|
+| 2025-07-07 | 2025-09-23 | +62,70% |
+| 2024-02-06 | 2024-04-03 | +38,55% |
+| 2023-11-22 | 2024-01-23 | +8,84% |
+| 2023-03-13 | 2023-05-08 | +7,30% |
+| 2024-01-31 | 2024-02-01 | +0,28% |
+
+Peggiori trade:
+
+| Entry signal | Exit signal | Return |
+|---|---|---:|
+| 2025-10-02 | 2025-10-10 | -13,60% |
+| 2024-12-05 | 2024-12-22 | -12,74% |
+| 2024-04-08 | 2024-04-12 | -10,56% |
+| 2024-07-19 | 2024-07-25 | -9,11% |
+| 2024-05-20 | 2024-06-24 | -7,47% |
+
+Prime differenze medie osservate tra ingressi vincenti e perdenti:
+
+- RSI medio vincitori 54,70 contro 59,62 dei perdenti;
+- volume relativo medio vincitori +23,64% contro +38,74% dei perdenti;
+- posizione nel range 52w vincitori 61,40% contro 72,64% dei perdenti;
+- distanza da SMA200 vincitori +14,99% contro +22,50% dei perdenti;
+- momentum 7g vincitori +2,61% contro +9,46% dei perdenti.
+
+Lettura:
+
+- gli ingressi perdenti sembrano piu' spesso acquisti in estensione;
+- il campione e' piccolo, quindi queste sono ipotesi di lavoro;
+- non basta filtrare il recente: bisogna verificare che il filtro non distrugga
+  il periodo completo.
+
+### Ipotesi filtri ingresso
+
+Performance misurata in EUR con `Close_EUR`.
+
+Baseline 2022-oggi:
+
+| Metrica | Valore |
+|---|---:|
+| Rendimento annualizzato | +4,12% |
+| Max drawdown | -49,73% |
+| Sharpe | 0,284 |
+| Esposizione | 24,41% |
+
+Migliore ipotesi 2022-oggi:
+
+- variante: `rsi65_dist30_mom7_8`;
+- regola sperimentale: blocca nuovi `ACQUISTA` se RSI > 65, distanza da SMA200
+  > +30%, oppure momentum 7g > +8%;
+- rendimento annualizzato: +12,64%;
+- max drawdown: -38,76%;
+- Sharpe: 0,587;
+- esposizione: 20,87%.
+
+Problema:
+
+- sul periodo completo la stessa variante scende a rendimento annualizzato
+  +16,51% e Sharpe 0,706;
+- la Baseline EUR sul periodo completo fa +30,26% annuo e Sharpe 0,828;
+- quindi la variante migliora il 2022-oggi ma taglia troppo rendimento storico.
+
+Decisione:
+
+- nessun filtro di ingresso viene promosso;
+- `RSI <= 65` isolato e' piu' interessante sul periodo completo:
+  +36,13% annuo, max drawdown -47,17%, Sharpe 0,944;
+- va testato meglio per anni, costi e impatto sui grandi trade;
+- la combinazione aggressiva resta solo come indicazione diagnostica del
+  problema 2022-oggi.
+
 ## Criteri Per Promuovere Una Regola
 
 Una regola sperimentale puo' essere candidata alla promozione solo se:
@@ -353,16 +457,17 @@ Una regola sperimentale puo' essere candidata alla promozione solo se:
 
 ## Prossima Analisi
 
-Costruire una tabella di tutte le entrate dal 2022 al 2026-06-27 con:
+Approfondire il filtro `RSI <= 65` perche':
 
-- indicatori al momento dell'ingresso;
-- esito del trade;
-- drawdown interno;
-- durata;
-- confronto fra entrate vincenti e perdenti.
+- migliora il periodo completo senza tagliare troppo rendimento;
+- migliora il drawdown rispetto alla Baseline EUR;
+- e' semplice e difendibile;
+- sembra coerente con il problema degli ingressi in estensione.
 
-Obiettivo:
+Test da fare:
 
-- identificare il primo filtro di ingresso davvero testabile;
-- ridurre il win rate basso della Baseline;
-- migliorare lo Sharpe senza peggiorare la capacita' di protezione del modello.
+- confronto annuale Baseline vs `RSI <= 65`;
+- impatto sui 5 migliori trade dal 2022;
+- scenari costi 0,10%, 0,25%, 0,50%;
+- walk-forward;
+- verifica se la soglia 65 e' stabile o scelta casuale.
