@@ -1898,9 +1898,11 @@ Modifica eseguita:
 - aggiunta in legenda la voce `Soglia RSI 65`;
 - aggiunta nel pannello RSI una linea dedicata a quota 65;
 - mantenuta la linea `RSI 40`, che resta la soglia minima del filtro RSI;
+- uniformata la soglia `RSI 65` allo stesso colore e stile continuo della
+  soglia `RSI 40`, per rappresentare graficamente il range RSI operativo;
 - aggiornati i parametri cache degli asset dashboard:
-  - `style.css?v=8`;
-  - `app.js?v=9`.
+  - `style.css?v=9`;
+  - `app.js?v=10`.
 
 Decisione:
 

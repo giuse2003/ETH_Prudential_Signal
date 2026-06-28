@@ -396,11 +396,10 @@ function drawCompositeGrid(ctx, rows, xFor, width, height, padding, scale) {
     {
       level: 65,
       label: "RSI 65",
-      stroke: "rgba(167,139,250,0.95)",
-      fill: "rgba(196,181,253,0.98)",
+      stroke: "rgba(14,165,233,0.95)",
+      fill: "rgba(125,211,252,0.98)",
       lineWidth: 2,
       labelX: 16,
-      dash: [8, 6],
     },
     {
       level: 70,
