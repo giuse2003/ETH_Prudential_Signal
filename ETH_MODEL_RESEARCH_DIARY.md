@@ -832,3 +832,70 @@ Decisione:
 - `RSI62/65 mom -6 vol +20` resta statisticamente superiore, ma richiede una
   protezione anti-trend-parabolico prima di essere considerata candidata
   promuovibile.
+
+### Separazione tra ingresso, uscita e combinazioni
+
+File generati:
+
+- `scripts/run_signal_component_analysis.py`;
+- `reports/signal_component_analysis.md`.
+
+Motivazione:
+
+- la tabella unica con Buy & Hold, Baseline, uscite, ingressi e combinazioni
+  generava confusione;
+- i modelli vanno valutati per funzione:
+  - benchmark;
+  - uscita;
+  - ingresso;
+  - combinazioni.
+
+Regola di analisi da qui in avanti:
+
+- un modello di uscita si valuta lasciando invariati gli ingressi Baseline;
+- un filtro di ingresso si valuta lasciando invariata l'uscita ufficiale;
+- una combinazione si valuta solo dopo aver capito separatamente i due
+  componenti.
+
+Risultati chiave separati:
+
+Benchmark:
+
+| Modello | Ann. | Max DD | Sharpe |
+|---|---:|---:|---:|
+| Buy & Hold ETH/EUR | +20,82% | -93,49% | 0,651 |
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 |
+
+Uscite, con ingressi Baseline invariati:
+
+| Modello uscita | Ann. | Max DD | Sharpe | Lettura |
+|---|---:|---:|---:|---|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | riferimento |
+| Trailing 8% puro | +20,61% | -40,24% | 0,698 | scartato: troppi falsi stop |
+| Trail8 -5 / vol +20 | +41,36% | -45,09% | 1,047 | uscita pulita candidata |
+| Trail8 -6 / vol +20 | +38,50% | -45,09% | 1,004 | migliora 2022+, ma falso stop gennaio 2021 |
+
+Ingressi, con uscita ufficiale invariata:
+
+| Filtro ingresso | Ann. | Max DD | Sharpe | Lettura |
+|---|---:|---:|---:|---|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | riferimento |
+| RSI <= 65 | +36,13% | -47,17% | 0,944 | candidato ingresso pulito |
+| RSI <= 62 | +35,89% | -47,17% | 0,943 | simile a RSI65, piu' restrittivo |
+| RSI <= 60 | +34,93% | -46,29% | 0,930 | troppo restrittivo rispetto al vantaggio |
+
+Combinazioni:
+
+| Combinazione | Ann. | Max DD | Sharpe | Lettura |
+|---|---:|---:|---:|---|
+| RSI65 + Trail8 -5 / vol +20 | +51,41% | -40,69% | 1,265 | candidato prudente principale |
+| RSI65 + Trail8 -6 / vol +20 | +50,26% | -33,99% | 1,272 | forte ma falso stop gennaio 2021 |
+| RSI62 + Trail8 -6 / vol +20 | +50,83% | -33,99% | 1,289 | migliore metricamente, ma piu' aggressivo |
+
+Decisione:
+
+- uscita candidata pulita: `Trail8 confermato -5 / vol +20`;
+- ingresso candidato pulito: `RSI <= 65`;
+- combinazione candidata prudente: `RSI65 + Trail8 -5 / vol +20`;
+- combinazione aggressiva da correggere: `RSI62/65 + Trail8 -6 / vol +20`;
+- le prossime analisi devono mantenere questa separazione.

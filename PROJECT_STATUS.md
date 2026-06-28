@@ -117,6 +117,8 @@ Da completare:
   i migliori candidati combinati emersi dallo stress test.
 - `scripts/run_false_exit_recurrence_analysis.py`: analisi della ricorrenza
   delle false uscite tipo gennaio 2021.
+- `scripts/run_signal_component_analysis.py`: report separato tra benchmark,
+  modelli di uscita, filtri di ingresso e combinazioni.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare
