@@ -1867,3 +1867,19 @@ Deploy:
 - comando: `npx wrangler deploy`;
 - Worker: `eth-prudential-signal`;
 - Version ID Cloudflare: `8557d497-04f3-4580-90c5-00f191331514`.
+
+Verifica/allineamento successivo:
+
+- aggiornato anche `docs/index.html`, perche' la sezione statica "Come nasce
+  un segnale" mostrava ancora 5 condizioni di acquisto e 1 di vendita;
+- rigenerato `docs/live-status.json` con 6 condizioni BUY e 2 condizioni SELL;
+- aggiornata l'etichetta LIVE/Fallback della condizione Trail8 con le soglie
+  esplicite:
+  - momentum 7g >= -5%;
+  - volume >= media20 +20%.
+
+Nuovo deploy Worker:
+
+- comando: `npx wrangler deploy`;
+- Worker: `eth-prudential-signal`;
+- Version ID Cloudflare: `4aecc8cd-e00e-4120-ab1f-cb6180cc4d87`.

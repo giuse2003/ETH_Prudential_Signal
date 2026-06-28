@@ -177,6 +177,8 @@ Da completare:
 - Testo `/conditions` aggiornato per esplicitare le soglie Trail8:
   momentum 7 giorni >= -5% e volume >= media 20 giorni +20%. Version ID
   Cloudflare: `8557d497-04f3-4580-90c5-00f191331514`.
+- Dashboard statica e `live-status.json` allineati alle nuove condizioni.
+  Ultimo Version ID Cloudflare: `4aecc8cd-e00e-4120-ab1f-cb6180cc4d87`.
 - Analisi corrente del modello: commit e push delle modifiche; poi monitoraggio
   del primo run operativo e del comando `/conditions`.
   Benchmark operativo: `Baseline ufficiale`; i confronti con benchmark passivi

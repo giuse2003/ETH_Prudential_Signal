@@ -371,7 +371,7 @@ function buildLiveSnapshot(rows, market) {
         previous.close < previous.sma50,
     },
     {
-      label: "trailing stop 8% confermato da momentum e volume",
+      label: "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
       passed: false,
     },
   ];
@@ -515,7 +515,7 @@ function deriveConditionGroups(status) {
           previousClose < previousSma50,
       },
       {
-        label: "trailing stop 8% confermato da momentum e volume",
+        label: "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
         passed: Boolean(status.trail8_confirmed),
       },
     ],

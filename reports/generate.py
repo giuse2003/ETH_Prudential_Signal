@@ -127,7 +127,7 @@ def save_live_status_json(
     ]
     sell_labels = [
         "prezzo live sotto SMA50 live per 2 giorni consecutivi",
-        "trailing stop 8% confermato da momentum e volume",
+        "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
     ]
     payload = {
         "signal": signal,

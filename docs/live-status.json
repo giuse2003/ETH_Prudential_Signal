@@ -1,9 +1,9 @@
 {
   "signal": "VENDI",
-  "price_usd": 1568.9,
-  "price_eur": 1377.95,
-  "volume_24h_usd": 5293270297.0,
-  "last_update": "2026-06-28 19:02:57 UTC",
+  "price_usd": 1570.61,
+  "price_eur": 1379.84,
+  "volume_24h_usd": 5219113145.0,
+  "last_update": "2026-06-28 20:21:00 UTC",
   "status": "Attivo",
   "condition_groups": {
     "buy": [
@@ -38,7 +38,7 @@
         "passed": true
       },
       {
-        "label": "trailing stop 8% confermato da momentum e volume",
+        "label": "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
         "passed": false
       }
     ]
