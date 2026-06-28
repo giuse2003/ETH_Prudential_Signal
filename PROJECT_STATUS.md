@@ -97,6 +97,8 @@ Da completare:
 - `ETH_PROJECT_ROADMAP.md`: roadmap operativa aggiornata.
 - `MODEL_IMPROVEMENT_ROADMAP.md`: baseline e piano test per migliorare il
   modello.
+- `ETH_MODEL_RESEARCH_DIARY.md`: diario operativo delle analisi sul modello,
+  con test fatti, decisioni, regole respinte e prossime verifiche.
 - `scripts/run_model_experiments.py`: runner sperimentale per confrontare
   filtri senza variare la strategia produttiva.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
