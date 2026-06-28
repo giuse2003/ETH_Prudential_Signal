@@ -119,6 +119,11 @@ Da completare:
   delle false uscite tipo gennaio 2021.
 - `scripts/run_signal_component_analysis.py`: report separato tra benchmark,
   modelli di uscita, filtri di ingresso e combinazioni.
+- `scripts/run_entry_signal_analysis.py`: analisi dedicata ai soli filtri di
+  ingresso, con uscita ufficiale invariata.
+- Analisi corrente del modello: solo ingressi. Benchmark operativo:
+  `Baseline ufficiale`; i confronti con benchmark passivi restano fuori dalla
+  selezione dei segnali.
 - `scripts/run_exit_experiments.py`: runner sperimentale per confrontare
   uscite protettive senza variare la strategia produttiva.
 - `scripts/run_stop_loss_experiments.py`: runner sperimentale per analizzare

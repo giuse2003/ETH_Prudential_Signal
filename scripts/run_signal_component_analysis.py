@@ -208,36 +208,8 @@ def _slice_metrics(equity: pd.DataFrame, start: str) -> dict[str, float]:
     }
 
 
-def _buy_hold_metrics(df: pd.DataFrame) -> dict[str, float | int | str]:
-    frame = df[["Close_EUR", "Segnale"]].rename(columns={"Close_EUR": "Close"}).copy()
-    equity, _, bh = run_backtest(frame)
-    recent = equity.loc[RECENT_START:].copy()
-    normalized = recent["EquityBuyHold"] / float(recent["EquityBuyHold"].iloc[0])
-    returns = normalized.pct_change()
-    n_days = max((recent.index[-1] - recent.index[0]).days, 1)
-    total_return = float(normalized.iloc[-1] - 1.0)
-    return {
-        "section": "benchmark",
-        "variant": "Buy & Hold ETH/EUR",
-        "description": "Acquisto e mantenimento di ETH/EUR.",
-        "annualized_return": bh.annualized_return,
-        "max_drawdown": bh.max_drawdown,
-        "sharpe_ratio": bh.sharpe_ratio,
-        "profit_factor": float("nan"),
-        "num_operations": 0,
-        "win_rate": float("nan"),
-        "exposure_ratio": 1.0,
-        "recent_annualized_return": float((1.0 + total_return) ** (CFG.periods_per_year / n_days) - 1.0),
-        "recent_max_drawdown": _max_drawdown(normalized),
-        "recent_sharpe_ratio": _sharpe(returns),
-        "blocked_new_entries": 0,
-        "blocked_total": 0,
-        "trailing_exits": 0,
-    }
-
-
 def _run(df: pd.DataFrame) -> pd.DataFrame:
-    rows: list[dict[str, float | int | str]] = [_buy_hold_metrics(df)]
+    rows: list[dict[str, float | int | str]] = []
     for component in COMPONENTS:
         frame, blocked_new, blocked_total, trailing_exits = _make_frame(
             df,
@@ -393,6 +365,7 @@ def _write_markdown(results: pd.DataFrame, out_path: Path) -> None:
             "",
             "## Decisione Operativa Provvisoria",
             "",
+            "- Benchmark decisionale: `Baseline ufficiale`.",
             "- Uscita candidata pulita: `Trail8 confermato -5 / vol +20`.",
             "- Ingresso candidato pulito: `RSI <= 65`.",
             "- Combinazione candidata prudente: `RSI65 + Trail8 -5 / vol +20`.",

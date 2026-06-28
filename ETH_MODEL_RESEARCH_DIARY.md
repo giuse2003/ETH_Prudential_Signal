@@ -842,8 +842,8 @@ File generati:
 
 Motivazione:
 
-- la tabella unica con Buy & Hold, Baseline, uscite, ingressi e combinazioni
-  generava confusione;
+- la tabella unica con benchmark passivo, Baseline, uscite, ingressi e
+  combinazioni generava confusione;
 - i modelli vanno valutati per funzione:
   - benchmark;
   - uscita;
@@ -863,7 +863,6 @@ Benchmark:
 
 | Modello | Ann. | Max DD | Sharpe |
 |---|---:|---:|---:|
-| Buy & Hold ETH/EUR | +20,82% | -93,49% | 0,651 |
 | Baseline ufficiale | +30,26% | -49,73% | 0,828 |
 
 Uscite, con ingressi Baseline invariati:
@@ -899,3 +898,38 @@ Decisione:
 - combinazione candidata prudente: `RSI65 + Trail8 -5 / vol +20`;
 - combinazione aggressiva da correggere: `RSI62/65 + Trail8 -6 / vol +20`;
 - le prossime analisi devono mantenere questa separazione.
+
+### Focus corrente: solo ingressi
+
+File generati:
+
+- `scripts/run_entry_signal_analysis.py`;
+- `reports/entry_signal_analysis.md`.
+
+Regola metodologica:
+
+- benchmark operativo: `Baseline ufficiale`;
+- uscita sempre invariata: `VENDI` sotto SMA50 per 2 giorni consecutivi;
+- nessun trailing stop in questa analisi;
+- nessuna combinazione ingresso + uscita in questa analisi;
+- nessuna modifica promossa nei segnali ufficiali.
+
+Metriche ingresso-only:
+
+| Filtro ingresso | Ann. | Max DD | Sharpe | PF | Ops | 2022+ Ann. | 2022+ DD | Nuovi ingressi bloccati |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | +30,26% | -49,73% | 0,828 | 4,215 | 28 | +4,12% | -49,73% | 0 |
+| RSI <= 65 | +36,13% | -47,17% | 0,944 | 5,670 | 27 | +5,28% | -47,17% | 14 |
+| RSI <= 62 | +35,89% | -47,17% | 0,943 | 5,652 | 27 | +5,28% | -47,17% | 21 |
+| RSI <= 60 | +34,93% | -46,29% | 0,930 | 5,708 | 27 | +4,10% | -46,29% | 38 |
+
+Decisione provvisoria sugli ingressi:
+
+- `RSI <= 65` e' il candidato principale: migliora rendimento, drawdown,
+  Sharpe e profit factor rispetto alla Baseline, bloccando meno ingressi delle
+  soglie piu' severe;
+- `RSI <= 62` resta in osservazione, ma al momento non giustifica la maggiore
+  restrittivita';
+- `RSI <= 60` e' troppo restrittivo rispetto al beneficio;
+- il prossimo approfondimento deve restare sugli ingressi, evento per evento,
+  prima di tornare ai modelli di uscita.

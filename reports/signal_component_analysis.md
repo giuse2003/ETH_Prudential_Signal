@@ -8,7 +8,6 @@ Performance misurata in EUR con `Close_EUR`, usando gli indicatori ufficiali.
 
 | Modello | Ann. | Max DD | Sharpe | PF | Ops | Esp. | 2022+ Ann. | 2022+ DD | 2022+ Sharpe |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Buy & Hold ETH/EUR | 20.82% | -93.49% | 0.651 | n/a | 0 | 100.00% | -17.74% | -71.89% | 0.057 |
 | Baseline ufficiale | 30.26% | -49.73% | 0.828 | 4.215 | 28 | 28.75% | 4.12% | -49.73% | 0.284 |
 
 ## 2. Modelli Di Uscita
@@ -64,6 +63,7 @@ Lettura combinazioni:
 
 ## Decisione Operativa Provvisoria
 
+- Benchmark decisionale: `Baseline ufficiale`.
 - Uscita candidata pulita: `Trail8 confermato -5 / vol +20`.
 - Ingresso candidato pulito: `RSI <= 65`.
 - Combinazione candidata prudente: `RSI65 + Trail8 -5 / vol +20`.
