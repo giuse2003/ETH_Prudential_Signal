@@ -1,9 +1,9 @@
 {
-  "price_usd": 1613.12,
-  "price_eur": 1412.095,
+  "price_usd": 1609.375,
+  "price_eur": 1409.165,
   "signal": "VENDI",
   "risk_level": "ALTO",
-  "last_update": "2026-06-29 22:44:38",
+  "last_update": "2026-06-29 23:49:43",
   "status": "Attivo",
   "rsi": 32.572059200535236,
   "sma50": 1906.0371899414063,
