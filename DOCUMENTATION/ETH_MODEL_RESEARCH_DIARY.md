@@ -2327,3 +2327,161 @@ File generati:
 - `scripts/run_sma50_exit_timing_test.py`;
 - `reports/sma50_exit_timing_test.md`;
 - `reports/sma50_exit_timing_trades.csv`.
+
+### Audit trade-by-trade uscita SMA50 a 1 giorno
+
+Motivo:
+
+- completare il test precedente con una comparazione puntuale operazione per
+  operazione;
+- verificare se il vantaggio della variante `Close < SMA50` a 1 giorno e'
+  robusto o concentrato in pochi casi;
+- includere anche i casi in cui la variante non apre una micro-operazione
+  presente nella Baseline.
+
+Risultato:
+
+- segmenti Baseline confrontati: 28;
+- segmenti modificati dalla variante a 1 giorno: 24;
+- segmenti migliorati: 16;
+- segmenti peggiorati: 8;
+- segmenti invariati: 4.
+
+Lettura:
+
+- il miglioramento non dipende da una sola operazione isolata;
+- la variante anticipa molte uscite SMA50 e riduce diverse perdite, soprattutto
+  nel 2024 e nel 2025;
+- ci sono comunque falsi anticipi: alcuni segmenti peggiorano perche' l'uscita
+  a 1 giorno chiude troppo presto o genera una doppia operazione meno
+  efficiente;
+- le uscite Trail8 restano invariate: la modifica riguarda solo la regola
+  SMA50.
+
+Esempi principali:
+
+- 2025-10-02 -> 2025-10-10 Baseline: -14,37%; variante 1 giorno: -2,65%;
+  delta +11,72 punti percentuali;
+- 2021-10-01 -> 2021-11-27 Baseline: +23,87%; variante 1 giorno: +12,32%;
+  delta -11,54 punti percentuali;
+- 2024-04-08 -> 2024-04-12 Baseline: -12,24%; variante 1 giorno: -5,14%;
+  delta +7,10 punti percentuali;
+- 2020-06-02 -> 2020-07-17 Baseline: -1,87%; variante 1 giorno: -9,07%;
+  delta -7,20 punti percentuali.
+
+Decisione provvisoria:
+
+- la regola `Close < SMA50` a 1 giorno resta un candidato forte per migliorare
+  il segnale di uscita;
+- non viene ancora promossa a regola ufficiale;
+- prossimo passo: validazione anno per anno e controllo dei casi peggiori, per
+  capire se serve una conferma minima o un filtro anti-falso segnale.
+
+File generati:
+
+- `scripts/run_sma50_exit_timing_audit.py`;
+- `reports/sma50_exit_timing_audit.md`;
+- `reports/sma50_exit_timing_audit.csv`;
+- `reports/sma50_exit_timing_changed_segments.csv`.
+
+### Validazione annuale uscita SMA50 a 1 giorno
+
+Motivo:
+
+- verificare se il vantaggio della variante SMA50 a 1 giorno e' distribuito
+  nel tempo;
+- distinguere miglioramento recente da robustezza storica;
+- mantenere invariati ingressi e Trail8.
+
+Risultati annuali USD:
+
+| Anno | Ret 2g | Ret 1g | Delta ret | DD 2g | DD 1g | Delta DD | Entry 2g/1g | Exit 2g/1g |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2019 | 61,14% | 56,73% | -4,42% | -20,21% | -20,21% | 0,00% | 1/1 | 1/1 |
+| 2020 | 178,27% | 156,01% | -22,25% | -24,43% | -24,97% | -0,54% | 4/5 | 3/4 |
+| 2021 | 268,68% | 277,51% | +8,82% | -44,93% | -40,97% | +3,96% | 5/6 | 6/7 |
+| 2023 | 1,51% | 0,74% | -0,78% | -23,63% | -24,32% | -0,69% | 7/8 | 6/7 |
+| 2024 | -1,75% | 20,40% | +22,15% | -40,39% | -28,50% | +11,88% | 7/6 | 8/7 |
+| 2025 | 35,07% | 56,97% | +21,90% | -26,17% | -15,31% | +10,86% | 4/3 | 4/3 |
+
+Sintesi:
+
+- anni con rendimento migliore: 3;
+- anni con rendimento peggiore: 3;
+- anni con drawdown annuale meno profondo: 3;
+- anni con drawdown annuale piu' profondo: 2;
+- 2017, 2018, 2022 e 2026 non hanno operazioni utili nel confronto.
+
+Lettura:
+
+- il vantaggio aggregato e' forte, ma arriva soprattutto da 2024 e 2025;
+- il 2020 peggiora in modo significativo per rendimento, quindi la variante
+  non e' uniformemente superiore;
+- il 2021 migliora rendimento e drawdown;
+- il 2023 peggiora poco, ma aumenta il numero di micro-operazioni;
+- la variante riduce molto il drawdown negli anni recenti, coerentemente con
+  l'obiettivo di protezione del capitale acquisito.
+
+Decisione provvisoria:
+
+- la SMA50 a 1 giorno resta un candidato serio per il segnale di uscita;
+- non viene ancora promossa a Baseline;
+- prossimo passo: stress con costi/slippage e analisi dei peggiori falsi stop,
+  soprattutto 2020 e 2021-10.
+
+File generati:
+
+- `scripts/run_sma50_exit_timing_yearly_validation.py`;
+- `reports/sma50_exit_timing_yearly_validation.md`;
+- `reports/sma50_exit_timing_yearly_validation.csv`.
+
+### Stress costi uscita SMA50 a 1 giorno
+
+Motivo:
+
+- verificare se il vantaggio della variante resiste a costi/slippage;
+- controllare il rischio tipico delle regole piu' reattive: piu' turnover e
+  piu' micro-operazioni;
+- mantenere invariati ingressi e Trail8.
+
+Risultati USD:
+
+| Costo | Modello | Ann. | Max DD | Sharpe | PF | Operazioni | Turnover |
+|---:|---|---:|---:|---:|---:|---:|---:|
+| 0,00% | SMA50 2 giorni + Trail8 | 43,61% | -44,93% | 1,084 | 5,889 | 28 | 56,0 |
+| 0,00% | SMA50 1 giorno + Trail8 | 47,98% | -40,97% | 1,179 | 7,117 | 29 | 58,0 |
+| 0,10% | SMA50 2 giorni + Trail8 | 42,69% | -44,99% | 1,068 | 5,786 | 28 | 56,0 |
+| 0,10% | SMA50 1 giorno + Trail8 | 46,99% | -41,03% | 1,162 | 6,958 | 29 | 58,0 |
+| 0,25% | SMA50 2 giorni + Trail8 | 41,30% | -45,07% | 1,045 | 5,637 | 28 | 56,0 |
+| 0,25% | SMA50 1 giorno + Trail8 | 45,51% | -41,12% | 1,137 | 6,732 | 29 | 58,0 |
+| 0,50% | SMA50 2 giorni + Trail8 | 39,02% | -46,78% | 1,005 | 5,404 | 28 | 56,0 |
+| 0,50% | SMA50 1 giorno + Trail8 | 43,08% | -43,06% | 1,094 | 6,382 | 29 | 58,0 |
+
+Delta variante 1 giorno vs Baseline 2 giorni:
+
+- costo 0,00%: ann. +4,36 punti, DD +3,96 punti, Sharpe +0,095;
+- costo 0,10%: ann. +4,30 punti, DD +3,95 punti, Sharpe +0,094;
+- costo 0,25%: ann. +4,21 punti, DD +3,95 punti, Sharpe +0,092;
+- costo 0,50%: ann. +4,06 punti, DD +3,71 punti, Sharpe +0,090.
+
+Lettura:
+
+- il vantaggio non scompare con i costi;
+- il turnover aumenta poco: 58 contro 56;
+- il profit factor resta migliore in tutti gli scenari;
+- lo stress rafforza il candidato, ma non cancella il problema dei falsi stop
+  rilevati nel 2020 e nel segmento 2021-10.
+
+Decisione provvisoria:
+
+- la variante SMA50 a 1 giorno supera il controllo costi/slippage;
+- resta candidata forte, non ancora regola ufficiale;
+- prossimo passo consigliato: analizzare i peggiori falsi stop e valutare se
+  una conferma selettiva puo' preservare il vantaggio del 2024-2025 senza
+  peggiorare il 2020.
+
+File generati:
+
+- `scripts/run_sma50_exit_timing_cost_stress.py`;
+- `reports/sma50_exit_timing_cost_stress.md`;
+- `reports/sma50_exit_timing_cost_stress.csv`.
