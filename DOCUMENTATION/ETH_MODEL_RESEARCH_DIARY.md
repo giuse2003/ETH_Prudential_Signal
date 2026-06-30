@@ -2194,3 +2194,60 @@ File generati:
 - `scripts/run_trail_priority_segment_audit.py`;
 - `reports/trail_priority_segment_audit.md`;
 - `reports/trail_priority_segment_audit.csv`.
+
+### Test barriere di rientro dopo Trail8 priority
+
+Motivo:
+
+- dopo una uscita Trail8 priority, il sistema puo' rientrare subito se le
+  condizioni BUY restano o tornano verdi;
+- alcuni rientri sono svantaggiosi perche' avvengono piu' in alto;
+- serviva testare se una barriera temporale o una conferma di reset delle
+  condizioni BUY migliora la qualita' dei rientri.
+
+Regole testate:
+
+- `cooldown Xd`: dopo una uscita Trail8 ignora nuovi ACQUISTA per X giorni;
+- `reset_green Xd`: dopo una uscita Trail8 richiede almeno una condizione BUY
+  rossa, poi X giorni consecutivi con BUY tutte verdi.
+
+Griglia:
+
+- X = 0, 3, 7, 10, 14, 21, 30 giorni.
+
+Risultati principali USD:
+
+| Modello | Ann. | Max DD | Sharpe | PF | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 43,61% | -44,93% | 1,084 | 5,889 | 28 |
+| Trail8 priority | 46,35% | -42,79% | 1,207 | 4,708 | 34 |
+| cooldown 14d | 43,43% | -42,79% | 1,200 | 4,917 | 31 |
+| cooldown 10d | 43,61% | -42,79% | 1,182 | 4,554 | 33 |
+| cooldown 3d / 7d | 43,72% | -42,79% | 1,179 | 4,571 | 33 |
+| reset_green 3d | 35,49% | -40,35% | 1,182 | 5,533 | 23 |
+
+Lettura:
+
+- Trail8 priority puro resta migliore per rendimento e Sharpe assoluto;
+- cooldown 14d e' il compromesso piu' interessante: riduce operazioni da 34 a
+  31, mantiene drawdown -42,79% e Sharpe 1,200, ma perde rendimento rispetto
+  al Trail8 puro;
+- cooldown 3d e 7d producono lo stesso risultato nel campione;
+- reset_green oltre 3 giorni diventa troppo restrittivo e blocca quasi tutti i
+  rientri;
+- reset_green 3d riduce molto il drawdown e aumenta il profit factor, ma taglia
+  troppo rendimento.
+
+Decisione provvisoria:
+
+- nessuna regola di rientro viene promossa;
+- il cooldown fisso, soprattutto 10-14 giorni, merita analisi evento-per-evento;
+- la regola reset_green va trattata con cautela perche' sembra troppo
+  selettiva.
+
+File generati:
+
+- `scripts/run_trail_reentry_rules.py`;
+- `reports/trail_reentry_rules.md`;
+- `reports/trail_reentry_rules_metrics.csv`;
+- `reports/trail_reentry_rules_events.csv`.
