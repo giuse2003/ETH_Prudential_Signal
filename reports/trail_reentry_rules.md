@@ -8,6 +8,7 @@ La Baseline ufficiale non viene modificata.
 
 - `cooldown Xd`: dopo una uscita Trail8 ignora nuovi ACQUISTA per X giorni.
 - `reset_green Xd`: dopo una uscita Trail8 richiede almeno una condizione BUY rossa, poi X giorni consecutivi con BUY tutte verdi.
+- `wait_official_sell`: dopo una uscita Trail8 ignora nuovi ACQUISTA finche' non arriva il VENDI ufficiale sotto SMA50 per 2 giorni.
 
 ## Metriche
 
@@ -28,6 +29,7 @@ La Baseline ufficiale non viene modificata.
 | reset_green 14d | 6.46% | -14.58% | 0.537 | inf | 1 | 1 | 145 |
 | reset_green 21d | 6.46% | -14.58% | 0.537 | inf | 1 | 1 | 145 |
 | reset_green 30d | 6.46% | -14.58% | 0.537 | inf | 1 | 1 | 145 |
+| wait official sell | 28.92% | -42.79% | 0.999 | 4.097 | 27 | 10 | 28 |
 
 ## Migliori Varianti Per Sharpe
 

@@ -2251,3 +2251,40 @@ File generati:
 - `reports/trail_reentry_rules.md`;
 - `reports/trail_reentry_rules_metrics.csv`;
 - `reports/trail_reentry_rules_events.csv`.
+
+### Test rientro solo dopo VENDI ufficiale SMA50
+
+Regola testata:
+
+- se il sistema esce con Trail8 priority, ignora ogni nuovo `ACQUISTA`;
+- il blocco resta attivo finche' non arriva il `VENDI` ufficiale:
+  - prezzo sotto SMA50 per 2 giorni consecutivi;
+- dopo quel reset il sistema puo' valutare nuovi ingressi.
+
+Motivo:
+
+- evitare rientri troppo rapidi dopo Trail8;
+- in particolare evitare casi come il 2025, dove il sistema usciva con Trail8
+  e poi rientrava piu' in alto pochi giorni dopo.
+
+Risultato USD:
+
+| Modello | Ann. | Max DD | Sharpe | PF | Operazioni | Entry bloccati |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 43,61% | -44,93% | 1,084 | 5,889 | 28 | 0 |
+| Trail8 priority | 46,35% | -42,79% | 1,207 | 4,708 | 34 | 0 |
+| Wait official sell | 28,92% | -42,79% | 0,999 | 4,097 | 27 | 28 |
+
+Lettura:
+
+- la regola evita rientri rapidi e blocca 28 potenziali ingressi;
+- elimina anche rientri sfavorevoli, ma blocca troppo spesso rientri utili;
+- resta fuori troppo a lungo in trend forti, in particolare nel 2020-2021;
+- rendimento annualizzato e Sharpe scendono sotto la Baseline ufficiale.
+
+Decisione:
+
+- regola non promossa;
+- utile come riferimento negativo;
+- per ora restano piu' interessanti cooldown brevi/medi, soprattutto 10-14
+  giorni, da analizzare evento-per-evento.

@@ -5,6 +5,8 @@ Varianti testate:
 - cooldown fisso: dopo Trail8 ignora ACQUISTA per X giorni;
 - reset + conferma verde: dopo Trail8 richiede almeno una condizione BUY rossa,
   poi X giorni consecutivi con tutte le condizioni BUY vere.
+- wait_official_sell: dopo Trail8 ignora nuovi ACQUISTA finche' non arriva il
+  VENDI ufficiale sotto SMA50 per 2 giorni.
 
 La Baseline ufficiale non viene modificata.
 """
@@ -83,6 +85,7 @@ def apply_variant(df: pd.DataFrame, *, mode: str, cooldown_days: int) -> tuple[p
     last_trail_exit_date: pd.Timestamp | None = None
     reset_seen_red = False
     green_streak = 0
+    wait_official_sell_reset = False
 
     for pos, (date, row) in enumerate(out.iterrows()):
         close_value = float(row["Close"])
@@ -93,6 +96,9 @@ def apply_variant(df: pd.DataFrame, *, mode: str, cooldown_days: int) -> tuple[p
         block_reason = ""
 
         if official_sell_ok:
+            if wait_official_sell_reset:
+                wait_official_sell_reset = False
+                last_trail_exit_date = None
             signals[pos] = "VENDI"
             if exposure:
                 events.append(
@@ -151,6 +157,7 @@ def apply_variant(df: pd.DataFrame, *, mode: str, cooldown_days: int) -> tuple[p
                 last_trail_exit_date = date
                 reset_seen_red = False
                 green_streak = 0
+                wait_official_sell_reset = mode == "wait_official_sell"
                 continue
 
         if last_trail_exit_date is not None and not exposure:
@@ -168,6 +175,9 @@ def apply_variant(df: pd.DataFrame, *, mode: str, cooldown_days: int) -> tuple[p
                     block_reason = "wait_red_condition"
                 elif green_streak < cooldown_days:
                     block_reason = f"wait_{cooldown_days}_green_days"
+            elif mode == "wait_official_sell":
+                if wait_official_sell_reset:
+                    block_reason = "wait_official_sell"
 
         if buy_ok and not exposure:
             if block_reason:
@@ -196,6 +206,7 @@ def apply_variant(df: pd.DataFrame, *, mode: str, cooldown_days: int) -> tuple[p
                 last_trail_exit_date = None
                 reset_seen_red = False
                 green_streak = 0
+                wait_official_sell_reset = False
                 events.append(
                     {
                         "date": date.date(),
@@ -262,11 +273,18 @@ def main() -> None:
         }
     )
 
-    for mode in ["cooldown", "reset_green"]:
-        for cooldown in COOLDOWNS:
+    test_grid = [(mode, cooldown) for mode in ["cooldown", "reset_green"] for cooldown in COOLDOWNS]
+    test_grid.append(("wait_official_sell", 0))
+
+    for mode, cooldown in test_grid:
             variant, events = apply_variant(df, mode=mode, cooldown_days=cooldown)
             _, metrics, _ = run_backtest(variant)
-            label = "Trail8 priority" if cooldown == 0 and mode == "cooldown" else f"{mode} {cooldown}d"
+            if cooldown == 0 and mode == "cooldown":
+                label = "Trail8 priority"
+            elif mode == "wait_official_sell":
+                label = "wait official sell"
+            else:
+                label = f"{mode} {cooldown}d"
             rows.append(_metrics_row(label, mode, cooldown, metrics, events))
             if not events.empty:
                 all_events.append(events)
@@ -293,6 +311,7 @@ def main() -> None:
         "",
         "- `cooldown Xd`: dopo una uscita Trail8 ignora nuovi ACQUISTA per X giorni.",
         "- `reset_green Xd`: dopo una uscita Trail8 richiede almeno una condizione BUY rossa, poi X giorni consecutivi con BUY tutte verdi.",
+        "- `wait_official_sell`: dopo una uscita Trail8 ignora nuovi ACQUISTA finche' non arriva il VENDI ufficiale sotto SMA50 per 2 giorni.",
         "",
         "## Metriche",
         "",
