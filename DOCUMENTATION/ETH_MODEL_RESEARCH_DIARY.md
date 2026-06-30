@@ -2135,3 +2135,62 @@ Decisione qualitativa:
   dell'uscita anticipata;
 - questo evento entra nel gruppo dei falsi stop da studiare prima di qualsiasi
   promozione della variante.
+
+### Audit per segmento Baseline delle altre uscite Trail8 priority
+
+Motivo:
+
+- dopo aver classificato il caso 2025 come sfavorevole, serviva valutare le
+  altre uscite Trail8 priority non come trade isolati, ma come sequenza
+  composta dentro il segmento Baseline corrispondente.
+
+Metodo:
+
+- ogni segmento Baseline e' una operazione unica della Baseline ufficiale;
+- dentro quel segmento la variante Trail8 priority puo' generare piu'
+  operazioni;
+- il confronto corretto e' tra rendimento Baseline del segmento e rendimento
+  composto della sequenza Trail8 priority.
+
+Risultati:
+
+- segmenti Baseline con almeno una uscita Trail8 priority: 10;
+- segmenti che migliorano: 3;
+- segmenti uguali: 2;
+- segmenti che peggiorano: 5.
+
+Escludendo il caso 2025 gia' accantonato:
+
+- segmenti rimanenti: 9;
+- migliorano: 3;
+- uguali: 2;
+- peggiorano: 4.
+
+Segmenti migliori:
+
+- 2021-03-31 -> 2021-05-22: +65,89% contro +19,67%;
+- 2021-10-01 -> 2021-11-27: +25,78% contro +23,87%;
+- 2021-11-30 -> 2021-12-04: -8,87% contro -11,05%.
+
+Segmenti peggiori principali:
+
+- 2020-10-21 -> 2021-02-26: +225,88% contro +268,71%;
+- 2019-04-23 -> 2019-07-12: +52,36% contro +61,14%;
+- 2020-07-21 -> 2020-09-04: +57,41% contro +58,45%;
+- 2023-03-13 -> 2023-04-20: +15,24% contro +15,64%.
+
+Decisione provvisoria:
+
+- la variante Trail8 priority migliora le metriche aggregate, ma a livello
+  evento-per-evento non e' ancora abbastanza selettiva;
+- le uscite utili sono concentrate in pochi segmenti;
+- molte uscite sono uguali o leggermente peggiorative, mentre il grande falso
+  stop 2020-2021 pesa molto;
+- prima di promuovere la regola serve trovare una caratteristica comune delle
+  uscite utili rispetto a quelle peggiorative.
+
+File generati:
+
+- `scripts/run_trail_priority_segment_audit.py`;
+- `reports/trail_priority_segment_audit.md`;
+- `reports/trail_priority_segment_audit.csv`.
