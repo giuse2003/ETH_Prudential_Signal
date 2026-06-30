@@ -34,13 +34,9 @@ Per generare `ACQUISTA` devono essere vere tutte queste condizioni:
 
 1. prezzo `Close` sopra `SMA200`;
 2. `SMA50` sopra `SMA200`;
-3. `RSI(14)` uguale o maggiore di `40`;
-4. `RSI(14)` uguale o minore di `65`;
-5. prezzo `Close` sopra quello di 7 giorni prima;
-6. volume giornaliero sopra la media dei volumi a 20 giorni.
-
-Nota: `RSI <= 65` vale solo per i nuovi ingressi. Se la posizione e' gia'
-aperta, il superamento di RSI 65 non genera da solo un'uscita.
+3. `RSI(14)` compreso tra `40` e `65`;
+4. prezzo `Close` sopra quello di 7 giorni prima;
+5. volume giornaliero sopra la media dei volumi a 20 giorni.
 
 Nel codice queste regole sono in `strategy/signals.py`, funzione
 `compute_strict_signal`.

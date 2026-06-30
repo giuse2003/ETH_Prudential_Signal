@@ -347,8 +347,7 @@ def live_condition_statuses(
     buy_statuses = [
         bool(row["Close"] > row["SMA200"]),
         bool(row["SMA50"] > row["SMA200"]),
-        bool(row["RSI"] >= 40),
-        bool(row["RSI"] <= ENTRY_RSI_MAX),
+        bool(40 <= row["RSI"] <= ENTRY_RSI_MAX),
         bool(row["Close"] > row[momentum_col]),
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
@@ -422,8 +421,7 @@ def _buy_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
     return [
         bool(row["Close"] > row["SMA200"]),
         bool(row["SMA50"] > row["SMA200"]),
-        bool(row["RSI"] >= 40),
-        bool(row["RSI"] <= ENTRY_RSI_MAX),
+        bool(40 <= row["RSI"] <= ENTRY_RSI_MAX),
         bool(row["Close"] > row[momentum_col]),
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]

@@ -120,8 +120,7 @@ def save_live_status_json(
     buy_labels = [
         "prezzo live sopra SMA200 live",
         "SMA50 live sopra SMA200 live",
-        "RSI live uguale o maggiore di 40",
-        f"RSI live uguale o minore di {ENTRY_RSI_MAX:.0f}",
+        f"valore RSI live compreso tra 40 e {ENTRY_RSI_MAX:.0f}",
         "prezzo live sopra quello di 7 giorni prima",
         "volume 24h live sopra media 20 giorni",
     ]
@@ -410,12 +409,8 @@ def save_status_json(
                 "passed": bool(latest["SMA50"] > latest["SMA200"]),
             },
             {
-                "label": "RSI uguale o maggiore di 40",
-                "passed": bool(latest["RSI"] >= 40),
-            },
-            {
-                "label": f"RSI uguale o minore di {ENTRY_RSI_MAX:.0f}",
-                "passed": bool(latest["RSI"] <= ENTRY_RSI_MAX),
+                "label": f"valore RSI compreso tra 40 e {ENTRY_RSI_MAX:.0f}",
+                "passed": bool(40 <= latest["RSI"] <= ENTRY_RSI_MAX),
             },
             {
                 "label": f"prezzo sopra quello di {CFG.momentum_days} giorni prima",

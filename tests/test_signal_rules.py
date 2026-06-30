@@ -145,9 +145,9 @@ class SignalRulesTests(unittest.TestCase):
         self.assertEqual(result.iloc[-1]["Volume"], 2500.0)
         self.assertEqual(result.iloc[-1]["VolumeAvg20"], 1000.0)
         self.assertTrue(buy_statuses[0])
-        self.assertTrue(buy_statuses[2])
+        self.assertFalse(buy_statuses[2])
+        self.assertTrue(buy_statuses[3])
         self.assertTrue(buy_statuses[4])
-        self.assertTrue(buy_statuses[5])
         self.assertFalse(sell_statuses[0])
         self.assertFalse(sell_statuses[1])
 

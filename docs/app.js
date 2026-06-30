@@ -1,4 +1,4 @@
-const DATA_VERSION = "20260630-sma50-1d";
+const DATA_VERSION = "20260630-rsi-range";
 const STATUS_ENDPOINT = `./status.json?v=${DATA_VERSION}`;
 const CHART_DATA_ENDPOINT = `./chart-data.json?v=${DATA_VERSION}`;
 const BACKTEST_ENDPOINT = `./backtest.json?v=${DATA_VERSION}`;

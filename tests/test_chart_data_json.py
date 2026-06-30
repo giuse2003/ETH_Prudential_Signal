@@ -55,7 +55,7 @@ class ChartDataJsonTests(unittest.TestCase):
                 price_usd=64000.0,
                 price_eur=56000.0,
                 volume_24h_usd=27000000000.0,
-                buy_statuses=[False, False, True, True, False, False],
+                buy_statuses=[False, False, True, False, False],
                 sell_statuses=[True, False],
                 out_path=path,
             )
@@ -64,6 +64,7 @@ class ChartDataJsonTests(unittest.TestCase):
         self.assertEqual(payload["signal"], "VENDI")
         self.assertEqual(payload["price_eur"], 56000.0)
         self.assertTrue(payload["condition_groups"]["buy"][2]["passed"])
+        self.assertEqual(len(payload["condition_groups"]["buy"]), 5)
         self.assertTrue(payload["condition_groups"]["sell"][0]["passed"])
 
     def test_saves_backtest_json(self) -> None:

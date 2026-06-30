@@ -66,13 +66,9 @@ Per generare `ACQUISTA` devono essere vere tutte le condizioni:
 
 1. `Close > SMA200`;
 2. `SMA50 > SMA200`;
-3. `RSI(14) >= 40`;
-4. `RSI(14) <= 65`;
-5. `Close > Close_7d_ago`;
-6. `Volume > VolumeAvg20`.
-
-Nota: `RSI <= 65` filtra solo nuovi ingressi e non forza la vendita di una
-posizione gia' aperta.
+3. `40 <= RSI(14) <= 65`;
+4. `Close > Close_7d_ago`;
+5. `Volume > VolumeAvg20`.
 
 ### Vendita
 
