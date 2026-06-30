@@ -71,6 +71,34 @@ La Baseline ufficiale non viene modificata.
 | 2024-03-15 | 3735.22 | 2024-04-08 | 3695.29 | 24 | -1.07% | vantaggioso: rientro piu' basso | 2024-03-15 | 0.00% |
 | 2025-08-18 | 4312.50 | 2025-08-25 | 4372.99 | 7 | 1.40% | svantaggioso: rientro piu' alto | 2025-09-23 | -3.41% |
 
+## Nota Sul Caso 2025
+
+L'uscita Trail8 priority del 2025 va considerata inutile/peggiorativa se
+valutata come sequenza completa:
+
+- entrata iniziale 2025-07-07 a 2543,01 USD;
+- uscita Trail8 priority 2025-08-18 a 4312,50 USD;
+- rientro 2025-08-25 a 4372,99 USD;
+- uscita finale 2025-09-23 a 4165,50 USD.
+
+Risultato composto della variante:
+
+- primo trade: +69,58%;
+- secondo trade: -4,74%;
+- sequenza composta: +61,54%.
+
+Risultato Baseline restando dentro fino al 2025-09-23:
+
+- +63,80%.
+
+Delta sequenza Trail8 priority vs Baseline:
+
+- -2,27 punti percentuali.
+
+Conclusione: il Trail8 del 2025 protegge apparentemente il primo trade, ma il
+rientro piu' alto e la successiva uscita negativa rendono l'operazione
+complessivamente peggiore del mantenimento Baseline.
+
 ## File generati
 
 - `reports\trail_priority_trade_audit.csv`

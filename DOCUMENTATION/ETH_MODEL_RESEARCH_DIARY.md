@@ -2109,3 +2109,29 @@ Decisione:
 - nessuna modifica alla Baseline ufficiale;
 - il tema resta aperto come miglioramento interessante da analizzare in modo
   evento-per-evento.
+
+### Classificazione uscita Trail8 priority 2025
+
+Evento analizzato:
+
+- entrata iniziale: 2025-07-07 a 2543,01 USD;
+- uscita Trail8 priority: 2025-08-18 a 4312,50 USD;
+- rientro successivo: 2025-08-25 a 4372,99 USD;
+- uscita finale: 2025-09-23 a 4165,50 USD.
+
+Risultato:
+
+- primo trade Trail8: +69,58%;
+- secondo trade dopo rientro: -4,74%;
+- sequenza composta Trail8 priority: +61,54%;
+- Baseline restando dentro fino al 2025-09-23: +63,80%;
+- delta Trail8 priority vs Baseline: -2,27 punti percentuali.
+
+Decisione qualitativa:
+
+- l'uscita Trail8 priority del 2025 viene classificata come uscita inutile /
+  peggiorativa nel complesso;
+- il rientro e' avvenuto piu' in alto e ha assorbito il beneficio apparente
+  dell'uscita anticipata;
+- questo evento entra nel gruppo dei falsi stop da studiare prima di qualsiasi
+  promozione della variante.
