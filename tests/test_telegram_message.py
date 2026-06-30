@@ -48,7 +48,7 @@ class TelegramMessageTests(unittest.TestCase):
                     "🅾️ 6.",
                     "",
                     "VENDI:",
-                    "🅾️ 1.",
+                    "✅ 1.",
                     "🅾️ 2.",
                 ]
             ),

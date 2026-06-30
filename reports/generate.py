@@ -126,7 +126,7 @@ def save_live_status_json(
         "volume 24h live sopra media 20 giorni",
     ]
     sell_labels = [
-        "prezzo live sotto SMA50 live per 2 giorni consecutivi",
+        "prezzo live sotto SMA50 live",
         "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
     ]
     payload = {
@@ -397,11 +397,7 @@ def save_status_json(
 
     momentum_col = f"Close_{CFG.momentum_days}d_ago"
     prev = df.iloc[-2] if len(df) >= 2 else None
-    sell_below_sma50_2d = bool(
-        latest["Close"] < latest["SMA50"]
-        and prev is not None
-        and prev["Close"] < prev["SMA50"]
-    )
+    sell_below_sma50_1d = bool(latest["Close"] < latest["SMA50"])
 
     condition_groups = {
         "buy": [
@@ -432,8 +428,8 @@ def save_status_json(
         ],
         "sell": [
             {
-                "label": "prezzo sotto SMA50 per 2 giorni consecutivi",
-                "passed": sell_below_sma50_2d,
+                "label": "prezzo sotto SMA50",
+                "passed": sell_below_sma50_1d,
             },
             {
                 "label": "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
@@ -459,7 +455,7 @@ def save_status_json(
         "close_last_candle": float(latest.get("Close")) if not pd.isna(latest.get("Close")) else None,
         "previous_close": float(prev.get("Close")) if prev is not None and not pd.isna(prev.get("Close")) else None,
         "previous_sma50": float(prev.get("SMA50")) if prev is not None and not pd.isna(prev.get("SMA50")) else None,
-        "below_sma50_2d": sell_below_sma50_2d,
+        "below_sma50_1d": sell_below_sma50_1d,
         "trail8_stop_hit": bool(latest.get("Trail8_Stop_Hit", False)),
         "trail8_confirmed": bool(latest.get("Trail8_Confirmed", False)),
         "entry_rsi_filter_passed": bool(latest.get("Entry_RSI_Filter_Passed", False)),

@@ -28,7 +28,7 @@ Nota operativa importante:
 Uscita:
 
 - uscita ufficiale storica:
-  - `Close < SMA50` per 2 giorni consecutivi;
+  - `Close < SMA50`;
 - nuova uscita protettiva:
   - trailing stop 8% dal massimo `Close` raggiunto da quando la posizione e'
     aperta;

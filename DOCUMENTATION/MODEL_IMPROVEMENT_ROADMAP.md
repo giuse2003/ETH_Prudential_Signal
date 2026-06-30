@@ -1,6 +1,6 @@
 # ETH Model Improvement Roadmap
 
-Ultimo aggiornamento: 2026-06-28
+Ultimo aggiornamento: 2026-06-30
 
 ## Obiettivo
 
@@ -14,26 +14,25 @@ costi realistici.
 
 ## Baseline Attuale
 
-Stato dopo promozione ufficiale del 2026-06-28:
+Stato dopo decisione ufficiale del 2026-06-30:
 
 - ingresso ufficiale: condizioni storiche Baseline + `RSI <= 65` sui soli
   nuovi ingressi;
-- uscita ufficiale: `Close < SMA50` per 2 giorni consecutivi oppure `Trail8
-  -5 / vol +20`;
+- uscita ufficiale: `Close < SMA50` oppure `Trail8 -5 / vol +20`;
 - varianti non promosse: `trade return >= 15%`, `momentum -6%`, `RSI <= 62`,
   trailing dinamico 15%/8%, volume +10%;
 - report canonico della promozione:
   `reports/official_baseline_implementation.md`.
 
-Metriche di promozione in EUR fino alla candela `2026-06-27`:
+Metriche correnti in USD fino alla candela `2026-06-29`:
 
 | Metrica | Nuova Baseline ufficiale |
 |---|---:|
-| Rendimento annualizzato | 42,74% |
-| Max drawdown | -45,09% |
-| Sharpe Ratio | 1,079 |
-| Profit factor | 5,999 |
-| Operazioni chiuse | 28 |
+| Rendimento annualizzato | 47,94% |
+| Max drawdown | -40,97% |
+| Sharpe Ratio | 1,179 |
+| Profit factor | 7,117 |
+| Operazioni chiuse | 29 |
 
 Le sezioni sotto restano come storico dei test che hanno portato alla
 promozione.
@@ -550,7 +549,7 @@ Risultati del periodo completo (2017-11-11 al 2026-06-25, netti con commissioni 
 Conclusione:
 - Con gli ingressi determinati dalla baseline SMA50, nessuna delle varianti adattive RSI soddisfa tutti i criteri di accettazione (in particolare lo Sharpe Netto di `rsi_adaptive_rsi_80_stop_8` si ferma a `1.041` contro il target di `>= 1.050`, e il max drawdown peggiora a `-55.68%`).
 - Questo evidenzia che le ottime performance registrate nel test precedente dipendevano strettamente dal diverso percorso di ingressi tracciato dal trailing stop 8%. Sotto gli ingressi dettati dalla SMA50, le uscite basate su trailing stop soffrono di maggiore drawdown e minore efficienza.
-- Stato corretto: la baseline SMA50 a 2 giorni resta la strategia ufficiale. `trail_dynamic_15_8` resta solo un candidato sperimentale da studiare, perche' non risolve il peggioramento del drawdown rispetto alla baseline SMA50.
+- Stato storico del test: all'epoca la baseline SMA50 a 2 giorni restava la strategia ufficiale. `trail_dynamic_15_8` resta solo un candidato sperimentale da studiare, perche' non risolveva il peggioramento del drawdown rispetto alla baseline SMA50 allora in vigore.
 
 ### Esperimento Sistema Trailing Stop 8% + RSI Adattivo (Uscita Alternativa)
 
@@ -719,8 +718,8 @@ drawdown rispetto alla baseline SMA50.
 Varianti:
 
 - trailing stop percentuale dal massimo del trade: testato;
-- uscita se prezzo sotto `SMA50` per 1 giorno: testato;
-- uscita se prezzo sotto `SMA50` per 2 giorni: regola attuale;
+- uscita se prezzo sotto `SMA50` per 1 giorno: regola ufficiale corrente;
+- uscita se prezzo sotto `SMA50` per 2 giorni: regola storica sostituita;
 - uscita se RSI scende sotto 35/40/45: testato;
 - uscita se Close perde 8/10/12/15/20/25% dall'ingresso: testato;
 - trailing stop dinamico (15%/8% e 17%/8%) basato su distanza SMA200: testato

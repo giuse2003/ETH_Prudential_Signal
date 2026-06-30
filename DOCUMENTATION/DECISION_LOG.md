@@ -2,6 +2,55 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-06-30 - Decisione su uscita SMA50 a 1 giorno
+
+**Decisione:** accettare il compromesso e promuovere come nuova regola di
+uscita ufficiale:
+
+- `Close < SMA50` gia' dopo 1 giorno;
+- resta invariato il trailing stop 8% confermato da momentum e volume;
+- restano invariati tutti i criteri di acquisto.
+
+**Regola sostituita:** `Close < SMA50` per 2 giorni consecutivi.
+
+**Motivo specifico della decisione:** la scelta e' stata presa per privilegiare
+la protezione del capitale acquisito e la riduzione del drawdown, anche
+accettando alcuni falsi stop storici. Il candidato migliora le metriche
+aggregate piu' rilevanti sull'intero periodo testato:
+
+- rendimento annualizzato: 47,94% vs 43,58%;
+- max drawdown: -40,97% vs -44,93%;
+- Sharpe: 1,179 vs 1,084;
+- profit factor: 7,117 vs 5,889;
+- stress costi superato in tutti gli scenari testati;
+- segmenti modificati: 16 migliorano, 8 peggiorano.
+
+**Compromesso accettato:** il rendimento annuale non migliora in modo uniforme:
+negli anni attivi il candidato migliora 3 anni e peggiora 3 anni. In
+particolare il 2019-2020 resta il punto debole storico. Il compromesso viene
+accettato perche' il miglioramento complessivo su drawdown, Sharpe, profit
+factor, costi e periodo recente 2023-2025 e' ritenuto piu' importante della
+maggiore stabilita' della vecchia conferma a 2 giorni.
+
+**Varianti non promosse:** nessuna conferma aggiuntiva testata sopra
+`Close < SMA50` a 1 giorno viene promossa. In particolare:
+
+- filtro rottura almeno -1%: piu' prudente ma meno efficiente;
+- volume relativo >= -10%: leggero vantaggio su rendimento e profit factor, ma
+  non migliora lo Sharpe rispetto alla regola pura;
+- filtri su RSI, momentum, distanza SMA50, candela rossa e combinazioni: utili
+  come storico, ma non superiori alla regola pura.
+
+**Stato operativo:** decisione approvata, registrata agli atti e implementata
+come nuova regola ufficiale della Baseline. Calcolo segnali, report,
+dashboard, messaggi Telegram e documentazione corrente devono restare
+allineati a questa regola.
+
+**Riferimenti:** `ETH_MODEL_RESEARCH_DIARY.md`,
+`reports/sma50_one_day_promotion_gate.md`,
+`reports/sma50_exit_confirmation_grid.md`,
+`reports/sma50_exit_timing_audit.md`.
+
 ## 2026-06-28 - Promozione nuova Baseline ufficiale
 
 **Decisione:** promuovere il candidato combinato a nuova Baseline ufficiale

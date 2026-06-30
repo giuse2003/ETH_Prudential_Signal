@@ -22,7 +22,7 @@ ogni avanzamento rilevante.
   modello.
 - Nuova Baseline ufficiale promossa il 2026-06-28:
   - ingresso storico + `RSI <= 65` sui nuovi ingressi;
-  - vendita sotto SMA50 per 2 giorni consecutivi oppure `Trail8 -5 / vol +20`.
+  - vendita sotto SMA50 oppure `Trail8 -5 / vol +20`.
 - Ultima verifica modello registrata in
   `reports/official_baseline_implementation.md`.
 

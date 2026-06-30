@@ -19,7 +19,7 @@ const CONDITIONS_MESSAGE = [
   "6. volume sopra media 20 giorni.",
   "",
   "Per VENDI deve essere vera almeno una di queste condizioni:",
-  "1. prezzo sotto SMA50 per 2 giorni consecutivi;",
+  "1. prezzo sotto SMA50;",
   "2. trailing stop 8% dal massimo post-ingresso, confermato da:",
   "   - momentum 7 giorni uguale o maggiore di -5%;",
   "   - volume almeno 20% sopra la media 20 giorni.",
@@ -345,7 +345,6 @@ function buildLiveSnapshot(rows, market) {
   const rsi = computeRsi14(closesWithLive);
   const volumeAvg20 = average(cleanRows.slice(-20).map((row) => row.volume));
   const close7dAgo = cleanRows[cleanRows.length - 7]?.close;
-  const previous = cleanRows[cleanRows.length - 1];
 
   const buy = [
     { label: "prezzo sopra SMA200", passed: market.priceUsd > sma200 },
@@ -363,12 +362,8 @@ function buildLiveSnapshot(rows, market) {
   ];
   const sell = [
     {
-      label: "prezzo sotto SMA50 per 2 giorni consecutivi",
-      passed:
-        market.priceUsd < sma50 &&
-        Number.isFinite(previous?.close) &&
-        Number.isFinite(previous?.sma50) &&
-        previous.close < previous.sma50,
+      label: "prezzo sotto SMA50",
+      passed: market.priceUsd < sma50,
     },
     {
       label: "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
@@ -473,8 +468,6 @@ function deriveConditionGroups(status) {
   const volume = Number(status.volume);
   const volumeAvg20 = Number(status.volume_avg20);
   const close7dAgo = Number(status.close_7d_ago);
-  const previousClose = Number(status.previous_close);
-  const previousSma50 = Number(status.previous_sma50);
 
   if (
     ![
@@ -504,15 +497,11 @@ function deriveConditionGroups(status) {
     ],
     sell: [
       {
-        label: "prezzo sotto SMA50 per 2 giorni consecutivi",
+        label: "prezzo sotto SMA50",
         passed:
-          typeof status.below_sma50_2d === "boolean"
-            ? status.below_sma50_2d
-            :
-          close < sma50 &&
-          Number.isFinite(previousClose) &&
-          Number.isFinite(previousSma50) &&
-          previousClose < previousSma50,
+          typeof status.below_sma50_1d === "boolean"
+            ? status.below_sma50_1d
+            : close < sma50,
       },
       {
         label: "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",

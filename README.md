@@ -34,7 +34,7 @@ tecnici giornalieri, dashboard web e notifiche Telegram.
 
 ### SELL / VENDI
 
-- Close below SMA50 for two consecutive days.
+- Close below SMA50.
 - Or trailing stop 8% from the highest close reached after entry, confirmed by
   7-day momentum >= -5% and volume at least 20% above the 20-day average.
 
@@ -67,7 +67,7 @@ Le regole ufficiali correnti sono:
 
 - acquisto: prezzo sopra SMA200, SMA50 sopra SMA200, RSI tra 40 e 65,
   momentum 7 giorni positivo e volume sopra la media 20 giorni;
-- vendita: prezzo sotto SMA50 per 2 giorni consecutivi oppure trailing stop
+- vendita: prezzo sotto SMA50 oppure trailing stop
   8% dal massimo Close post-ingresso, confermato da momentum 7 giorni >= -5%
   e volume almeno +20% sopra la media 20 giorni.
 

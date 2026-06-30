@@ -19,7 +19,7 @@ python main.py --force-download
 
 - `ACQUISTA`: condizioni di trend, momentum, RSI e volume favorevoli.
 - `MANTIENI`: conserva l'esposizione precedente.
-- `VENDI`: prezzo sotto SMA50 per 2 giorni consecutivi.
+- `VENDI`: prezzo sotto SMA50.
 - I segnali vengono applicati al rendimento della giornata successiva per evitare look-ahead bias.
 
 ## Risultato Backtest ETH

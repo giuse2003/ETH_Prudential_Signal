@@ -1,6 +1,7 @@
-const STATUS_ENDPOINT = "./status.json";
-const CHART_DATA_ENDPOINT = "./chart-data.json";
-const BACKTEST_ENDPOINT = "./backtest.json";
+const DATA_VERSION = "20260630-sma50-1d";
+const STATUS_ENDPOINT = `./status.json?v=${DATA_VERSION}`;
+const CHART_DATA_ENDPOINT = `./chart-data.json?v=${DATA_VERSION}`;
+const BACKTEST_ENDPOINT = `./backtest.json?v=${DATA_VERSION}`;
 const COINBASE_EUR_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-EUR/spot";
 const COINBASE_USD_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-USD/spot";
 const SUBSCRIBER_COUNT_ENDPOINT =

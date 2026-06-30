@@ -1,6 +1,6 @@
 # ETH Model Research Diary
 
-Ultimo aggiornamento: 2026-06-28
+Ultimo aggiornamento: 2026-06-30
 
 Questo file e' il diario operativo del lavoro sul miglioramento del modello
 ETH Prudential Signal.
@@ -8,7 +8,7 @@ ETH Prudential Signal.
 Nota cronologica:
 
 - le sezioni iniziali riassumono lo stato ufficiale corrente dopo la
-  promozione del 2026-06-28;
+  decisione operativa del 2026-06-30;
 - le sezioni `Registro Analisi` documentano in ordine la sequenza dei test,
   delle esclusioni e delle decisioni;
 - quando una regola passa da candidata a ufficiale, la decisione viene
@@ -33,17 +33,21 @@ Segnale `ACQUISTA` quando tutte le condizioni sono vere:
 - Close > SMA200;
 - SMA50 > SMA200;
 - RSI >= 40;
+- RSI <= 65;
 - Close > Close di 7 giorni prima;
 - Volume > VolumeAvg20.
 
-Segnale `VENDI` quando:
+Segnale `VENDI` quando almeno una condizione e' vera:
 
-- Close < SMA50 per 2 giorni consecutivi.
+- Close < SMA50;
+- trailing stop 8% dal massimo Close post-ingresso, confermato da:
+  - momentum 7 giorni >= -5%;
+  - volume relativo >= +20% rispetto alla media 20 giorni.
 
 `MANTIENI` conserva l'esposizione precedente.
 
-Nota importante: gli esperimenti su trailing stop, ATR, RSI e filtri di
-ingresso/uscita non sono regole operative ufficiali.
+Nota importante: ulteriori esperimenti su ATR, filtri aggiuntivi o varianti
+del trailing restano storici/sperimentali finche' non vengono promossi.
 
 ## Baseline Completa
 
@@ -1842,7 +1846,7 @@ Risultato atteso su Telegram `/conditions`:
   5. prezzo sopra quello di 7 giorni prima;
   6. volume sopra media 20 giorni.
 - VENDI:
-  1. prezzo sotto SMA50 per 2 giorni consecutivi;
+  1. prezzo sotto SMA50;
   2. trailing stop 8% confermato da momentum e volume.
 
 Nota:
@@ -2258,7 +2262,7 @@ Regola testata:
 
 - se il sistema esce con Trail8 priority, ignora ogni nuovo `ACQUISTA`;
 - il blocco resta attivo finche' non arriva il `VENDI` ufficiale:
-  - prezzo sotto SMA50 per 2 giorni consecutivi;
+  - prezzo sotto SMA50;
 - dopo quel reset il sistema puo' valutare nuovi ingressi.
 
 Motivo:
@@ -2485,3 +2489,257 @@ File generati:
 - `scripts/run_sma50_exit_timing_cost_stress.py`;
 - `reports/sma50_exit_timing_cost_stress.md`;
 - `reports/sma50_exit_timing_cost_stress.csv`.
+
+### Test filtro rottura SMA50 almeno -1%
+
+Motivo:
+
+- provare a ridurre i falsi stop della variante SMA50 a 1 giorno;
+- vendere dopo 1 solo giorno sotto SMA50 soltanto se la rottura e'
+  significativa;
+- mantenere la Baseline a 2 giorni quando la chiusura e' sotto SMA50 ma meno
+  dell'1%.
+
+Regola testata:
+
+- `VENDI` se `Close <= SMA50 * 0,99`;
+- oppure resta valido il `VENDI` Baseline se `Close < SMA50` per 2 giorni;
+- ingressi e Trail8 invariati.
+
+Risultati USD:
+
+| Modello | Totale | Ann. | Max DD | Sharpe | PF | Operazioni | Turnover |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| SMA50 2 giorni + Trail8 | 2173,16% | 43,61% | -44,93% | 1,084 | 5,889 | 28 | 56,0 |
+| SMA50 1 giorno pura + Trail8 | 2843,36% | 47,98% | -40,97% | 1,179 | 7,117 | 29 | 58,0 |
+| SMA50 1 giorno solo se -1% + Trail8 | 2433,38% | 45,43% | -40,97% | 1,129 | 6,204 | 27 | 54,0 |
+
+Lettura:
+
+- il filtro -1% batte la Baseline ufficiale;
+- riduce operazioni e turnover rispetto alla variante pura a 1 giorno;
+- non batte la variante pura a 1 giorno su rendimento, Sharpe o profit factor;
+- conserva lo stesso max drawdown della variante pura.
+
+Decisione provvisoria:
+
+- variante utile come versione piu' prudente;
+- non promossa rispetto alla SMA50 a 1 giorno pura;
+- per ora il filtro -1% non sembra il miglior modo per isolare i falsi stop.
+
+File generati:
+
+- `scripts/run_sma50_exit_1pct_filter_test.py`;
+- `reports/sma50_exit_1pct_filter_test.md`;
+- `reports/sma50_exit_1pct_filter_trades.csv`.
+
+### Griglia conferme aggiuntive su SMA50 a 1 giorno
+
+Motivo:
+
+- non lasciare la regola di uscita soltanto come `Close < SMA50` a 1 giorno;
+- provare conferme aggiuntive per ridurre i falsi stop;
+- testare tutto lo storico disponibile, dal 2017-11-11 al 2026-06-29;
+- mantenere invariati ingressi e Trail8.
+
+Conferme testate:
+
+- distanza sotto SMA50: da -0,25% a -5,00%;
+- momentum 7 giorni: da -1,00% a -10,00%;
+- volume relativo rispetto alla media 20 giorni: da -10% a +50%;
+- RSI: soglie 40, 42, 45, 48, 50, 52;
+- candela rossa;
+- close sotto il close del giorno precedente;
+- slope SMA50 negativa su 5 giorni;
+- combinazioni OR/AND fra distanza, momentum, volume e RSI.
+
+Risultati principali USD:
+
+| Modello | Ann. | Totale | Max DD | Sharpe | PF | Operazioni | Turnover |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| SMA50 2 giorni + Trail8 | 43,58% | 2173,16% | -44,93% | 1,084 | 5,889 | 28 | 56,0 |
+| SMA50 1 giorno pura | 47,94% | 2843,36% | -40,97% | 1,179 | 7,117 | 29 | 58,0 |
+| 1g + volume relativo >= -10% | 48,02% | 2857,31% | -40,97% | 1,178 | 7,244 | 28 | 56,0 |
+| 1g + RSI <= 52 | 47,56% | 2778,12% | -40,97% | 1,172 | 6,948 | 29 | 58,0 |
+| 1g + distanza <= -0,25% | 46,78% | 2649,51% | -40,97% | 1,157 | 6,667 | 28 | 56,0 |
+| 1g + distanza <= -0,50% | 46,78% | 2649,51% | -40,97% | 1,157 | 6,667 | 28 | 56,0 |
+
+Sintesi:
+
+- varianti effettive testate oltre ai due riferimenti: 91;
+- varianti che battono la Baseline su annualizzato, drawdown e Sharpe: 81;
+- varianti che battono o pareggiano la SMA50 1 giorno pura su annualizzato,
+  drawdown e Sharpe insieme: 0.
+
+Lettura:
+
+- la SMA50 1 giorno pura resta il riferimento piu' forte tra le regole semplici
+  testate;
+- `volume relativo >= -10%` migliora leggermente rendimento annualizzato e
+  profit factor, riducendo anche turnover, ma non migliora lo Sharpe rispetto
+  alla 1 giorno pura;
+- le conferme piu' severe riducono operazioni e turnover, ma tagliano anche
+  uscite utili;
+- la griglia conferma che la regola a 1 giorno pura e' difficile da battere
+  senza introdurre complessita' non giustificata.
+
+Decisione provvisoria:
+
+- nessuna conferma aggiuntiva viene promossa sopra SMA50 1 giorno pura;
+- `volume relativo >= -10%` resta candidata secondaria da osservare, ma il
+  vantaggio e' troppo sottile per giustificare una regola nuova;
+- il prossimo Promotion Gate dovrebbe confrontare soprattutto:
+  - Baseline SMA50 2 giorni + Trail8;
+  - SMA50 1 giorno pura + Trail8;
+  - eventuale variante secondaria volume relativo >= -10%.
+
+File generati:
+
+- `scripts/run_sma50_exit_confirmation_grid.py`;
+- `reports/sma50_exit_confirmation_grid.md`;
+- `reports/sma50_exit_confirmation_grid.csv`;
+- `reports/sma50_exit_confirmation_grid_yearly_top.csv`.
+
+### Promotion Gate SMA50 a 1 giorno
+
+Motivo:
+
+- concentrare i test sul miglior candidato emerso: `Close < SMA50` a 1 giorno
+  + Trail8;
+- confrontarlo con la Baseline `Close < SMA50` per 2 giorni + Trail8;
+- verificare metriche aggregate, costi, finestre rolling, anni attivi e audit
+  segmenti;
+- non modificare ancora i segnali ufficiali.
+
+Periodo:
+
+- dal 2017-11-11 al 2026-06-29;
+- dati e indicatori ETH-USD;
+- ingressi invariati.
+
+Gate:
+
+| Check | Esito | Nota |
+|---|---:|---|
+| Rendimento annualizzato completo migliora | PASS | 47,94% vs 43,58% |
+| Max drawdown completo migliora | PASS | -40,97% vs -44,93% |
+| Sharpe completo migliora | PASS | 1,179 vs 1,084 |
+| Profit factor completo migliora | PASS | 7,117 vs 5,889 |
+| Stress costi migliora in tutti gli scenari | PASS | 4/4 ann., 4/4 DD, 4/4 Sharpe |
+| Rendimento annuale migliora nella maggioranza degli anni attivi | FAIL | 3 anni meglio, 3 anni peggio |
+| Drawdown annuale migliora nella maggioranza degli anni attivi | PASS | 3 meglio, 2 peggio |
+| Finestre rolling migliorano nella maggioranza | PASS | 4 meglio, 2 peggio |
+| Segmenti modificati migliorano nella maggioranza | PASS | 16 migliorano, 8 peggiorano |
+
+Risultato:
+
+- PASS: 8;
+- FAIL: 1.
+
+Metriche complete USD:
+
+| Modello | Totale | Ann. | Max DD | Sharpe | PF | Operazioni | Turnover |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Baseline SMA50 2g + Trail8 | 2173,16% | 43,58% | -44,93% | 1,084 | 5,889 | 28 | 56,0 |
+| Candidate SMA50 1g + Trail8 | 2843,36% | 47,94% | -40,97% | 1,179 | 7,117 | 29 | 58,0 |
+
+Finestre rolling:
+
+| Finestra | Delta ret | Delta DD | Delta Sharpe |
+|---|---:|---:|---:|
+| 2019-2020 | -47,17% | -3,02% | -0,111 |
+| 2020-2021 | -58,85% | +3,96% | -0,005 |
+| 2021-2022 | +8,82% | +3,96% | +0,049 |
+| 2023-2024 | +22,22% | +11,88% | +0,343 |
+| 2024-2025 | +56,28% | +12,54% | +0,589 |
+| 2025-2026 | +21,90% | +10,86% | +0,400 |
+
+Lettura:
+
+- il candidato supera quasi tutti i criteri tecnici;
+- il vantaggio e' molto forte dal 2023 in poi, soprattutto nel 2024-2025;
+- il punto debole resta il 2019-2020, dove la reattivita' a 1 giorno peggiora
+  il rendimento;
+- la scelta finale non e' piu' solo statistica: bisogna decidere se il modello
+  deve privilegiare la protezione del capitale acquisito e la riduzione del
+  drawdown, accettando qualche falso stop storico.
+
+Decisione provvisoria:
+
+- SMA50 1 giorno + Trail8 e' il candidato principale per sostituire SMA50 2
+  giorni + Trail8;
+- non ancora promosso automaticamente;
+- prossimo passo consigliato: discutere il FAIL annuale 3/3 e decidere se
+  considerarlo accettabile alla luce dei miglioramenti su drawdown, Sharpe,
+  costi e periodo recente.
+
+File generati:
+
+- `scripts/run_sma50_one_day_promotion_gate.py`;
+- `reports/sma50_one_day_promotion_gate.md`;
+- `reports/sma50_one_day_promotion_gate_checks.csv`;
+- `reports/sma50_one_day_promotion_gate_windows.csv`.
+
+### Decisione finale sul compromesso SMA50 a 1 giorno
+
+Decisione:
+
+- accettare il compromesso della SMA50 a 1 giorno;
+- registrare la decisione nel `DECISION_LOG.md`;
+- non introdurre ulteriori filtri sopra la regola pura;
+- implementare la modifica operativa in modo atomico su modello, report,
+  dashboard e Telegram.
+
+Motivo specifico:
+
+- la regola a 1 giorno protegge prima il capitale acquisito;
+- migliora rendimento annualizzato, drawdown massimo, Sharpe e profit factor;
+- supera lo stress costi;
+- migliora la maggioranza dei segmenti modificati;
+- il peggioramento 2019-2020 viene accettato consapevolmente come costo della
+  maggiore reattivita' del modello.
+
+Compromesso accettato:
+
+- il rendimento annuale migliora in 3 anni attivi e peggiora in 3 anni attivi;
+- il vecchio filtro a 2 giorni resta storicamente piu' calmo in alcuni regimi;
+- la nuova regola viene preferita perche' e' piu' coerente con l'obiettivo del
+  modello: protezione prudenziale del capitale e riduzione del drawdown.
+
+Stato:
+
+- decisione approvata e messa agli atti;
+- implementazione ufficiale eseguita su calcolo segnali, dashboard, report e
+  messaggi Telegram.
+
+### Implementazione ufficiale SMA50 a 1 giorno
+
+Modifica applicata:
+
+- sostituita la vecchia uscita `Close < SMA50` per 2 giorni consecutivi;
+- nuova uscita ufficiale: `Close < SMA50` gia' dopo 1 candela giornaliera
+  chiusa;
+- Trail8 invariato;
+- condizioni di acquisto invariate.
+
+File operativi allineati:
+
+- `strategy/signals.py`;
+- `reports/generate.py`;
+- `cloudflare-worker/src/worker.js`;
+- `docs/index.html`;
+- `docs/status.json`;
+- `docs/live-status.json`;
+- `docs/backtest.json`;
+- `README.md`;
+- documentazione corrente in `DOCUMENTATION/`;
+- test automatici.
+
+Verifiche:
+
+- rigenerati dati/report con `python main.py --force-download`;
+- copiata la dashboard aggiornata in `docs/`;
+- verificato che `status.json` esponga `below_sma50_1d`;
+- suite `unittest` completata con 60 test passati;
+- ricerca sui file operativi: nessun riferimento residuo alla vecchia regola
+  di conferma SMA50 a 2 giorni.

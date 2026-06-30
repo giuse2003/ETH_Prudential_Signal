@@ -49,13 +49,13 @@ Nel codice queste regole sono in `strategy/signals.py`, funzione
 
 Per generare `VENDI` deve essere vera almeno una di queste condizioni:
 
-1. prezzo `Close` sotto `SMA50` per due giorni consecutivi.
+1. prezzo `Close` sotto `SMA50`.
 2. trailing stop 8% dal massimo `Close` raggiunto dopo l'ingresso, confermato
    da:
    - momentum 7 giorni uguale o maggiore di `-5%`;
    - volume relativo almeno `+20%` sopra la media a 20 giorni.
 
-La regola sotto SMA50 a 2 giorni resta la vendita ufficiale storica. Il
+La regola sotto SMA50 a 1 giorno e' la vendita ufficiale corrente. Il
 trailing stop confermato e' stato promosso dopo la validazione del candidato
 combinato con filtro ingresso `RSI <= 65`.
 

@@ -20,7 +20,7 @@ Cloudflare.
 - Strategia ufficiale corrente: Baseline promossa il 2026-06-28.
   - `ACQUISTA`: condizioni storiche + filtro `RSI <= 65` sui soli nuovi
     ingressi.
-  - `VENDI`: `Close < SMA50` per 2 giorni consecutivi oppure trailing stop 8%
+  - `VENDI`: `Close < SMA50` oppure trailing stop 8%
     dal massimo Close post-ingresso, confermato da momentum 7 giorni >= -5% e
     volume relativo >= +20%.
 - Esperimenti modello isolati in `scripts/run_model_experiments.py`; non

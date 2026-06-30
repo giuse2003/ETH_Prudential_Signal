@@ -88,7 +88,7 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     """
     Classificazione stretta:
     ACQUISTA se TUTTE le condizioni rialziste sono vere.
-    VENDI se il prezzo chiude sotto SMA50 per due giorni consecutivi.
+    VENDI se il prezzo chiude sotto SMA50 gia' dopo 1 giorno.
     Altrimenti MANTIENI.
     """
     df = df.copy()
@@ -116,8 +116,7 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     )
     filtered_new_entry_cond = official_buy_cond & entry_rsi_filter
 
-    below_sma50 = close < sma50
-    official_sell_cond = below_sma50 & below_sma50.shift(1).fillna(False)
+    official_sell_cond = close < sma50
 
     signal, trail_stop_hit, trail_confirmed = _stateful_signals(
         df=df,
@@ -354,11 +353,7 @@ def live_condition_statuses(
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
     sell_statuses = [
-        bool(
-            row["Close"] < row["SMA50"]
-            and previous is not None
-            and previous["Close"] < previous["SMA50"]
-        ),
+        bool(row["Close"] < row["SMA50"]),
         bool(row.get("Trail8_Confirmed", False)),
     ]
     return buy_statuses, sell_statuses
@@ -435,13 +430,12 @@ def _buy_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
 
 
 def _sell_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
-    if len(df_with_signals) < 2:
+    if len(df_with_signals) < 1:
         return [False]
 
-    previous = df_with_signals.iloc[-2]
     row = df_with_signals.iloc[-1]
     return [
-        bool(row["Close"] < row["SMA50"] and previous["Close"] < previous["SMA50"]),
+        bool(row["Close"] < row["SMA50"]),
         bool(row.get("Trail8_Confirmed", False)),
     ]
 

@@ -44,7 +44,7 @@ class SignalRulesTests(unittest.TestCase):
         self.assertEqual(result.iloc[-1]["Segnale"], "ACQUISTA")
         self.assertTrue(result.iloc[-1]["Entry_RSI_Filter_Passed"])
 
-    def test_price_below_sma50_for_two_days_triggers_sell_signal(self) -> None:
+    def test_price_below_sma50_triggers_sell_signal(self) -> None:
         df = pd.DataFrame(
             {
                 "Close": [120.0, 119.0],
@@ -61,7 +61,7 @@ class SignalRulesTests(unittest.TestCase):
 
         self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
 
-    def test_single_close_below_sma50_does_not_trigger_sell_signal(self) -> None:
+    def test_single_close_below_sma50_triggers_sell_signal(self) -> None:
         df = pd.DataFrame(
             {
                 "Close": [132.0, 119.0],
@@ -76,7 +76,7 @@ class SignalRulesTests(unittest.TestCase):
 
         result = compute_signals(df)
 
-        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI")
+        self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
 
     def test_trailing_stop_confirmed_triggers_sell_signal(self) -> None:
         df = pd.DataFrame(

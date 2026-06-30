@@ -106,7 +106,7 @@ class TelegramWebhookTests(unittest.TestCase):
                     ],
                     "sell": [
                         {
-                            "label": "prezzo sotto SMA50 per 2 giorni consecutivi",
+                            "label": "prezzo sotto SMA50",
                             "passed": True,
                         },
                         {

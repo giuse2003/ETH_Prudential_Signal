@@ -78,7 +78,7 @@ posizione gia' aperta.
 
 Per generare `VENDI` deve essere vera almeno una condizione:
 
-1. `Close < SMA50` per 2 giorni consecutivi;
+1. `Close < SMA50`;
 2. trailing stop 8% dal massimo `Close` post-ingresso, confermato da:
    - momentum 7 giorni >= -5%;
    - volume relativo >= +20% rispetto alla media 20 giorni.
