@@ -2288,3 +2288,42 @@ Decisione:
 - utile come riferimento negativo;
 - per ora restano piu' interessanti cooldown brevi/medi, soprattutto 10-14
   giorni, da analizzare evento-per-evento.
+
+### Test uscita SMA50 a 1 giorno
+
+Motivo:
+
+- verificare se conviene anticipare il `VENDI` ufficiale da prezzo sotto SMA50
+  per 2 giorni consecutivi a prezzo sotto SMA50 gia' dopo 1 giorno;
+- ingressi e Trail8 restano invariati.
+
+Risultati USD:
+
+| Modello | Entrate | Uscite | Uscite SMA50 | Uscite Trail8 | Totale | Ann. | Max DD | Sharpe | PF |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| SMA50 2 giorni + Trail8 | 28 | 28 | 24 | 4 | 2173,16% | 43,61% | -44,93% | 1,084 | 5,889 |
+| SMA50 1 giorno + Trail8 | 29 | 29 | 25 | 4 | 2843,36% | 47,98% | -40,97% | 1,179 | 7,117 |
+
+Differenza 1 giorno vs 2 giorni:
+
+- entrate: +1;
+- uscite: +1;
+- uscite SMA50 effettive: +1;
+- uscite Trail8 effettive: nessuna differenza;
+- rendimento annualizzato: +4,36 punti percentuali;
+- max drawdown: migliora di 3,96 punti percentuali;
+- Sharpe: +0,095;
+- profit factor: +1,228.
+
+Decisione provvisoria:
+
+- la regola SMA50 a 1 giorno e' molto interessante sulle metriche aggregate;
+- non viene promossa automaticamente;
+- prossimo controllo necessario: audit trade-by-trade per capire quale
+  operazione aggiuntiva crea il miglioramento e se introduce falsi stop.
+
+File generati:
+
+- `scripts/run_sma50_exit_timing_test.py`;
+- `reports/sma50_exit_timing_test.md`;
+- `reports/sma50_exit_timing_trades.csv`.
