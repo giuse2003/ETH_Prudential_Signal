@@ -2062,3 +2062,50 @@ Decisione provvisoria:
 - non viene promossa automaticamente;
 - prossimo controllo consigliato: analisi evento-per-evento delle 12 uscite
   Trail8 priority, distinguendo uscite utili da falsi stop.
+
+### Audit cronologico operazioni Trail8 priority
+
+Motivo:
+
+- verificare tutta la cronologia acquisti/vendite della variante Trail8
+  priority;
+- confrontare ogni operazione contro il mantenimento Baseline sul segmento
+  corrispondente;
+- capire se le uscite Trail8 generano rientri vicini e se quei rientri sono
+  vantaggiosi o svantaggiosi.
+
+Risultati:
+
+- operazioni Trail8 priority chiuse: 34;
+- operazioni Baseline chiuse: 28;
+- confronto trade singolo vs mantenimento Baseline:
+  - 5 operazioni migliorano;
+  - 24 sono uguali;
+  - 5 peggiorano;
+- uscite Trail8 priority: 12;
+- rientri dopo uscita Trail8:
+  - 6 rientri piu' bassi, quindi vantaggiosi;
+  - 6 rientri piu' alti, quindi svantaggiosi.
+
+Lettura provvisoria:
+
+- la variante migliora le metriche complessive, ma non perche' ogni uscita sia
+  migliore;
+- alcune uscite Trail8 anticipano bene una caduta successiva;
+- altre tagliano troppo presto trend ancora validi e costringono a rientrare
+  piu' in alto;
+- serve una seconda selezione qualitativa sulle 12 uscite Trail8 priority per
+  separare protezione vera da falso stop.
+
+File generati:
+
+- `scripts/run_trail_priority_trade_audit.py`;
+- `reports/trail_priority_trade_audit.md`;
+- `reports/trail_priority_trade_audit.csv`;
+- `reports/trail_priority_reentry_audit.csv`.
+
+Decisione:
+
+- nessuna modifica alla Baseline ufficiale;
+- il tema resta aperto come miglioramento interessante da analizzare in modo
+  evento-per-evento.
