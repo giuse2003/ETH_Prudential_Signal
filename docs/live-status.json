@@ -1,9 +1,9 @@
 {
   "signal": "VENDI",
-  "price_usd": 1618.3,
-  "price_eur": 1417.8,
-  "volume_24h_usd": 10844037587.0,
-  "last_update": "2026-07-02 08:28:30 UTC",
+  "price_usd": 1644.0,
+  "price_eur": 1440.91,
+  "volume_24h_usd": 11754047891.0,
+  "last_update": "2026-07-02 11:06:07 UTC",
   "status": "Attivo",
   "condition_groups": {
     "buy": [
@@ -17,7 +17,7 @@
       },
       {
         "label": "valore RSI live compreso tra 40 e 65",
-        "passed": false
+        "passed": true
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
