@@ -1,4 +1,4 @@
-const STATUS_ENDPOINT = "./reports/status.json";
+const STATUS_ENDPOINT = "./reports/live-status.json";
 const COINBASE_EUR_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-EUR/spot";
 const COINBASE_USD_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-USD/spot";
 const SUBSCRIBER_COUNT_ENDPOINT =
