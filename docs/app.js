@@ -1,5 +1,5 @@
 const DATA_VERSION = "20260630-rsi-range";
-const STATUS_ENDPOINT = `./status.json?v=${DATA_VERSION}`;
+const STATUS_ENDPOINT = `./live-status.json?v=${DATA_VERSION}`;
 const CHART_DATA_ENDPOINT = `./chart-data.json?v=${DATA_VERSION}`;
 const BACKTEST_ENDPOINT = `./backtest.json?v=${DATA_VERSION}`;
 const COINBASE_EUR_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-EUR/spot";
