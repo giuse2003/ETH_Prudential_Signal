@@ -1,6 +1,6 @@
 # ETH Model Research Diary
 
-Ultimo aggiornamento: 2026-06-30
+Ultimo aggiornamento: 2026-07-05
 
 Questo file e' il diario operativo del lavoro sul miglioramento del modello
 ETH Prudential Signal.
@@ -2743,3 +2743,116 @@ Verifiche:
 - suite `unittest` completata con 60 test passati;
 - ricerca sui file operativi: nessun riferimento residuo alla vecchia regola
   di conferma SMA50 a 2 giorni.
+
+### Test rimozione condizione ingresso SMA50 > SMA200
+
+Motivo:
+
+- verificare se la condizione di acquisto `SMA50 > SMA200` puo' essere
+  eliminata dalla Baseline;
+- isolare solo questa modifica, lasciando invariati:
+  - `Close > SMA200`;
+  - `RSI >= 40`;
+  - `RSI <= 65`;
+  - momentum 7 giorni positivo;
+  - volume sopra media 20 giorni;
+  - uscite `Close < SMA50` a 1 giorno e Trail8 confermato.
+
+Periodo:
+
+- dati rigenerati fino alla candela chiusa `2026-07-03`;
+- performance principali misurate in EUR tramite `Close_EUR`;
+- controllo di coerenza eseguito anche in USD.
+
+Confronto principale:
+
+| Variante | Ann. | Max DD | Sharpe | Profit factor | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 50,95% | -41,10% | 1,216 | 7,400 | 29 |
+| Senza `SMA50 > SMA200` | 56,07% | -41,10% | 1,247 | 7,335 | 31 |
+
+Controllo USD:
+
+| Variante | Ann. | Max DD | Sharpe | Profit factor | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 51,81% | -40,97% | 1,217 | 7,117 | 29 |
+| Senza `SMA50 > SMA200` | 57,34% | -40,97% | 1,255 | 7,089 | 31 |
+
+Robustezza rimozione pura:
+
+- stress costi 0,25% ancora positivo: delta annualizzato +4,84 punti;
+- finestre rolling 730 giorni positive nel 92% dei casi;
+- il candidato fallisce pero' 2 gate di stabilita':
+  - peggiora il segmento 2018-2019 di -27,15 punti di rendimento;
+  - peggiora il drawdown del segmento 2018-2019 di -16,53 punti.
+
+Trade sbloccati perche' `SMA50 <= SMA200`:
+
+| Entry | Exit | Return | DD trade | RSI | Mom 7g | Volume rel |
+|---|---|---:|---:|---:|---:|---:|
+| 2019-04-11 | 2019-07-11 | +62,52% | -19,32% | 59,51 | +4,71% | +21,33% |
+| 2019-09-22 | 2019-09-24 | -20,49% | -20,49% | 63,28 | +11,46% | +7,30% |
+| 2020-04-19 | 2020-06-27 | +18,91% | -13,77% | 61,43 | +12,70% | +19,12% |
+| 2023-02-02 | 2023-03-03 | -2,15% | -9,86% | 63,08 | +2,50% | +22,36% |
+| 2023-11-14 | 2024-01-22 | +16,76% | -10,94% | 61,60 | +4,82% | +36,79% |
+| 2024-11-14 | 2024-12-21 | +10,12% | -15,61% | 60,73 | +5,64% | +24,70% |
+| 2025-06-09 | 2025-06-13 | -4,83% | -9,21% | 61,78 | +2,85% | +3,44% |
+
+Lettura:
+
+- la rimozione pura e' interessante sulle metriche aggregate;
+- il peggioramento 2018-2019 e' troppo ampio per promuoverla direttamente;
+- il falso rimbalzo del 2019-09-22 mostra il rischio della rimozione senza
+  protezioni.
+
+### Guardrail su rimozione SMA50 > SMA200
+
+Motivo:
+
+- capire se la rimozione puo' essere resa piu' robusta applicando un guardrail
+  solo agli ingressi anticipati, cioe' quando `SMA50 <= SMA200`.
+
+Varianti principali:
+
+| Variante | Ann. | Max DD | Sharpe | Profit factor | Delta 2018-2019 | Rolling + | Gate |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `RSI <= 62 oppure volume rel >= +15%` | 60,55% | -41,10% | 1,321 | 9,488 | +6,16% | 96,00% | PASS |
+| `momentum 7g <= +10%` | 60,02% | -41,10% | 1,316 | 9,443 | +6,16% | 96,00% | PASS |
+| `RSI <= 62` | 59,80% | -41,10% | 1,315 | 9,015 | +6,16% | 96,00% | PASS |
+| `volume rel >= +15%` | 58,71% | -41,10% | 1,294 | 8,460 | +6,16% | 96,00% | PASS |
+| rimozione pura | 56,07% | -41,10% | 1,247 | 7,335 | -27,15% | 92,00% | FAIL |
+
+Lettura:
+
+- i guardrail eliminano il difetto principale della rimozione pura;
+- la variante piu' semplice e difendibile e' `momentum 7g <= +10%` sugli
+  ingressi con `SMA50 <= SMA200`;
+- la variante numericamente migliore, `RSI <= 62 oppure volume rel >= +15%`,
+  e' meno elegante e piu' esposta al rischio di regola costruita sul campione.
+
+Decisione:
+
+- non modificare la Baseline;
+- non eliminare ora `SMA50 > SMA200`;
+- registrare il test come prova fatta e lasciare la strategia ufficiale
+  invariata;
+- eventuale lavoro futuro puo' ripartire dal guardrail semplice
+  `momentum 7g <= +10%`, ma solo con audit evento-per-evento e confronto con
+  altre semplificazioni del modello.
+
+File generati:
+
+- `scripts/run_sma50_trend_filter_removal.py`;
+- `scripts/run_sma50_trend_filter_robustness.py`;
+- `scripts/run_sma50_trend_filter_guardrails.py`;
+- `reports/sma50_trend_filter_removal.md`;
+- `reports/sma50_trend_filter_robustness.md`;
+- `reports/sma50_trend_filter_guardrails.md`.
+
+Verifiche:
+
+- `python main.py --force-download`;
+- `python scripts\run_sma50_trend_filter_removal.py`;
+- `python scripts\run_sma50_trend_filter_robustness.py`;
+- `python scripts\run_sma50_trend_filter_guardrails.py`;
+- `python -m py_compile scripts\run_sma50_trend_filter_removal.py scripts\run_sma50_trend_filter_robustness.py scripts\run_sma50_trend_filter_guardrails.py`.
