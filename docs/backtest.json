@@ -1,15 +1,15 @@
 {
   "period": {
     "start_date": "2017-11-11",
-    "end_date": "2026-07-04"
+    "end_date": "2026-07-05"
   },
   "strategy": {
     "total_return": 28.43360541222516,
-    "annualized_return": 0.47850208007487804,
+    "annualized_return": 0.47831902051533626,
     "max_drawdown": -0.4097252122986822,
     "num_operations": 29,
     "win_rate": 0.3448275862068966,
-    "sharpe_ratio": 1.1779358980357126,
+    "sharpe_ratio": 1.1777487329680572,
     "profit_factor": 7.116545346472427,
     "average_trade_return": 0.19098379355841824,
     "median_trade_return": -0.024429771965754465,
@@ -19,17 +19,17 @@
     "worst_trade": -0.1025812782190052,
     "average_trade_days": 25.724137931034484,
     "median_trade_days": 10.0,
-    "exposure_ratio": 0.23622545915136162,
+    "exposure_ratio": 0.23615068059512503,
     "turnover": 58.0,
     "transaction_cost_rate": 0.0
   },
   "buy_hold": {
-    "total_return": 4.653448922447214,
-    "annualized_return": 0.2217421101680448,
+    "total_return": 4.693734169929458,
+    "annualized_return": 0.22266763031360282,
     "max_drawdown": -0.9396254038538314,
     "num_operations": 0,
     "win_rate": 0.0,
-    "sharpe_ratio": 0.66504014640886,
+    "sharpe_ratio": 0.6659034890188842,
     "profit_factor": null,
     "average_trade_return": null,
     "median_trade_return": null,
@@ -46,11 +46,11 @@
   "cost_scenarios": {
     "gross_0_00pct": {
       "total_return": 28.43360541222516,
-      "annualized_return": 0.47850208007487804,
+      "annualized_return": 0.47831902051533626,
       "max_drawdown": -0.4097252122986822,
       "num_operations": 29,
       "win_rate": 0.3448275862068966,
-      "sharpe_ratio": 1.1779358980357126,
+      "sharpe_ratio": 1.1777487329680572,
       "profit_factor": 7.116545346472427,
       "average_trade_return": 0.19098379355841824,
       "median_trade_return": -0.024429771965754465,
@@ -60,17 +60,17 @@
       "worst_trade": -0.1025812782190052,
       "average_trade_days": 25.724137931034484,
       "median_trade_days": 10.0,
-      "exposure_ratio": 0.23622545915136162,
+      "exposure_ratio": 0.23615068059512503,
       "turnover": 58.0,
       "transaction_cost_rate": 0.0
     },
     "cost_0_10pct": {
       "total_return": 26.773804202630583,
-      "annualized_return": 0.46861337320880336,
+      "annualized_return": 0.46843465845294663,
       "max_drawdown": -0.41031548708638343,
       "num_operations": 29,
       "win_rate": 0.3448275862068966,
-      "sharpe_ratio": 1.1610856417451492,
+      "sharpe_ratio": 1.160901173908784,
       "profit_factor": 6.958083609784856,
       "average_trade_return": 0.1898005174347572,
       "median_trade_return": -0.025397935307902908,
@@ -80,17 +80,17 @@
       "worst_trade": -0.10350015905188537,
       "average_trade_days": 25.724137931034484,
       "median_trade_days": 10.0,
-      "exposure_ratio": 0.23622545915136162,
+      "exposure_ratio": 0.23615068059512503,
       "turnover": 58.0,
       "transaction_cost_rate": 0.001
     },
     "cost_0_25pct": {
       "total_return": 24.455160927456742,
-      "annualized_return": 0.4538858459378714,
+      "annualized_return": 0.45371356290891085,
       "max_drawdown": -0.41120089926793557,
       "num_operations": 29,
       "win_rate": 0.3448275862068966,
-      "sharpe_ratio": 1.1357270129272936,
+      "sharpe_ratio": 1.135546602649283,
       "profit_factor": 6.731836625711536,
       "average_trade_return": 0.18802560324926562,
       "median_trade_return": -0.02685018032112574,
@@ -100,17 +100,17 @@
       "worst_trade": -0.10487848030120595,
       "average_trade_days": 25.724137931034484,
       "median_trade_days": 10.0,
-      "exposure_ratio": 0.23622545915136162,
+      "exposure_ratio": 0.23615068059512503,
       "turnover": 58.0,
       "transaction_cost_rate": 0.0025
     },
     "stress_0_50pct": {
       "total_return": 21.00644386148014,
-      "annualized_return": 0.42961918639731267,
+      "annualized_return": 0.42945739774237635,
       "max_drawdown": -0.43064444597863005,
       "num_operations": 29,
       "win_rate": 0.3448275862068966,
-      "sharpe_ratio": 1.0932583534546063,
+      "sharpe_ratio": 1.0930847342232124,
       "profit_factor": 6.382475593404242,
       "average_trade_return": 0.18506741294011284,
       "median_trade_return": -0.0292705886764969,
@@ -120,10 +120,10 @@
       "worst_trade": -0.10717568238340669,
       "average_trade_days": 25.724137931034484,
       "median_trade_days": 10.0,
-      "exposure_ratio": 0.23622545915136162,
+      "exposure_ratio": 0.23615068059512503,
       "turnover": 58.0,
       "transaction_cost_rate": 0.005
     }
   },
-  "last_update": "2026-07-05 23:30:49 UTC"
+  "last_update": "2026-07-06 01:20:04 UTC"
 }
