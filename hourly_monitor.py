@@ -5,8 +5,8 @@ Comportamento:
 - Scarica/aggiorna dati giornalieri ETH-USD (Yahoo Finance) e calcola indicatori giornalieri.
 - Calcola segnale "di regime" (prudente).
 - Legge prezzo spot "live" da Coinbase in EUR.
-- Invia DAILY su nuova candela se cambia il segnale.
-- Invia LIVE se le condizioni aggregate CoinGecko restano variate per almeno 30 minuti.
+- Invia DAILY su nuova candela solo se cambia almeno una condizione operativa.
+- Invia LIVE se le condizioni aggregate CoinGecko restano variate per almeno 10 minuti.
 """
 
 from __future__ import annotations
@@ -46,13 +46,13 @@ def should_notify(state: MonitorState, signal: str, conditions_key: str) -> tupl
     if state.last_signal is None or state.last_conditions_key is None:
         return False, "baseline iniziale salvata senza notifica"
 
-    if signal != state.last_signal:
-        return True, f"segnale cambiato: {state.last_signal} -> {signal}"
-
     if conditions_key != state.last_conditions_key:
         return True, "condizioni operative cambiate"
 
-    return False, "segnale e condizioni invariati"
+    if signal != state.last_signal:
+        return False, f"segnale cambiato senza cambio condizioni: {state.last_signal} -> {signal}"
+
+    return False, "condizioni operative invariate"
 
 
 def _parse_iso_utc(value: str | None) -> datetime | None:
@@ -200,7 +200,7 @@ def main() -> None:
     # 4) Eventi:
     # - workflow manuale: invia sempre, come una richiesta esplicita /segnale
     # - workflow schedulato: processa una candela giornaliera una sola volta
-    #   e invia DAILY se cambia almeno una condizione o il segnale finale.
+    #   e invia DAILY solo se cambia almeno una condizione operativa.
     if new_candle_available:
         scheduled_notify, notify_reason = should_notify(state, signal, conditions_key)
     else:
@@ -314,7 +314,8 @@ def main() -> None:
     if candle_processed:
         state.last_processed_candle_date = latest_candle_date
 
-    if candle_processed:
+    should_update_notified_state = notification_sent or state.last_conditions_key is None
+    if candle_processed and should_update_notified_state:
         state.last_signal = signal
         state.last_conditions_key = conditions_key
         state.last_risk_level = risk_level

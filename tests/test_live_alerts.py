@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from hourly_monitor import should_send_live_alert
+from hourly_monitor import LIVE_STABILITY_MINUTES, should_send_live_alert
 from state.state_store import MonitorState
 
 
@@ -31,11 +31,14 @@ class LiveAlertTests(unittest.TestCase):
         must_notify, reason = should_send_live_alert(
             state,
             "BUY:00000|SELL:1",
-            now + timedelta(minutes=30),
+            now + timedelta(minutes=LIVE_STABILITY_MINUTES),
         )
 
         self.assertTrue(must_notify)
-        self.assertEqual(reason, "condizioni LIVE variate e stabili da almeno 30 minuti")
+        self.assertEqual(
+            reason,
+            f"condizioni LIVE variate e stabili da almeno {LIVE_STABILITY_MINUTES} minuti",
+        )
 
     def test_live_alert_cooldown_blocks_same_alert_for_two_hours(self) -> None:
         now = datetime(2026, 6, 22, 12, 0, tzinfo=timezone.utc)
