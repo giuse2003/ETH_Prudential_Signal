@@ -1,20 +1,20 @@
 {
-  "price_usd": 1800.655,
-  "price_eur": 1577.05,
+  "price_usd": 1799.145,
+  "price_eur": 1575.105,
   "signal": "VENDI",
   "risk_level": "ALTO",
-  "last_update": "2026-07-07 16:27:37",
+  "last_update": "2026-07-07 18:30:02",
   "status": "Attivo",
-  "rsi": 58.13789682011739,
-  "sma50": 1808.5288525390624,
-  "sma200": 2262.8777734375,
-  "atr": 77.8806344801084,
-  "volume": 10921524224.0,
-  "volume_avg20": 11176552724.8,
-  "close_7d_ago": 1570.3612060546875,
-  "close_last_candle": 1791.7099609375,
-  "previous_close": 1779.032958984375,
-  "previous_sma50": 1816.2896923828125,
+  "rsi": 58.7047334013425,
+  "sma50": 1801.7533422851564,
+  "sma200": 2257.6867767333983,
+  "atr": 79.9866399612805,
+  "volume": 16997487730.0,
+  "volume_avg20": 11311601089.5,
+  "close_7d_ago": 1610.205810546875,
+  "close_last_candle": 1797.57373046875,
+  "previous_close": 1783.0059814453125,
+  "previous_sma50": 1808.3547729492188,
   "below_sma50_1d": true,
   "trail8_stop_hit": false,
   "trail8_confirmed": false,
@@ -39,7 +39,7 @@
       },
       {
         "label": "volume sopra media 20 giorni",
-        "passed": false
+        "passed": true
       }
     ],
     "sell": [
