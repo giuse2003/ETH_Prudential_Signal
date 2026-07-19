@@ -20,8 +20,8 @@ segnali:
 - `VENDI`: e' vera almeno una condizione di uscita ufficiale.
 
 Il sistema pubblica lo stato su una dashboard GitHub Pages e risponde via bot
-Telegram ai comandi manuali. Il webhook Telegram e servito da Cloudflare
-Worker per evitare il cold start del vecchio servizio Render.
+Telegram ai comandi manuali. Cloudflare Worker e l'unico backend pubblico per
+webhook, iscrizioni e conteggio aggregato.
 
 ## Regole della strategia
 
@@ -238,13 +238,23 @@ File principali:
 - `docs/app.js`;
 - `docs/style.css`;
 - `docs/status.json`.
+- `docs/live-status.json`;
+- `docs/chart-data.json`;
+- `docs/backtest.json`.
 
 La dashboard mostra:
 
 - segnale corrente;
 - prezzo ETH;
 - indicatori principali;
+- candele OHLC daily verdi/rosse, SMA50, SMA200, RSI e volumi;
 - conteggio aggregato degli iscritti Telegram.
+
+Le candele concluse arrivano da Yahoo Finance e sono le sole usate dal
+modello. La dashboard aggiunge una candela UTC corrente da Coinbase, marcata
+come provvisoria e priva di indicatori. Quando Yahoo pubblica la candela
+chiusa della stessa data, il refresh storico la sostituisce automaticamente.
+Il monitor ritenta Yahoo a ogni run finche la candela attesa non e processata.
 
 Il conteggio iscritti viene letto dal Worker Cloudflare:
 
@@ -255,7 +265,7 @@ GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count
 La risposta contiene solo:
 
 ```json
-{"active_subscribers": 2}
+{"active_subscribers": 1}
 ```
 
 Non espone token, chat ID o dati personali.
@@ -450,8 +460,7 @@ Usato per:
 
 - webhook Telegram;
 - health check;
-- conteggio iscritti;
-- eliminare il cold start del vecchio Render.
+- conteggio iscritti.
 
 ### Telegram Bot API
 
@@ -466,13 +475,6 @@ Usata per:
 ### Supabase
 
 Usato come database per gli iscritti Telegram.
-
-### Render
-
-Render era usato in precedenza per il webhook FastAPI. Il progetto e stato
-migrato a Cloudflare Worker. I file legacy `telegram_webhook.py`,
-`render.yaml` e `RENDER_DEPLOYMENT.md` possono restare come riferimento o
-fallback storico, ma il servizio operativo attuale e Cloudflare Worker.
 
 ## Secret e variabili
 
@@ -542,10 +544,10 @@ Attualmente i test coprono:
 - backtest e conteggio trade;
 - filtro candele giornaliere chiuse;
 - regole di acquisto/vendita;
-- messaggi Telegram legacy;
-- webhook legacy;
+- messaggi e comandi Telegram;
+- Worker Cloudflare e formato delle condizioni;
 - iscrizioni Supabase;
-- dashboard e endpoint iscritti.
+- dashboard, endpoint iscritti e grafico OHLC.
 
 ### 4. Configurare Supabase
 
@@ -659,8 +661,7 @@ git push
 - Il broadcast automatico a tutti gli iscritti Supabase non e ancora
   implementato; il monitor automatico usa il `TELEGRAM_CHAT_ID` configurato nei
   GitHub Secrets.
-- Alcuni file legacy Render/FastAPI restano nel repository come fallback
-  storico ma non rappresentano il deployment principale attuale.
+- Render/FastAPI sono stati rimossi: il Worker e l'unico backend pubblico.
 
 ## File principali
 

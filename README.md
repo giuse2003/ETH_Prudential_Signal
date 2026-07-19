@@ -1,6 +1,6 @@
 # ETH Prudential Signal
 
-Ultimo aggiornamento: 2026-06-28
+Ultimo aggiornamento: 2026-07-19
 
 ETH Prudential Signal is a transparent Ethereum risk-management model based on
 daily technical indicators: SMA50, SMA200, RSI and volume confirmation. It
@@ -91,6 +91,9 @@ costituiscono consulenza finanziaria.
   `/disiscrivimi`.
 - Card pubblica per aprire il bot e visualizzare il numero aggregato degli
   iscritti attivi.
+- Grafico OHLC giornaliero con candele verdi/rosse, SMA50, SMA200, RSI e
+  volumi: Yahoo Finance fornisce lo storico chiuso e Coinbase la candela UTC
+  ancora in corso.
 
 ## Regole temporali
 
@@ -164,6 +167,9 @@ python run_dashboard.py
 
 Apri `http://localhost:8000`.
 
+Il server locale pubblica direttamente la cartella `docs/`, quindi mostra la
+stessa dashboard distribuita con GitHub Pages.
+
 ## Dashboard GitHub Pages
 
 La dashboard pubblica e disponibile qui:
@@ -221,6 +227,10 @@ Il webhook:
 - usa il formatter Telegram gia esistente.
 - risponde solo alla chat privata dell'utente che ha inviato il comando.
 - risponde con segnale, prezzo EUR e stato sintetico delle condizioni.
+
+Cloudflare Worker e l'unico backend pubblico del progetto. Il precedente
+servizio Render/FastAPI e stato rimosso dopo aver verificato che webhook,
+iscrizioni e conteggio pubblico passano tutti dal Worker.
 
 Sono disponibili anche `/start` e `/help`.
 
@@ -289,8 +299,6 @@ state/          stato persistente del monitor
 strategy/       punteggio, segnale e rischio
 tests/          test automatici
 docs/           dashboard GitHub Pages
-telegram_webhook.py  fallback legacy FastAPI per i comandi Telegram
-render.yaml          configurazione legacy Render
 ```
 
 Per lo stato corrente e le decisioni progettuali:
@@ -300,3 +308,4 @@ Per lo stato corrente e le decisioni progettuali:
 - [DECISION_LOG.md](DOCUMENTATION/DECISION_LOG.md)
 - [TELEGRAM_SUBSCRIBERS_ROADMAP.md](DOCUMENTATION/TELEGRAM_SUBSCRIBERS_ROADMAP.md)
 - [SUPABASE_SETUP.md](DOCUMENTATION/SUPABASE_SETUP.md)
+- [BASELINE_SYNC_CHECKLIST.md](DOCUMENTATION/BASELINE_SYNC_CHECKLIST.md)

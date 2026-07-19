@@ -1,8 +1,17 @@
 # Telegram Subscribers Roadmap
 
-Ultimo aggiornamento: 24 giugno 2026
+Ultimo aggiornamento: 19 luglio 2026
 
-Stato generale: `BOT ETH ATTIVO - SUPABASE WORKER DA CONFIGURARE - FASE 4 DA IMPLEMENTARE`
+Stato generale: `BOT ETH E SUPABASE WORKER ATTIVI - FASE 4 DA IMPLEMENTARE`
+
+Nota di stato del 19 luglio 2026:
+
+- Cloudflare Worker e l'unico backend pubblico;
+- Supabase e configurato nel Worker sulla tabella `telegram_subscribers_eth`;
+- `/subscribers/health` e `/subscribers/count` sono operativi;
+- Render/FastAPI sono stati rimossi dopo la verifica di zero servizi Render
+  attivi; i riferimenti successivi a Render nel registro avanzamento sono
+  esclusivamente cronologia del vecchio deployment.
 
 Nota di riallineamento ETH del 24 giugno 2026:
 
@@ -15,8 +24,8 @@ Nota di riallineamento ETH del 24 giugno 2026:
 - `/start`, `/conditions` e `/segnale` rispondono dal bot ETH;
 - `/segnale` usa il fallback daily da `docs/status.json` quando
   `docs/live-status.json` non e ancora disponibile;
-- `/iscrivimi`, `/disiscrivimi` e `/subscribers/count` restano bloccati finche
-  `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` non sono configurati nel Worker;
+- `/iscrivimi`, `/disiscrivimi` e `/subscribers/count` sono operativi tramite
+  i secret Supabase configurati nel Worker;
 - token API Cloudflare dedicato creato e `CLOUDFLARE_API_TOKEN` configurato
   nella sessione PowerShell per consentire deploy da CLI con Wrangler.
 - le operazioni del 24 giugno sono state eseguite sul PC Lenovo al lavoro; sul
@@ -72,7 +81,7 @@ Notifica agli iscritti solo quando cambia segnale o rischio
 - Creare o configurare il progetto Supabase.
 - Eseguire lo script SQL fornito nel pannello Supabase.
 - Recuperare le credenziali Supabase senza condividerle in chat.
-- Inserire le variabili protette su Render.
+- Inserire le variabili protette nel Cloudflare Worker.
 - Inserire i secret richiesti su GitHub Actions.
 - Eseguire le prove Telegram finali dal proprio account.
 
@@ -105,7 +114,7 @@ Notifica agli iscritti solo quando cambia segnale o rischio
 
 ### Fase 2 - Webhook Telegram
 
-- [x] **2.1 Codex:** aggiungere client Supabase al servizio FastAPI.
+- [x] **2.1 Codex:** aggiungere il client Supabase al backend webhook.
 - [x] **2.2 Codex:** implementare `/iscrivimi`.
 - [x] **2.3 Codex:** implementare `/disiscrivimi`.
 - [x] **2.4 Codex:** aggiornare `/start` e `/help`.
@@ -121,7 +130,7 @@ Notifica agli iscritti solo quando cambia segnale o rischio
 - [x] **3.2 Codex:** aggiungere pulsante "Ricevi segnali su Telegram".
 - [x] **3.3 Codex:** collegare il pulsante al deep link del bot.
 - [x] **3.4 Codex:** aggiungere breve testo su consenso e disiscrizione.
-- [x] **3.5 Codex:** aggiungere `GET /subscribers/count` al servizio FastAPI.
+- [x] **3.5 Codex:** aggiungere `GET /subscribers/count` al backend pubblico.
 - [x] **3.6 Codex:** mostrare nella dashboard il numero di iscritti attivi.
 - [x] **3.7 Codex:** configurare CORS per l'origine GitHub Pages.
 - [x] **3.8 Test:** verificare endpoint, fallback, dashboard desktop e mobile.
@@ -179,7 +188,7 @@ una costante JavaScript o una configurazione pubblica priva di secret.
 
 ##### Contatore pubblico degli iscritti
 
-Implementare sul servizio FastAPI esistente:
+Implementare sul backend pubblico esistente:
 
 ```text
 GET /subscribers/count
@@ -204,7 +213,7 @@ L'endpoint deve:
 Il JavaScript della dashboard deve interrogare:
 
 ```text
-https://eth-prudential-signal.onrender.com/subscribers/count
+https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count
 ```
 
 Se il servizio non e disponibile, mostrare:
@@ -218,7 +227,7 @@ della dashboard.
 
 ##### CORS
 
-Configurare FastAPI, se necessario, per consentire l'origine:
+Configurare il Worker per consentire l'origine:
 
 ```text
 https://giuse2003.github.io
@@ -238,7 +247,7 @@ Il frontend pubblico non deve contenere:
 
 La dashboard non deve interrogare direttamente Supabase con chiavi
 privilegiate. Tutte le operazioni sul database devono passare dal backend
-FastAPI.
+Cloudflare Worker.
 
 ##### Vincoli
 
@@ -254,7 +263,7 @@ Non modificare:
 
 ##### Deliverable Fase 3
 
-- endpoint FastAPI per il conteggio degli iscritti attivi;
+- endpoint Worker per il conteggio degli iscritti attivi;
 - card Telegram nella dashboard;
 - integrazione JavaScript del contatore;
 - configurazione CORS minima;
@@ -274,15 +283,16 @@ Non modificare:
 
 ### Fase 5 - Configurazione protetta
 
-- [x] **5.1 Utente:** aggiungere su Render `SUPABASE_URL`.
-- [x] **5.2 Utente:** aggiungere su Render `SUPABASE_SERVICE_ROLE_KEY`.
-- [ ] **5.3 Utente:** aggiungere su Render `TELEGRAM_ADMIN_CHAT_ID`.
+- [x] **5.1 Utente:** aggiungere nel Worker `SUPABASE_URL`.
+- [x] **5.2 Utente:** aggiungere nel Worker `SUPABASE_SERVICE_ROLE_KEY`.
+- [ ] **5.3 Utente:** configurare `TELEGRAM_ADMIN_CHAT_ID` solo se richiesto
+      dalla futura Fase 4.
 - [ ] **5.4 Utente:** aggiungere su GitHub Actions i secret necessari.
 - [x] **5.5 Codex:** mantenere compatibilita temporanea con
   `TELEGRAM_CHAT_ID`, se necessaria.
 - [x] **5.6 Verifica:** confermare che nessun secret sia presente nei log o
   nei file versionati.
-- [ ] **5.7 Utente/Codex:** configurare `SUPABASE_URL` e
+- [x] **5.7 Utente/Codex:** configurare `SUPABASE_URL` e
   `SUPABASE_SERVICE_ROLE_KEY` come secret del Worker Cloudflare ETH.
 - [x] **5.8 Utente/Codex:** creare token API Cloudflare dedicato per Wrangler.
 - [x] **5.9 Codex:** configurare `CLOUDFLARE_API_TOKEN` localmente per deploy e
@@ -307,7 +317,7 @@ Non modificare:
 
 ## Variabili previste
 
-### Render
+### Cloudflare Worker
 
 ```text
 TELEGRAM_BOT_TOKEN
@@ -392,6 +402,7 @@ La funzionalita sara considerata completata quando:
 | 2026-06-24 | Bot ETH Cloudflare | Parziale | Bot dedicato e webhook funzionanti; `/segnale` corretto con fallback daily; Supabase Worker ancora da configurare. |
 | 2026-06-24 | Token API Cloudflare | Completato | `wrangler whoami` e deploy CLI riusciti per `eth-prudential-signal`. |
 | 2026-06-24 | Nota PC Lenovo/casa | Da casa controllare prima eventuale API/Wrangler BTC gia presente prima di configurare nuovi token. |
+| 2026-07-19 | Dismissione Render | Completato | Verificati Worker/Supabase e zero servizi Render attivi; rimossi backend FastAPI, configurazione e dipendenze legacy. |
 
 ## Prossimo passo
 

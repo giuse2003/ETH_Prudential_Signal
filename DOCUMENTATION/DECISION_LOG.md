@@ -2,6 +2,33 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-07-19 - Candele daily e rimozione definitiva Render
+
+**Decisione infrastrutturale:** mantenere Cloudflare Worker come unico backend
+pubblico ed eliminare dal repository il fallback Render/FastAPI.
+
+**Verifica preliminare:** webhook Telegram, `/subscribers/count`,
+`/subscribers/health` e comandi del bot risultano serviti dal Worker ETH; il
+pannello Render mostra zero servizi attivi. Sono quindi stati rimossi
+`render.yaml`, `telegram_webhook.py`, il relativo test, la guida di deploy e le
+dipendenze FastAPI/Uvicorn.
+
+**Decisione dashboard:** sostituire la linea del prezzo con candele OHLC
+giornaliere:
+
+- storico chiuso ufficiale da Yahoo Finance;
+- candela UTC corrente da Coinbase, marcata come provvisoria;
+- priorita sempre ai dati Yahoo: quando la candela chiusa viene pubblicata,
+  sostituisce quella Coinbase della stessa data;
+- SMA50, SMA200, RSI 40/65, volumi e media volumi 20 giorni restano visibili;
+- la candela live non modifica indicatori, baseline o segnale operativo.
+
+**Correzioni operative collegate:** il monitor ritenta Yahoo a ogni run finche
+la candela giornaliera attesa non e stata processata; `run_dashboard.py` serve
+ora direttamente la dashboard pubblica in `docs/`.
+
+**Baseline:** invariata.
+
 ## 2026-06-30 - Decisione su uscita SMA50 a 1 giorno
 
 **Decisione:** accettare il compromesso e promuovere come nuova regola di
@@ -100,7 +127,7 @@ link e numero aggregato degli iscritti attivi.
 - `/start iscrivimi` viene trattato come `/iscrivimi`;
 - `GET /subscribers/count` conta server-side soltanto le righe attive;
 - nessun dato personale viene restituito dal nuovo endpoint;
-- la dashboard mostra un fallback neutro se Render non risponde;
+- la dashboard mostra un fallback neutro se il Worker non risponde;
 - CORS accetta soltanto GitHub Pages e gli indirizzi locali di sviluppo;
 - nessun secret Supabase o Telegram e presente nel frontend.
 

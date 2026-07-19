@@ -1,6 +1,6 @@
 # Project Status
 
-Ultimo aggiornamento: 2026-06-28
+Ultimo aggiornamento: 2026-07-19
 
 ## Obiettivo
 
@@ -44,6 +44,11 @@ Cloudflare.
 - Prezzi spot Coinbase disponibili in USD ed EUR.
 - Indicatori, strategia, rischio, report e dashboard implementati.
 - Backtest dashboard alimentato da `docs/backtest.json`, non piu hard-coded.
+- Grafico dashboard a candele OHLC giornaliere rosse/verdi: Yahoo Finance per
+  le candele chiuse, Coinbase per la candela UTC provvisoria; SMA50, SMA200,
+  RSI 40/65 e volumi restano visibili.
+- La candela Coinbase e solo visuale e non modifica segnale o indicatori.
+- `run_dashboard.py` serve direttamente `docs/`, allineando locale e Pages.
 - Worker Cloudflare `eth-prudential-signal` deployato.
 - Bot Telegram ETH dedicato collegato al Worker via webhook.
 - Menu comandi Telegram aggiornato tramite GitHub Actions.
@@ -56,20 +61,25 @@ Cloudflare.
   - `TELEGRAM_WEBHOOK_SECRET`
 - Supabase iscritti collegato: schema, Worker e secret puntano alla tabella
   dedicata `public.telegram_subscribers_eth`.
-- Endpoint `/subscribers/count` operativo; al momento restituisce `0`
-  iscritti attivi.
+- Endpoint `/subscribers/count` operativo; al 2026-07-19 restituisce `1`
+  iscritto attivo.
+- Render dismesso definitivamente: zero servizi attivi verificati nel pannello
+  e componenti FastAPI/Render rimossi dal repository.
+- Polling Yahoo corretto: ogni run ritenta il download finche la candela daily
+  attesa non risulta processata.
 
 ## Verifiche Recenti
 
 ```powershell
 python -m unittest discover -s tests
+node --check docs\app.js
 node --check cloudflare-worker\src\worker.js
 ```
 
 Risultato:
 
 ```text
-Ran 57 tests
+Ran 52 tests
 OK
 ```
 
@@ -80,7 +90,7 @@ Endpoint verificati:
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/health`
   -> configurato true su `telegram_subscribers_eth`, senza esporre valori.
 - `GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count`
-  -> `{"active_subscribers":0}`.
+  -> `{"active_subscribers":1}`.
 
 ## Supabase
 
@@ -91,9 +101,8 @@ Decisione attuale:
   mescolare iscritti o stati di iscrizione.
 - il progetto Supabase condiviso e stato rinominato `crypto-prudential-signal`.
 
-Da completare:
-
-- validare il workflow GitHub Actions `Hourly ETH monitor (Telegram)`.
+Il workflow `Hourly ETH monitor (Telegram)` e il successivo deploy Pages sono
+stati verificati con run recenti concluse con successo il 2026-07-19.
 
 ## File Principali
 
@@ -215,4 +224,3 @@ Da completare:
 
 - Broadcast automatico a tutti gli iscritti Supabase.
 - Rendimento liquidita nel backtest.
-- Pulizia completa dei file legacy Render/FastAPI.

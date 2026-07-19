@@ -1,6 +1,6 @@
 # ETH Model Research Diary
 
-Ultimo aggiornamento: 2026-07-05
+Ultimo aggiornamento: 2026-07-19
 
 Questo file e' il diario operativo del lavoro sul miglioramento del modello
 ETH Prudential Signal.
@@ -2856,3 +2856,48 @@ Verifiche:
 - `python scripts\run_sma50_trend_filter_robustness.py`;
 - `python scripts\run_sma50_trend_filter_guardrails.py`;
 - `python -m py_compile scripts\run_sma50_trend_filter_removal.py scripts\run_sma50_trend_filter_robustness.py scripts\run_sma50_trend_filter_guardrails.py`.
+
+## Registro Operativo 2026-07-19 - Dashboard OHLC e dismissione Render
+
+Obiettivo:
+
+- rendere il grafico ETH piu leggibile con candele daily rosse e verdi;
+- seguire il giorno UTC corrente senza usare dati incompleti nel segnale;
+- eliminare componenti infrastrutturali non piu utilizzate;
+- verificare il funzionamento generale senza modificare la Baseline.
+
+Implementazione grafico:
+
+- `chart-data.json` esporta Open, High, Low e Close Yahoo oltre a indicatori e
+  volumi;
+- la dashboard disegna candele storiche chiuse e barre volume coerenti con il
+  colore della giornata;
+- Coinbase Exchange alimenta la candela UTC corrente, visualizzata vuota e
+  tratteggiata per indicarne la natura provvisoria;
+- un fallback spot aggiorna almeno Close, High e Low se l'endpoint OHLC non e
+  temporaneamente disponibile;
+- i dati Yahoo hanno sempre priorita e sostituiscono la riga provvisoria non
+  appena la candela ufficiale viene pubblicata;
+- SMA50, SMA200, RSI con soglie 40/65 e media volumi 20 giorni restano linee;
+- la candela Coinbase non entra in indicatori, backtest o segnali.
+
+Audit infrastrutturale:
+
+- Worker ETH, health iscritti e contatore pubblico verificati online;
+- dashboard GitHub Pages e workflow schedulati verificati attivi;
+- pannello Render verificato con zero servizi attivi;
+- rimossi backend FastAPI legacy, configurazione Render, test dedicati,
+  dipendenze e guida di deploy ormai non eseguibile.
+
+Correzioni operative:
+
+- Yahoo viene forzato a ogni run finche la data daily attesa non risulta
+  processata, eliminando il vincolo fragile del solo minuto 30;
+- `run_dashboard.py` pubblica ora `docs/`, allineando dashboard locale e
+  pubblica;
+- aggiunta `BASELINE_SYNC_CHECKLIST.md` con i controlli trasversali obbligatori.
+
+Decisione modello:
+
+- nessuna condizione di ingresso o uscita e stata modificata;
+- metriche e baseline restano quelle ufficiali.

@@ -68,8 +68,7 @@ Motivo:
   - aggiunto test regressione: `RSI <= 65` vale solo sui nuovi ingressi.
 - `tests/test_chart_data_json.py`
 - `tests/test_telegram_message.py`
-- `tests/test_telegram_webhook.py`
-  - aggiornati layout condizioni e aspettative.
+  - aggiornati layout condizioni e aspettative Telegram allora in uso.
 
 ## Verifica Metriche
 
@@ -97,7 +96,7 @@ Queste metriche coincidono con il candidato approvato nel gate decisionale.
 ## Test Eseguiti
 
 ```powershell
-python -m py_compile strategy\signals.py reports\generate.py telegram_webhook.py
+python -m py_compile strategy\signals.py reports\generate.py
 node --check cloudflare-worker\src\worker.js
 python -m unittest discover -s tests -v
 ```
@@ -114,6 +113,9 @@ Nota:
 - durante i test compare il warning noto sul download Yahoo non riuscito e
   fallback al file storico temporaneo;
 - il warning non blocca i test.
+- dal 2026-07-19 il webhook FastAPI/Render storico e stato rimosso; il Worker
+  Cloudflare e l'unico backend Telegram. Questa modifica infrastrutturale non
+  cambia le regole o le metriche registrate in questo report.
 
 ## Stato
 

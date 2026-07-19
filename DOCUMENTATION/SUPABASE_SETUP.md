@@ -125,7 +125,8 @@ service_role secret
 
 La service role:
 
-- deve essere usata soltanto da Render e GitHub Actions;
+- deve essere usata soltanto dal Cloudflare Worker e da eventuali job backend
+  GitHub Actions esplicitamente autorizzati;
 - non deve essere inserita nella dashboard web;
 - non deve essere aggiunta al repository;
 - non deve essere inviata in chat;
@@ -135,8 +136,9 @@ Non usare la chiave `anon` o `publishable` per il backend degli iscritti.
 
 ## 6. Cosa non fare ancora
 
-Non aggiungere ancora le credenziali a Render o GitHub. Questo avverra nella
-configurazione del Worker Cloudflare, dopo aver verificato lo script SQL.
+Non aggiungere le credenziali al frontend o ai file versionati. La
+configurazione operativa va eseguita nei secret del Worker Cloudflare, dopo
+aver verificato lo script SQL.
 
 Non inserire manualmente righe nella tabella. La prima iscrizione verra creata
 dal comando `/iscrivimi`.

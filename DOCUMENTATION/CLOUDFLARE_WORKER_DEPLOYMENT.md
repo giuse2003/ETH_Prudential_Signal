@@ -1,8 +1,8 @@
 # Cloudflare Worker Deployment
 
-Questo deployment sostituisce il webhook FastAPI su Render con un Cloudflare
-Worker, eliminando il cold start del servizio gratuito Render per i comandi
-Telegram.
+Cloudflare Worker e l'unico backend pubblico del progetto per i comandi
+Telegram e gli iscritti. Il precedente deployment Render/FastAPI e stato
+dismesso e rimosso dal repository il 2026-07-19.
 
 ## Cosa viene spostato
 
@@ -83,21 +83,13 @@ Poi scrivi al bot:
 /disiscrivimi
 ```
 
-## Aggiornare la dashboard
+## Endpoint dashboard
 
-Dopo il deploy, aggiorna in `app.js` e `docs/app.js`:
-
-```js
-const SUBSCRIBER_COUNT_ENDPOINT =
-  "https://eth-prudential-signal.onrender.com/subscribers/count";
-```
-
-con:
+La dashboard pubblica deve usare esclusivamente:
 
 ```js
 const SUBSCRIBER_COUNT_ENDPOINT =
-  "<WORKER_URL>/subscribers/count";
+  "https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count";
 ```
 
-Quando il Worker e verificato, il servizio Render puo restare come fallback o
-essere disattivato.
+Non configurare endpoint Render o un secondo webhook Telegram.

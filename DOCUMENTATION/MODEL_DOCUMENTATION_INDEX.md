@@ -1,6 +1,6 @@
 # Model Documentation Index
 
-Ultimo aggiornamento: 2026-06-28
+Ultimo aggiornamento: 2026-07-19
 
 Questo file indica dove sono memorizzate le informazioni che riguardano la
 costruzione, i test, le decisioni e lo stato ufficiale del modello ETH
@@ -33,6 +33,8 @@ Nota organizzativa:
   storico dei test e riepilogo della Baseline promossa.
 - `ETH_PROJECT_ROADMAP.md`: roadmap operativa del progetto, inclusi
   infrastruttura, dashboard, Telegram e documentazione.
+- `BASELINE_SYNC_CHECKLIST.md`: controlli obbligatori per mantenere allineati
+  modello, dashboard, Telegram, Worker, workflow e documentazione.
 
 ## Report di Validazione
 
@@ -57,6 +59,7 @@ Nota organizzativa:
 | 2026-06-27 | Analisi trailing/ATR/RSI piu' avanzate e scarto delle varianti deboli o troppo complesse | `MODEL_IMPROVEMENT_ROADMAP.md`, `../reports/` |
 | 2026-06-28 | Analisi separata ingressi/uscite, validazione combinata, gate finale e promozione nuova Baseline ufficiale | `ETH_MODEL_RESEARCH_DIARY.md`, `../reports/final_promotion_gate.md`, `../reports/official_baseline_implementation.md`, `DECISION_LOG.md` |
 | 2026-06-28 | Allineamento Telegram `/conditions`, dashboard, legenda RSI 40/65 e documentazione cronologica | `ETH_MODEL_RESEARCH_DIARY.md`, `../README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_STATUS.md` |
+| 2026-07-19 | Grafico OHLC con candela live Coinbase, polling Yahoo resiliente e rimozione definitiva Render/FastAPI | `ETH_MODEL_RESEARCH_DIARY.md`, `DECISION_LOG.md`, `PROJECT_STATUS.md`, `BASELINE_SYNC_CHECKLIST.md` |
 
 ## Regole Ufficiali Del Modello
 

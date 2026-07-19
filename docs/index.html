@@ -73,8 +73,8 @@
             <div class="label">Prezzo + indicatori</div>
             <h2 id="priceChartTitle">Andamento Ethereum con SMA50, SMA200, RSI e volume</h2>
             <p>
-              Il grafico mostra le candele giornaliere chiuse usate dal modello:
-              prezzo ETH-USD, medie mobili, RSI e volume sullo stesso periodo storico.
+              Le candele chiuse arrivano da Yahoo Finance; quella UTC in corso
+              segue Coinbase e resta separata dai segnali fino alla chiusura.
             </p>
           </div>
           <div class="chart-controls" aria-label="Periodo grafico">
@@ -84,7 +84,9 @@
           </div>
         </div>
         <div class="chart-legend" aria-hidden="true">
-          <span><i class="legend-price"></i>Prezzo ETH</span>
+          <span><i class="legend-candle-up"></i>Rialzo</span>
+          <span><i class="legend-candle-down"></i>Ribasso</span>
+          <span><i class="legend-candle-live"></i>In corso</span>
           <span><i class="legend-sma50"></i>SMA50</span>
           <span><i class="legend-sma200"></i>SMA200</span>
           <span><i class="legend-rsi"></i>RSI</span>
@@ -97,7 +99,8 @@
           <div class="chart-loading" id="chartLoading">Caricamento grafico...</div>
         </div>
         <p class="chart-note" id="chartNote">
-          Dati storici ETH-USD da Yahoo Finance. Le medie mobili sono calcolate su candele giornaliere chiuse.
+          Dati storici ETH-USD da Yahoo Finance; candela UTC corrente da Coinbase.
+          Indicatori e segnali usano soltanto candele giornaliere chiuse.
         </p>
       </section>
 
