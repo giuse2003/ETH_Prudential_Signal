@@ -33,6 +33,8 @@ FastAPI non fanno parte dell'architettura.
 - Se cambia il Worker, eseguire `npx wrangler deploy` dalla sua cartella.
 - Verificare `/conditions`, `/segnale`, `/subscribers/health` e
   `/subscribers/count`.
+- Verificare che `/segnale` usi soltanto `live-status.json` e non abbia fallback
+  DAILY.
 - Non reintrodurre endpoint Render, webhook FastAPI o relativi secret.
 
 ## 4. GitHub Actions
@@ -41,6 +43,8 @@ FastAPI non fanno parte dell'architettura.
   quattro JSON della dashboard.
 - Il monitor deve forzare Yahoo a ogni run finche la candela daily attesa non
   risulta processata.
+- Il monitor non deve inviare notifiche DAILY o da `workflow_dispatch`; l'unico
+  invio automatico ammesso e quello sulle variazioni delle 7 condizioni LIVE.
 - Controllare l'esito del workflow e del deploy GitHub Pages dopo il push.
 
 ## 5. Documentazione

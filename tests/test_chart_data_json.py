@@ -71,6 +71,7 @@ class ChartDataJsonTests(unittest.TestCase):
         self.assertEqual(payload["price_eur"], 56000.0)
         self.assertTrue(payload["condition_groups"]["buy"][2]["passed"])
         self.assertEqual(len(payload["condition_groups"]["buy"]), 5)
+        self.assertEqual(len(payload["condition_groups"]["sell"]), 2)
         self.assertTrue(payload["condition_groups"]["sell"][0]["passed"])
 
     def test_saves_backtest_json(self) -> None:

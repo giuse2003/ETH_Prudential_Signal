@@ -42,7 +42,7 @@ create table if not exists public.telegram_subscribers_eth (
 );
 
 comment on table public.telegram_subscribers_eth is
-    'Iscritti Telegram ETH alle notifiche di cambio segnale o rischio.';
+    'Iscritti Telegram ETH alle notifiche sulle variazioni delle 7 condizioni LIVE.';
 
 comment on column public.telegram_subscribers_eth.telegram_chat_id is
     'Identificativo della chat privata usato come destinatario Telegram.';

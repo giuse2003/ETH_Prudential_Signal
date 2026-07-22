@@ -1,6 +1,6 @@
 # Project Status
 
-Ultimo aggiornamento: 2026-07-19
+Ultimo aggiornamento: 2026-07-22
 
 ## Obiettivo
 
@@ -67,6 +67,11 @@ Cloudflare.
   e componenti FastAPI/Render rimossi dal repository.
 - Polling Yahoo corretto: ogni run ritenta il download finche la candela daily
   attesa non risulta processata.
+- Telegram riallineato al solo segnale LIVE: le nuove candele chiuse e
+  `workflow_dispatch` non generano piu messaggi DAILY.
+- Le 7 condizioni LIVE vengono controllate ogni 10 minuti mantenendo la
+  stabilizzazione di 10 minuti; `/segnale` usa soltanto
+  `docs/live-status.json`, senza fallback DAILY.
 
 ## Verifiche Recenti
 
@@ -79,7 +84,7 @@ node --check cloudflare-worker\src\worker.js
 Risultato:
 
 ```text
-Ran 52 tests
+Ran 48 tests
 OK
 ```
 
@@ -101,8 +106,8 @@ Decisione attuale:
   mescolare iscritti o stati di iscrizione.
 - il progetto Supabase condiviso e stato rinominato `crypto-prudential-signal`.
 
-Il workflow `Hourly ETH monitor (Telegram)` e il successivo deploy Pages sono
-stati verificati con run recenti concluse con successo il 2026-07-19.
+Il workflow `Hourly ETH monitor (Telegram)` continua ad aggiornare dashboard e
+stato giornaliero, ma Telegram usa esclusivamente le variazioni LIVE.
 
 ## File Principali
 

@@ -2,6 +2,27 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-07-22 - Telegram esclusivamente LIVE
+
+**Decisione operativa:** eliminare ogni invio Telegram del segnale DAILY e
+mantenere soltanto il segnale LIVE.
+
+**Comportamento approvato:**
+
+- il monitor schedulato continua ad aggiornare dati giornalieri, dashboard e
+  backtest, ma la nuova candela chiusa non genera piu notifiche Telegram;
+- una notifica automatica parte soltanto quando varia almeno una delle 7
+  condizioni LIVE e la variazione supera la stabilizzazione gia prevista di
+  10 minuti;
+- `workflow_dispatch` aggiorna i dati senza inviare anteprime DAILY;
+- `main.py` non invia piu il messaggio di servizio all'avvio locale;
+- `/segnale` restituisce esclusivamente `live-status.json`; se lo stato LIVE
+  non e disponibile, il Worker risponde con errore temporaneo e non usa piu
+  `status.json` come fallback DAILY.
+
+**Baseline:** invariata. Le cinque condizioni `ACQUISTA`, le due condizioni
+`VENDI`, le soglie e la gestione della posizione non sono state modificate.
+
 ## 2026-07-19 - Candele daily e rimozione definitiva Render
 
 **Decisione infrastrutturale:** mantenere Cloudflare Worker come unico backend

@@ -246,6 +246,7 @@ $env:CLOUDFLARE_API_TOKEN="..."
 | 2026-06-24 | Configurato Telegram base | Bot ETH dedicato, secret GitHub/Cloudflare e webhook verso Worker completati. |
 | 2026-06-24 | Corretto `/segnale` Worker | Aggiunto fallback da `live-status.json` mancante a `status.json`; `/live-preview` e `/segnale` funzionano. |
 | 2026-07-19 | Dashboard OHLC e pulizia infrastruttura | Aggiunte candele Yahoo/Coinbase, corretto polling daily, allineato server locale e rimosso Render/FastAPI. |
+| 2026-07-22 | Telegram solo LIVE | Rimossi invio DAILY e fallback DAILY di `/segnale`; mantenute invariate le 7 condizioni operative. |
 | 2026-06-24 | Configurato token API Cloudflare | `wrangler whoami` e `wrangler deploy` funzionano da CLI; deploy Version ID `d88bee42-afd3-4f13-ac82-d35dc9794809`. |
 | 2026-06-24 | Nota PC Lenovo/casa | Le configurazioni cloud sono gia attive; sul PC di casa va controllata prima l'eventuale API/Wrangler del progetto BTC. |
 | 2026-06-24 | Aggiornato menu comandi Telegram | Workflow `Telegram command menu` registrato da GitHub Actions e completato con successo. |

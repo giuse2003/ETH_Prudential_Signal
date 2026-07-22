@@ -1,6 +1,6 @@
 # ETH Model Research Diary
 
-Ultimo aggiornamento: 2026-07-19
+Ultimo aggiornamento: 2026-07-22
 
 Questo file e' il diario operativo del lavoro sul miglioramento del modello
 ETH Prudential Signal.
@@ -2856,6 +2856,36 @@ Verifiche:
 - `python scripts\run_sma50_trend_filter_robustness.py`;
 - `python scripts\run_sma50_trend_filter_guardrails.py`;
 - `python -m py_compile scripts\run_sma50_trend_filter_removal.py scripts\run_sma50_trend_filter_robustness.py scripts\run_sma50_trend_filter_guardrails.py`.
+
+## Registro Operativo 2026-07-22 - Telegram esclusivamente LIVE
+
+Obiettivo:
+
+- eliminare il segnale DAILY dai messaggi Telegram;
+- mantenere soltanto le variazioni del segnale LIVE e la risposta LIVE a
+  `/segnale`;
+- non modificare nessuna regola di acquisto o vendita.
+
+Implementazione:
+
+- rimosso dal monitor l'invio DAILY alla pubblicazione di una nuova candela;
+- rimosso l'invio DAILY da `workflow_dispatch`;
+- rimosso il messaggio Telegram di servizio dall'esecuzione locale di
+  `main.py`;
+- mantenuti controllo ogni 10 minuti, stabilizzazione LIVE di 10 minuti e
+  cooldown gia esistente;
+- rimosso dal Worker il fallback da `live-status.json` a `status.json` per
+  `/segnale` e `/live-preview`;
+- ripuliti i campi di stato usati soltanto dalle vecchie notifiche DAILY;
+- aggiornati test, dashboard e documentazione operativa.
+
+Decisione modello:
+
+- le cinque condizioni ACQUISTA e le due condizioni VENDI sono invariate;
+- soglie, calcolo degli indicatori, gestione della posizione, backtest e
+  Baseline ufficiale non cambiano;
+- il giornaliero resta necessario per storico, dashboard, backtest e base di
+  calcolo, ma non produce piu messaggi Telegram.
 
 ## Registro Operativo 2026-07-19 - Dashboard OHLC e dismissione Render
 

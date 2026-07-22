@@ -309,10 +309,10 @@ Non vengono inviati a tutti gli iscritti.
 
 ### Messaggio `/segnale`
 
-Il messaggio e volutamente compatto:
+Il messaggio e volutamente compatto e usa esclusivamente lo stato LIVE:
 
 ```text
-ETH MONITOR
+ETH MONITOR LIVE!
 
 Segnale: VENDI
 
@@ -398,8 +398,8 @@ Workflow:
 
 Trigger:
 
-- ogni ora (`cron: "0 * * * *"`);
-- manuale (`workflow_dispatch`).
+- ogni 10 minuti (`cron: "*/10 * * * *"`);
+- manuale (`workflow_dispatch`) per aggiornare i dati, senza invio Telegram.
 
 Funzioni:
 
@@ -409,9 +409,10 @@ Funzioni:
 4. genera `reports/status.json`;
 5. copia lo stato in `docs/status.json`;
 6. committa e pusha l'aggiornamento della dashboard;
-7. invia una notifica Telegram solo se cambia il segnale o cambia almeno una
-   condizione operativa mostrata nel messaggio;
-8. salva lo stato in cache `.state`.
+7. non invia segnali DAILY;
+8. salva `live-status.json` e invia una notifica soltanto quando varia almeno
+   una delle 7 condizioni LIVE e la variazione resta stabile per 10 minuti;
+9. salva lo stato in cache `.state`.
 
 Nota: al momento le notifiche automatiche del monitor usano il secret
 `TELEGRAM_CHAT_ID`, quindi sono legate a un destinatario configurato in
@@ -655,9 +656,9 @@ git push
   macroeconomici o fondamentali.
 - Il prezzo spot Coinbase serve per visualizzazione, non per decidere il
   segnale.
-- Le notifiche automatiche ignorano le oscillazioni del solo prezzo spot: il
-  messaggio parte solo se cambia `Segnale` oppure cambia il vero/falso di una
-  condizione ACQUISTA/VENDI.
+- Le notifiche Telegram sono esclusivamente LIVE: nessun messaggio parte dalla
+  nuova candela DAILY. Il messaggio automatico parte solo se cambia il
+  vero/falso di una delle 5 condizioni ACQUISTA o 2 condizioni VENDI.
 - Il broadcast automatico a tutti gli iscritti Supabase non e ancora
   implementato; il monitor automatico usa il `TELEGRAM_CHAT_ID` configurato nei
   GitHub Secrets.

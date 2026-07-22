@@ -3,7 +3,7 @@ const HELP_MESSAGE = [
   "",
   "/segnale - mostra il segnale ETH corrente",
   "/conditions - mostra le condizioni di acquisto e vendita",
-  "/iscrivimi - ricevi notifiche quando cambia segnale o rischio",
+  "/iscrivimi - ricevi notifiche quando varia una condizione LIVE",
   "/disiscrivimi - interrompi le notifiche automatiche",
   "/privacy - informazioni sui dati memorizzati",
 ].join("\n");
@@ -34,7 +34,7 @@ const PRIVACY_MESSAGE = [
 const SUBSCRIBED_MESSAGE = [
   "Iscrizione attiva.",
   "",
-  "Riceverai un messaggio soltanto quando cambia il segnale ETH o il livello di rischio.",
+  "Riceverai un messaggio soltanto quando varia una delle 7 condizioni LIVE.",
   "Puoi annullare l'iscrizione con /disiscrivimi.",
 ].join("\n");
 
@@ -221,27 +221,6 @@ async function processCommand(request, env) {
   await sendTelegramMessage(env, request.chatId, message);
 }
 
-async function fetchGithubStatus(env) {
-  const statusUrl =
-    env.STATUS_JSON_URL ||
-    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json";
-  const separator = statusUrl.includes("?") ? "&" : "?";
-  const response = await fetch(`${statusUrl}${separator}t=${Date.now()}`, {
-    headers: {
-      Accept: "application/json",
-      "Cache-Control": "no-cache",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`GitHub status HTTP ${response.status}`);
-  }
-  const status = await response.json();
-  if (!status || typeof status !== "object" || Array.isArray(status)) {
-    throw new Error("status.json non contiene un oggetto JSON.");
-  }
-  return status;
-}
-
 async function fetchGithubChartData(env) {
   const statusUrl =
     env.STATUS_JSON_URL ||
@@ -291,33 +270,12 @@ async function fetchGithubLiveStatus(env) {
 }
 
 async function buildLiveSignalMessage(env) {
-  try {
-    const live = await fetchGithubLiveStatus(env);
-    return formatMonitorMessage(
-      String(live.signal || "MANTIENI"),
-      Number(live.price_eur),
-      live.condition_groups,
-      "ETH MONITOR LIVE!",
-    );
-  } catch (error) {
-    console.warn("LIVE status non disponibile, uso status daily.", error);
-    const status = await fetchGithubStatus(env);
-    return buildDailySignalMessage(status);
-  }
-}
-
-function buildDailySignalMessage(status) {
-  const signal = String(status.signal || "MANTIENI");
-  const priceEur =
-    status.price_eur === null || status.price_eur === undefined
-      ? null
-      : Number(status.price_eur);
-
+  const live = await fetchGithubLiveStatus(env);
   return formatMonitorMessage(
-    signal,
-    priceEur,
-    status.condition_groups || deriveConditionGroups(status),
-    "ETH MONITOR DAILY!",
+    String(live.signal || "MANTIENI"),
+    Number(live.price_eur),
+    live.condition_groups,
+    "ETH MONITOR LIVE!",
   );
 }
 
@@ -456,56 +414,6 @@ function formatSignalConditions(conditionGroups) {
     "VENDI:",
     ...formatConditionGroup(conditionGroups.sell),
   ];
-}
-
-function deriveConditionGroups(status) {
-  const close = Number(status.close_last_candle ?? status.price_usd);
-  const sma50 = Number(status.sma50);
-  const sma200 = Number(status.sma200);
-  const rsi = Number(status.rsi);
-  const volume = Number(status.volume);
-  const volumeAvg20 = Number(status.volume_avg20);
-  const close7dAgo = Number(status.close_7d_ago);
-
-  if (
-    ![
-      close,
-      sma50,
-      sma200,
-      rsi,
-      volume,
-      volumeAvg20,
-      close7dAgo,
-    ].every(Number.isFinite)
-  ) {
-    return null;
-  }
-
-  return {
-    buy: [
-      { label: "prezzo sopra SMA200", passed: close > sma200 },
-      { label: "SMA50 sopra SMA200", passed: sma50 > sma200 },
-      { label: "valore RSI compreso tra 40 e 65", passed: rsi >= 40 && rsi <= 65 },
-      {
-        label: "prezzo sopra quello di 7 giorni prima",
-        passed: close > close7dAgo,
-      },
-      { label: "volume sopra media 20 giorni", passed: volume > volumeAvg20 },
-    ],
-    sell: [
-      {
-        label: "prezzo sotto SMA50",
-        passed:
-          typeof status.below_sma50_1d === "boolean"
-            ? status.below_sma50_1d
-            : close < sma50,
-      },
-      {
-        label: "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
-        passed: Boolean(status.trail8_confirmed),
-      },
-    ],
-  };
 }
 
 function formatConditionGroup(conditions) {

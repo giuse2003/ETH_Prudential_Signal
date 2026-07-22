@@ -1,6 +1,6 @@
 # ETH Prudential Signal
 
-Ultimo aggiornamento: 2026-07-19
+Ultimo aggiornamento: 2026-07-22
 
 ETH Prudential Signal is a transparent Ethereum risk-management model based on
 daily technical indicators: SMA50, SMA200, RSI and volume confirmation. It
@@ -84,9 +84,10 @@ costituiscono consulenza finanziaria.
 - Backtest della strategia rispetto al Buy & Hold.
 - Report testuale, CSV storico, serie equity e grafico.
 - Dashboard locale e dashboard pubblicabile con GitHub Pages.
-- Monitor schedulato con GitHub Actions e notifiche Telegram solo quando cambia
-  almeno una condizione operativa.
-- Comando Telegram `/segnale` servito in tempo reale da Cloudflare Worker.
+- Monitor schedulato con GitHub Actions e notifiche Telegram esclusivamente
+  LIVE quando varia almeno una delle 7 condizioni operative.
+- Comando Telegram `/segnale` servito da Cloudflare Worker usando
+  esclusivamente l'ultimo stato LIVE pubblicato.
 - Iscrizioni Telegram persistenti su Supabase tramite `/iscrivimi` e
   `/disiscrivimi`.
 - Card pubblica per aprire il bot e visualizzare il numero aggregato degli
@@ -200,8 +201,9 @@ Il workflow `.github/workflows/hourly-monitor.yml`:
 2. rimuove la candela giornaliera UTC ancora aperta;
 3. calcola segnale e rischio sull'ultima candela chiusa;
 4. aggiorna la dashboard;
-5. invia Telegram solo quando cambia almeno una condizione operativa mostrata
-   nel messaggio.
+5. non invia segnali DAILY;
+6. verifica le 7 condizioni LIVE e invia Telegram solo quando una variazione
+   resta stabile per almeno 10 minuti.
 
 La pianificazione GitHub Actions e best effort e puo subire ritardi.
 
@@ -222,11 +224,13 @@ https://eth-prudential-signal.giuse2003.workers.dev
 Il webhook:
 
 - riceve `POST /webhook` da Telegram;
-- scarica sempre `docs/status.json` dal GitHub Raw URL pubblico;
+- scarica `docs/live-status.json` dal GitHub Raw URL pubblico;
 - non salva copie locali e non modifica il monitor;
 - usa il formatter Telegram gia esistente.
 - risponde solo alla chat privata dell'utente che ha inviato il comando.
-- risponde con segnale, prezzo EUR e stato sintetico delle condizioni.
+- risponde con segnale LIVE, prezzo EUR e stato sintetico delle 7 condizioni;
+- se lo stato LIVE non e disponibile, restituisce un errore temporaneo senza
+  ripiegare sul segnale DAILY.
 
 Cloudflare Worker e l'unico backend pubblico del progetto. Il precedente
 servizio Render/FastAPI e stato rimosso dopo aver verificato che webhook,
@@ -265,7 +269,7 @@ Guida completa:
 
 Il workflow `Telegram command menu` serve solo ad aggiornare il menu dei
 comandi Telegram. Il workflow `Hourly ETH monitor (Telegram)` deve restare
-attivo per aggiornare `docs/status.json` e inviare i cambi automatici.
+attivo per aggiornare i JSON pubblici e inviare esclusivamente i cambi LIVE.
 
 Gli iscritti Telegram ETH vengono salvati in Supabase nella tabella dedicata
 `public.telegram_subscribers_eth`, separata da eventuali tabelle del progetto

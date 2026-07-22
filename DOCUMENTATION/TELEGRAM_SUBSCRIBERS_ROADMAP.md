@@ -1,6 +1,6 @@
 # Telegram Subscribers Roadmap
 
-Ultimo aggiornamento: 19 luglio 2026
+Ultimo aggiornamento: 22 luglio 2026
 
 Stato generale: `BOT ETH E SUPABASE WORKER ATTIVI - FASE 4 DA IMPLEMENTARE`
 
@@ -22,8 +22,8 @@ Nota di riallineamento ETH del 24 giugno 2026:
 - webhook Telegram registrato verso
   `https://eth-prudential-signal.giuse2003.workers.dev/webhook`;
 - `/start`, `/conditions` e `/segnale` rispondono dal bot ETH;
-- `/segnale` usa il fallback daily da `docs/status.json` quando
-  `docs/live-status.json` non e ancora disponibile;
+- `/segnale` usa esclusivamente `docs/live-status.json`; se manca, restituisce
+  un errore temporaneo senza fallback DAILY;
 - `/iscrivimi`, `/disiscrivimi` e `/subscribers/count` sono operativi tramite
   i secret Supabase configurati nel Worker;
 - token API Cloudflare dedicato creato e `CLOUDFLARE_API_TOKEN` configurato
@@ -56,7 +56,7 @@ Bot Telegram
 Database Supabase
         |
         v
-Notifica agli iscritti solo quando cambia segnale o rischio
+Notifica agli iscritti solo quando varia una delle 7 condizioni LIVE
 ```
 
 ## Decisioni gia prese
@@ -66,8 +66,9 @@ Notifica agli iscritti solo quando cambia segnale o rischio
 - L'utente dovra aprire volontariamente il bot e interagire con esso.
 - Il comando di iscrizione sara `/iscrivimi`.
 - Il comando di revoca sara `/disiscrivimi`.
-- `/segnale` continuera a mostrare il segnale corrente.
-- Le notifiche collettive partiranno solo al cambio di segnale o rischio.
+- `/segnale` continuera a mostrare esclusivamente il segnale LIVE corrente.
+- Le notifiche collettive partiranno solo quando varia una delle 7 condizioni
+  LIVE.
 - Non verra inviato un messaggio collettivo ogni ora senza variazioni.
 - Il database persistente previsto e Supabase.
 - `TELEGRAM_CHAT_ID` attuale identifica l'amministratore, non l'elenco degli
@@ -93,7 +94,7 @@ Notifica agli iscritti solo quando cambia segnale o rischio
   aggiornare `/segnale`.
 - Implementare il repository degli iscritti.
 - Aggiungere il pulsante alla dashboard.
-- Modificare l'invio automatico al cambio di segnale o rischio.
+- Modificare l'invio automatico sulle variazioni delle 7 condizioni LIVE.
 - Gestire utenti che bloccano il bot o chat non piu raggiungibili.
 - Aggiungere test automatici.
 - Aggiornare documentazione, file di contesto e questa roadmap.
@@ -161,7 +162,7 @@ La card deve contenere:
 ```text
 NOTIFICHE TELEGRAM
 
-Ricevi un avviso solo quando cambia il segnale ETH o il livello di rischio.
+Ricevi un avviso solo quando varia una delle 7 condizioni LIVE.
 
 Iscritti attivi: <numero>
 
@@ -274,7 +275,7 @@ Non modificare:
 ### Fase 4 - Invio collettivo
 
 - [ ] **4.1 Codex:** leggere gli iscritti attivi da Supabase.
-- [ ] **4.2 Codex:** inviare notifiche solo al cambio di segnale o rischio.
+- [ ] **4.2 Codex:** inviare notifiche solo sulle variazioni delle 7 condizioni LIVE.
 - [ ] **4.3 Codex:** mantenere la notifica amministratore compatibile.
 - [ ] **4.4 Codex:** gestire rate limit Telegram e invii parzialmente falliti.
 - [ ] **4.5 Codex:** disattivare iscritti che bloccano il bot.
@@ -370,7 +371,7 @@ La funzionalita sara considerata completata quando:
 
 - un visitatore apre il bot dalla dashboard;
 - `/iscrivimi` registra il consenso senza duplicati;
-- l'iscritto riceve una notifica quando cambia segnale o rischio;
+- l'iscritto riceve una notifica quando varia una delle 7 condizioni LIVE;
 - non riceve notifiche orarie senza variazioni;
 - `/disiscrivimi` interrompe gli invii;
 - il proprietario continua a ricevere e usare le funzioni amministrative;
@@ -403,17 +404,18 @@ La funzionalita sara considerata completata quando:
 | 2026-06-24 | Token API Cloudflare | Completato | `wrangler whoami` e deploy CLI riusciti per `eth-prudential-signal`. |
 | 2026-06-24 | Nota PC Lenovo/casa | Da casa controllare prima eventuale API/Wrangler BTC gia presente prima di configurare nuovi token. |
 | 2026-07-19 | Dismissione Render | Completato | Verificati Worker/Supabase e zero servizi Render attivi; rimossi backend FastAPI, configurazione e dipendenze legacy. |
+| 2026-07-22 | Telegram solo LIVE | Completato per amministratore e `/segnale` | Rimossi invio e fallback DAILY; broadcast Supabase resta nella Fase 4. |
 
 ## Prossimo passo
 
-Avviare la Fase 4 per l'invio collettivo ai soli iscritti attivi quando cambia
-il segnale o il rischio.
+Avviare la Fase 4 per l'invio collettivo ai soli iscritti attivi quando varia
+una delle 7 condizioni LIVE.
 
 La Fase 4 dovra:
 
 1. leggere da Supabase soltanto gli iscritti con `active = true`;
 2. mantenere la notifica amministratore compatibile;
-3. evitare invii quando segnale e rischio non cambiano;
+3. evitare invii quando le 7 condizioni LIVE non cambiano;
 4. gestire rate limit, errori parziali e utenti che bloccano il bot;
 5. aggiornare gli esiti di consegna senza interrompere gli altri invii;
 6. essere verificata con test automatici e una notifica collettiva controllata.

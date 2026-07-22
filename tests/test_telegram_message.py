@@ -77,22 +77,6 @@ class TelegramMessageTests(unittest.TestCase):
 
         self.assertIn("50.000 EUR", message)
 
-    def test_manual_preview_uses_same_formatter_as_signal_change(self) -> None:
-        source = (
-            __import__("pathlib")
-            .Path(__file__)
-            .resolve()
-            .parents[1]
-            .joinpath("hourly_monitor.py")
-            .read_text(encoding="utf-8")
-        )
-
-        self.assertNotIn("ETH Monitor attivo e funzionante.", source)
-        self.assertIn(
-            'msg = format_telegram_message(df_sig, price_eur=spot_eur, title="ETH MONITOR DAILY!")',
-            source,
-        )
-
     def test_message_accepts_custom_title(self) -> None:
         df = pd.DataFrame(
             {
@@ -112,20 +96,6 @@ class TelegramMessageTests(unittest.TestCase):
         message = format_telegram_message(df, price_eur=50000.0, title="ETH MONITOR LIVE!")
 
         self.assertTrue(message.startswith("ETH MONITOR LIVE!"))
-
-    def test_manual_workflow_dispatch_still_forces_telegram_response(self) -> None:
-        source = (
-            __import__("pathlib")
-            .Path(__file__)
-            .resolve()
-            .parents[1]
-            .joinpath("hourly_monitor.py")
-            .read_text(encoding="utf-8")
-        )
-
-        self.assertIn("must_notify = is_manual_run or scheduled_notify", source)
-        self.assertIn('notify_reason = "richiesta manuale workflow_dispatch"', source)
-
 
 if __name__ == "__main__":
     unittest.main()
