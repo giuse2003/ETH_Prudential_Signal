@@ -20,6 +20,45 @@ class TelegramConfig:
     chat_id: str
 
 
+def format_condition_message(
+    signal: str,
+    price_eur: float | None,
+    buy_statuses: list[bool],
+    sell_statuses: list[bool],
+    title: str = "ETH-USD Signal - LIVE PREVIEW",
+) -> str:
+    """Formatta il messaggio LIVE con le icone Telegram approvate."""
+    if price_eur is None:
+        price_text = "ETH-EUR non disponibile"
+    else:
+        price_text = f"{int(float(price_eur)):,}".replace(",", ".") + " EUR"
+
+    def condition_lines(statuses: list[bool]) -> list[str]:
+        return [
+            f"{'✅' if passed else '🅾️'} {index}."
+            for index, passed in enumerate(statuses, start=1)
+        ]
+
+    return "\n".join(
+        [
+            title,
+            "",
+            f"Azione: {signal}",
+            "",
+            "Prezzo informativo:",
+            price_text,
+            "",
+            "(per le condizioni: /conditions)",
+            "",
+            "ACQUISTA:",
+            *condition_lines(buy_statuses),
+            "",
+            "VENDI:",
+            *condition_lines(sell_statuses),
+        ]
+    )
+
+
 def format_monitor_message(
     signal: str,
     risk_level: str,

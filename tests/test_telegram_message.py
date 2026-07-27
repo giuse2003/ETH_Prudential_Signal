@@ -4,10 +4,58 @@ import unittest
 
 import pandas as pd
 
+from notifications.telegram import format_condition_message as format_runtime_condition_message
 from strategy.signals import format_telegram_message
 
 
-class TelegramMessageTests(unittest.TestCase):
+class RuntimeTelegramMessageTests(unittest.TestCase):
+    def test_message_uses_approved_condition_icons(self) -> None:
+        message = format_runtime_condition_message(
+            signal="MANTIENI STATO ATTUALE",
+            price_eur=1728.9,
+            buy_statuses=[False, False, True, True, False],
+            sell_statuses=[False, False],
+        )
+
+        self.assertEqual(
+            message,
+            "\n".join(
+                [
+                    "ETH-USD Signal - LIVE PREVIEW",
+                    "",
+                    "Azione: MANTIENI STATO ATTUALE",
+                    "",
+                    "Prezzo informativo:",
+                    "1.728 EUR",
+                    "",
+                    "(per le condizioni: /conditions)",
+                    "",
+                    "ACQUISTA:",
+                    "🅾️ 1.",
+                    "🅾️ 2.",
+                    "✅ 3.",
+                    "✅ 4.",
+                    "🅾️ 5.",
+                    "",
+                    "VENDI:",
+                    "🅾️ 1.",
+                    "🅾️ 2.",
+                ]
+            ),
+        )
+
+    def test_message_handles_missing_eur_price(self) -> None:
+        message = format_runtime_condition_message(
+            signal="VENDI",
+            price_eur=None,
+            buy_statuses=[False] * 5,
+            sell_statuses=[True, False],
+        )
+        self.assertIn("ETH-EUR non disponibile", message)
+        self.assertIn("VENDI:\n✅ 1.\n🅾️ 2.", message)
+
+
+class FrozenStrategyTelegramMessageTests(unittest.TestCase):
     def test_message_uses_compact_condition_layout(self) -> None:
         df = pd.DataFrame(
             {
@@ -96,6 +144,7 @@ class TelegramMessageTests(unittest.TestCase):
         message = format_telegram_message(df, price_eur=50000.0, title="ETH MONITOR LIVE!")
 
         self.assertTrue(message.startswith("ETH MONITOR LIVE!"))
+
 
 if __name__ == "__main__":
     unittest.main()

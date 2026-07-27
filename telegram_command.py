@@ -9,10 +9,10 @@ from pathlib import Path
 from notifications.telegram import (
     TelegramConfig,
     extract_authorized_commands,
+    format_condition_message,
     get_telegram_updates,
     send_telegram_message,
 )
-from strategy.signals import format_condition_message
 
 
 def load_published_live_status(project_root: Path) -> dict:

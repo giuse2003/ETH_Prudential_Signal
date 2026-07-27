@@ -294,7 +294,7 @@ function formatSignalConditions(conditionGroups) {
 
 function formatConditionGroup(conditions) {
   return conditions.map((condition, index) => {
-    const marker = condition.passed ? "🟩" : "🟥";
+    const marker = condition.passed ? "✅" : "🅾️";
     return `${marker} ${index + 1}.`;
   });
 }

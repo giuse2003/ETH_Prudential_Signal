@@ -9,10 +9,9 @@ from pathlib import Path
 
 import requests
 
-from notifications.telegram import TelegramConfig, send_telegram_message
+from notifications.telegram import TelegramConfig, format_condition_message, send_telegram_message
 from pipeline import run_pipeline
 from state.state_store import MonitorState, load_state, save_state
-from strategy.signals import format_condition_message
 from telegram_subscribers import SupabaseSubscriberStore
 
 LIVE_STABILITY_MINUTES = 10

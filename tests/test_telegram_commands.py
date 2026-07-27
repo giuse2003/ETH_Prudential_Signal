@@ -36,8 +36,8 @@ class TelegramCommandTests(unittest.TestCase):
         message = build_live_signal_message(payload)
         self.assertTrue(message.startswith("ETH-USD Signal - LIVE PREVIEW"))
         self.assertIn("Azione: MANTIENI STATO ATTUALE", message)
-        self.assertIn("ACQUISTA:\n🟥 1.", message)
-        self.assertIn("VENDI:\n🟩 1.", message)
+        self.assertIn("ACQUISTA:\n🅾️ 1.", message)
+        self.assertIn("VENDI:\n✅ 1.", message)
 
     def test_worker_has_no_daily_fallback_for_signal_command(self) -> None:
         source = (Path(__file__).resolve().parents[1] / "cloudflare-worker" / "src" / "worker.js").read_text(encoding="utf-8")
@@ -45,6 +45,7 @@ class TelegramCommandTests(unittest.TestCase):
         self.assertNotIn("ETH MONITOR DAILY!", source)
         self.assertNotIn("computeRsi14", source)
         self.assertNotIn("buildLiveSnapshot", source)
+        self.assertIn('condition.passed ? "✅" : "🅾️"', source)
 
 
 if __name__ == "__main__":
