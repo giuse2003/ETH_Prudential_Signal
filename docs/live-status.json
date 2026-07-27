@@ -1,27 +1,35 @@
 {
-  "signal": "MANTIENI",
-  "price_usd": 1952.65,
-  "price_eur": 1713.0,
-  "volume_24h_usd": 7197672685.0,
-  "last_update": "2026-07-27 05:08:21 UTC",
+  "run_id": "20260727T135020Z-b654e035",
+  "generated_at_utc": "2026-07-27T13:50:20.777037+00:00",
+  "run_type": "operational-latest",
+  "project": "ETH-USD Signal",
+  "model_version": "1.0",
+  "data_source": "Coinbase Advanced Trade",
+  "market": "ETH-USD",
+  "timezone": "UTC",
+  "mode": "LIVE PREVIEW",
+  "action": "MANTIENI STATO ATTUALE",
+  "price_usd": 1968.15,
+  "price_eur": 1728.9,
+  "volume_24h_eth": 81396.13182756,
   "status": "Attivo",
-  "rsi": 63.495522024049244,
-  "sma50": 1749.2723481445312,
-  "sma200": 2139.8847154541018,
-  "atr": 63.963025993743834,
+  "rsi": 64.7088946952594,
+  "sma50": 1754.8957999999998,
+  "sma200": 2134.3298999999997,
+  "atr": 63.21692784526676,
   "risk_level": "ALTO",
   "condition_groups": {
     "buy": [
       {
-        "label": "prezzo live sopra SMA200 live",
+        "label": "prezzo live sopra SMA200",
         "passed": false
       },
       {
-        "label": "SMA50 live sopra SMA200 live",
+        "label": "SMA50 live sopra SMA200",
         "passed": false
       },
       {
-        "label": "valore RSI live compreso tra 40 e 65",
+        "label": "RSI live tra 40 e 65 per i nuovi ingressi",
         "passed": true
       },
       {
@@ -29,17 +37,17 @@
         "passed": true
       },
       {
-        "label": "volume 24h live sopra media 20 giorni",
+        "label": "volume ETH-USD live sopra media 20 giorni",
         "passed": false
       }
     ],
     "sell": [
       {
-        "label": "prezzo live sotto SMA50 live",
+        "label": "prezzo live sotto SMA50",
         "passed": false
       },
       {
-        "label": "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
+        "label": "trailing stop 8% confermato da momentum e volume",
         "passed": false
       }
     ]

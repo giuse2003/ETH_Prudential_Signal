@@ -1,24 +1,27 @@
 {
-  "price_usd": 1953.735,
-  "price_eur": 1713.605,
-  "signal": "MANTIENI",
-  "risk_level": "ALTO",
-  "last_update": "2026-07-27 05:08:21",
+  "run_id": "20260727T135020Z-b654e035",
+  "generated_at_utc": "2026-07-27T13:50:20.777037+00:00",
+  "run_type": "operational-latest",
+  "project": "ETH-USD Signal",
+  "model_version": "1.0",
+  "data_source": "Coinbase Advanced Trade",
+  "market": "ETH-USD",
+  "timezone": "UTC",
+  "mode": "DAILY",
+  "candle_date": "2026-07-26",
+  "action": "MANTIENI STATO ATTUALE",
+  "price_usd": 1952.93,
+  "price_eur": null,
   "status": "Attivo",
-  "rsi": 56.011310993944164,
-  "sma50": 1741.5947021484376,
-  "sma200": 2145.955685424805,
-  "atr": 62.77344430936835,
-  "volume": 4367514252.0,
-  "volume_avg20": 9875641477.35,
-  "close_7d_ago": 1861.39208984375,
-  "close_last_candle": 1873.222412109375,
-  "previous_close": 1860.1767578125,
-  "previous_sma50": 1735.747470703125,
-  "below_sma50_1d": false,
-  "trail8_stop_hit": false,
-  "trail8_confirmed": false,
-  "entry_rsi_filter_passed": true,
+  "risk_level": "ALTO",
+  "rsi": 63.4746505954135,
+  "sma50": 1749.3278,
+  "sma200": 2140.01065,
+  "atr": 66.90899921797958,
+  "volume_eth": 38607.17095977,
+  "volume_avg20_eth": 83017.3875237495,
+  "previous_close": 1873.05,
+  "previous_sma50": 1741.6466,
   "condition_groups": {
     "buy": [
       {
@@ -30,7 +33,7 @@
         "passed": false
       },
       {
-        "label": "valore RSI compreso tra 40 e 65",
+        "label": "RSI tra 40 e 65 per i nuovi ingressi",
         "passed": true
       },
       {
@@ -38,7 +41,7 @@
         "passed": true
       },
       {
-        "label": "volume sopra media 20 giorni",
+        "label": "volume ETH-USD sopra media 20 giorni",
         "passed": false
       }
     ],
@@ -48,7 +51,7 @@
         "passed": false
       },
       {
-        "label": "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
+        "label": "trailing stop 8% confermato da momentum e volume",
         "passed": false
       }
     ]
