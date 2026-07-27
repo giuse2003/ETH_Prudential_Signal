@@ -1,0 +1,59 @@
+{
+  "run_id": "baseline-v1-2026-07-26",
+  "run_type": "frozen-baseline",
+  "as_of": "2026-07-26",
+  "project": "ETH-USD Signal",
+  "model_version": "1.0",
+  "data_source": "Coinbase Advanced Trade",
+  "market": "ETH-USD",
+  "timezone": "UTC",
+  "mode": "DAILY",
+  "candle_date": "2026-07-26",
+  "action": "MANTIENI STATO ATTUALE",
+  "price_usd": 1952.93,
+  "price_eur": null,
+  "status": "Attivo",
+  "risk_level": "ALTO",
+  "rsi": 63.4746505954135,
+  "sma50": 1749.3278,
+  "sma200": 2140.01065,
+  "atr": 66.90899921797958,
+  "volume_eth": 38607.17095977,
+  "volume_avg20_eth": 83017.3875237495,
+  "previous_close": 1873.05,
+  "previous_sma50": 1741.6466,
+  "condition_groups": {
+    "buy": [
+      {
+        "label": "prezzo sopra SMA200",
+        "passed": false
+      },
+      {
+        "label": "SMA50 sopra SMA200",
+        "passed": false
+      },
+      {
+        "label": "RSI tra 40 e 65 per i nuovi ingressi",
+        "passed": true
+      },
+      {
+        "label": "prezzo sopra quello di 7 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "volume ETH-USD sopra media 20 giorni",
+        "passed": false
+      }
+    ],
+    "sell": [
+      {
+        "label": "prezzo sotto SMA50",
+        "passed": false
+      },
+      {
+        "label": "trailing stop 8% confermato da momentum e volume",
+        "passed": false
+      }
+    ]
+  }
+}

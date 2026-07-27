@@ -98,7 +98,7 @@ async function loadBotStatus() {
 
 function updateBotUI(data) {
   // Update operational signal card
-  const signal = data.signal || "MANTIENI";
+  const signal = data.action || "MANTIENI STATO ATTUALE";
   els.signalVal.textContent = signal;
   els.signalCard.className = "metric highlight-card"; // reset classes
   

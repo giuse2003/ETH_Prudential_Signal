@@ -1,37 +1,40 @@
-# ETH Signal Rule Verification Log
+# ETH-USD Signal Rule Verification Log
 
-Questo file sostituisce il log sperimentale importato dal progetto BTC.
-Le metriche qui sotto sono prodotte dal run locale Ethereum eseguito con:
+Ultimo aggiornamento: 2026-07-27
 
-```text
-python main.py --force-download
+## Dataset canonico
+
+- Coinbase Advanced Trade `ETH-USD`, granularita `ONE_DAY`;
+- storico continuo `2016-05-23`–`2026-07-26`;
+- valutazione post warm-up `2016-12-08`–`2026-07-26`;
+- 3.518 osservazioni senza duplicati o giorni mancanti;
+- `ETH-EUR` esclusivamente spot informativo.
+
+## Regole verificate
+
+- cinque condizioni di acquisto: `Close>SMA200`, `SMA50>SMA200`, RSI 40–65
+  per i nuovi ingressi, momentum 7 giorni positivo, volume sopra media 20;
+- due condizioni di vendita: `Close<SMA50` oppure trailing 8% confermato;
+- precedenza della vendita;
+- azione neutrale `MANTIENI STATO ATTUALE`;
+- esecuzione dal rendimento del giorno successivo;
+- trade finali aperti esclusi da conteggio e win rate.
+
+## Baseline v1
+
+| Strategia | Rendimento totale | Annualizzato | Max drawdown | Trade | Win rate | Sharpe |
+|---|---:|---:|---:|---:|---:|---:|
+| ETH-USD Signal | +18.663,52% | 72,16% | -45,89% | 36 | 36,11% | 1,357 |
+| Buy & Hold | +23.716,22% | 76,47% | -94,01% | n/a | n/a | 1,076 |
+
+Profit factor strategia: `14.00916695086703`.
+
+## Verifica
+
+```powershell
+python -m pip install --require-hashes -r requirements.lock
+python -m unittest discover -s tests -v
+python reproduce.py --manifest docs/runs/baseline-v1-2026-07-26/manifest.json
 ```
 
-## Dataset
-
-- Serie principale: `ETH-USD`.
-- Serie EUR di supporto: `ETH-EUR`.
-- Fonte dati storici: Yahoo Finance.
-- Ultima candela chiusa del run: `2026-06-22`.
-- Calendario: crypto 365 giorni.
-
-## Regole correnti
-
-- `ACQUISTA`: condizioni di trend, momentum, RSI e volume favorevoli.
-- `MANTIENI`: conserva l'esposizione precedente.
-- `VENDI`: prezzo sotto SMA50.
-- I segnali vengono applicati al rendimento della giornata successiva per evitare look-ahead bias.
-
-## Risultato Backtest ETH
-
-| Strategia | Rendimento totale | Rendimento annualizzato | Drawdown massimo | Operazioni | Win rate | Sharpe |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| ETH Prudential Signal | +980,86% | +31,80% | -52,57% | 28 | 39,3% | 0,849 |
-| Buy & Hold Ethereum | +438,05% | +21,55% | -93,96% | 0 | n/a | 0,659 |
-
-## Artefatti Generati
-
-- `reports/report.txt`
-- `reports/backtest.json`
-- `reports/equity_timeseries.csv`
-- `docs/backtest.json`
+La fonte canonica dei valori non arrotondati e il manifest congelato.

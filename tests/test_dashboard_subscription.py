@@ -55,6 +55,12 @@ class DashboardSubscriptionTests(unittest.TestCase):
         self.assertIn('data-range="180">6 mesi', self.html)
         self.assertIn('let chartRange = "180"', self.javascript)
 
+    def test_dashboard_reads_coherent_manifest_bundle(self) -> None:
+        self.assertIn("const MANIFEST_ENDPOINT", self.javascript)
+        self.assertIn("payload.metrics?.strategy", self.javascript)
+        self.assertIn("botData.run_id !== chartRunId", self.javascript)
+        self.assertNotIn("BACKTEST_ENDPOINT", self.javascript)
+
 
 if __name__ == "__main__":
     unittest.main()

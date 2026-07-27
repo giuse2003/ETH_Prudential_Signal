@@ -3,7 +3,7 @@ Backtest per la strategia prudente.
 
 Interpretazione prudente di "Segnale" -> esposizione capitale:
 - ACQUISTA -> 100%
-- MANTIENI -> conserva l'esposizione precedente
+- MANTIENI STATO ATTUALE -> conserva l'esposizione precedente
 - VENDI -> 0%
 
 Nota importante (per evitare bias):
@@ -167,7 +167,7 @@ def exposure_from_signal(signals: pd.Series, exposure_map: dict[str, float]) -> 
     """
     Mappa stringhe di segnale -> esposizione frazione di capitale.
     """
-    # default prudente se troviamo segnali non previsti = NaN (MANTIENI)
+    # default prudente se troviamo segnali non previsti = NaN (mantenimento)
     default = float("nan")
     return signals.map(lambda s: exposure_map.get(s, default)).astype(float)
 
@@ -201,7 +201,7 @@ def run_backtest(
 
     desired_exposure = exposure_from_signal(df["Segnale"], CFG.exposure_map)
 
-    # I NaN in desired_exposure indicano "MANTIENI" -> usiamo ffill() per propagare la posizione
+    # I NaN indicano mantenimento: ffill propaga la posizione precedente.
     desired_exposure = desired_exposure.ffill().fillna(0.0)
 
     # esposizione effettiva per il rendimento di oggi:

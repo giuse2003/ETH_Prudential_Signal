@@ -42,12 +42,12 @@ def format_monitor_message(
 
     return "\n".join(
         [
-            "ETH MONITOR",
+            "ETH-USD Signal - LIVE PREVIEW",
             "",
-            f"Segnale: {signal}",
+            f"Azione: {signal}",
             f"Rischio: {risk_level}",
             "",
-            "Prezzo:",
+            "Prezzo informativo:",
             price_text,
             "",
             "Indicazione:",

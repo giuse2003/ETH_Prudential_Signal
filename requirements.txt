@@ -1,5 +1,1 @@
-pandas
-numpy
-matplotlib
-yfinance
-requests
+-r requirements.lock

@@ -1,6 +1,6 @@
 # Model Documentation Index
 
-Ultimo aggiornamento: 2026-07-22
+Ultimo aggiornamento: 2026-07-27
 
 Questo file indica dove sono memorizzate le informazioni che riguardano la
 costruzione, i test, le decisioni e lo stato ufficiale del modello ETH
@@ -22,6 +22,18 @@ Nota organizzativa:
 - `PROJECT_STATUS.md`: stato operativo aggiornato del progetto.
 - `../reports/official_baseline_implementation.md`: report canonico della
   promozione della nuova Baseline ufficiale.
+
+Contratto corrente del 2026-07-27:
+
+- nome metodologico pubblico: **ETH-USD Signal**;
+- repository, bot e Worker mantengono i nomi `ETH_Prudential_Signal` e
+  `eth-prudential-signal`;
+- `ETH-USD` e' la serie ufficiale per indicatori, segnali e backtest operativo;
+- `ETH-EUR` resta supporto informativo, non una seconda strategia;
+- Coinbase e l'unica fonte runtime del modello;
+- la baseline ETH v1 e congelata al `2026-07-26` in
+  `../docs/runs/baseline-v1-2026-07-26/`;
+- il run operativo giornaliero e descritto da `../docs/manifest.json`.
 
 ## Diario e Decisioni
 
@@ -61,6 +73,8 @@ Nota organizzativa:
 | 2026-06-28 | Allineamento Telegram `/conditions`, dashboard, legenda RSI 40/65 e documentazione cronologica | `ETH_MODEL_RESEARCH_DIARY.md`, `../README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_STATUS.md` |
 | 2026-07-19 | Grafico OHLC con candela live Coinbase, polling Yahoo resiliente e rimozione definitiva Render/FastAPI | `ETH_MODEL_RESEARCH_DIARY.md`, `DECISION_LOG.md`, `PROJECT_STATUS.md`, `BASELINE_SYNC_CHECKLIST.md` |
 | 2026-07-22 | Telegram riallineato al solo segnale LIVE: rimossi invio e fallback DAILY, mantenute invariate le 7 condizioni | `ETH_MODEL_RESEARCH_DIARY.md`, `DECISION_LOG.md`, `PROJECT_STATUS.md`, `../README.md` |
+| 2026-07-27 | Coerenza ETH-USD Signal v1: contratto dati, metriche operative da JSON e distinzione da baseline congelata BTC-USD | `DECISION_LOG.md`, `PROJECT_STATUS.md`, `PROJECT_OVERVIEW.md`, `BASELINE_SYNC_CHECKLIST.md`, `../README.md` |
+| 2026-07-27 | Migrazione Coinbase-only, baseline v1 congelata e riproduzione offline | `DECISION_LOG.md`, `PROJECT_STATUS.md`, `../REPRODUCIBILITY.md`, `../EVALUATION_VALUES.md` |
 
 ## Regole Ufficiali Del Modello
 

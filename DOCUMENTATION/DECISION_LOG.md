@@ -2,6 +2,43 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-07-27 - Coerenza ETH-USD Signal v1
+
+**Decisione di coerenza:** il modello pubblico viene descritto come
+**ETH-USD Signal**. Il repository, il bot Telegram e il Worker mantengono i
+nomi infrastrutturali `ETH_Prudential_Signal` e `eth-prudential-signal` per non
+interrompere URL, webhook e automazioni esistenti.
+
+**Contratto dati e pubblicazione approvato:**
+
+- `ETH-USD` e' il mercato del modello: indicatori, segnali e backtest operativo
+  usano la serie principale in dollari;
+- Coinbase Advanced Trade `ETH-USD` diventa l'unica fonte di candele, volumi,
+  indicatori, segnali e backtest;
+- lo storico canonico usa la serie continua dal `2016-05-23`; i due giorni
+  mancanti precedenti non vengono interpolati;
+- `ETH-EUR` resta soltanto prezzo spot informativo; non e' una seconda strategia;
+- Yahoo Finance e `yfinance` vengono rimossi dalla pipeline runtime;
+- la candela Coinbase in corso non entra in indicatori, backtest o segnale
+  DAILY;
+- le azioni pubblicabili diventano `ACQUISTA`, `MANTIENI STATO ATTUALE`, `VENDI`;
+- `VENDI` ha precedenza quando una condizione di uscita ufficiale e' vera;
+- DAILY e LIVE restano separati: DAILY alimenta storico, report e dashboard;
+  Telegram pubblica soltanto variazioni LIVE stabilizzate;
+- Worker Cloudflare, dashboard e bot consumano il pacchetto con `run_id` e non
+  ricalcolano il modello;
+- la baseline v1 viene congelata al `2026-07-26`; il run operativo continua ad
+  aggiornarsi ogni giorno senza modificare la baseline;
+- ambiente, input, sorgenti, metriche e output canonici sono verificati offline
+  da `reproduce.py`.
+
+**Baseline:** invariata. Le cinque condizioni `ACQUISTA`, le due condizioni
+`VENDI`, le soglie e la gestione posizione non sono state modificate.
+
+**Impatto:** pipeline unica, manifest/hash, pubblicazione transazionale,
+ambiente bloccato, baseline congelata e interfacce riallineate. Le metriche del
+run corrente vengono lette da `docs/manifest.json`.
+
 ## 2026-07-22 - Telegram esclusivamente LIVE
 
 **Decisione operativa:** eliminare ogni invio Telegram del segnale DAILY e

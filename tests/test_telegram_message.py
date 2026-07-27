@@ -19,7 +19,7 @@ class TelegramMessageTests(unittest.TestCase):
                 "Volume": [900.0, 800.0],
                 "VolumeAvg20": [1000.0, 1000.0],
                 "Close_7d_ago": [110.0, 95.0],
-                "Segnale": ["MANTIENI", "VENDI"],
+                "Segnale": ["MANTIENI STATO ATTUALE", "VENDI"],
                 "Livello_Rischio": ["MEDIO", "ALTO"],
             }
         )
@@ -30,29 +30,29 @@ class TelegramMessageTests(unittest.TestCase):
             message,
             "\n".join(
                 [
-                    "ETH MONITOR",
+                    "ETH-USD Signal - LIVE PREVIEW",
                     "",
-                    "Segnale: VENDI",
+                    "Azione: VENDI",
                     "",
-                    "Prezzo:",
+                    "Prezzo informativo:",
                     "54.169 EUR",
                     "",
                     "(per le condizioni: /conditions)",
                     "",
                     "ACQUISTA:",
-                    "🅾️ 1.",
-                    "🅾️ 2.",
-                    "🅾️ 3.",
-                    "🅾️ 4.",
-                    "🅾️ 5.",
+                    "🟥 1.",
+                    "🟥 2.",
+                    "🟥 3.",
+                    "🟥 4.",
+                    "🟥 5.",
                     "",
                     "VENDI:",
-                    "✅ 1.",
-                    "🅾️ 2.",
+                    "🟩 1.",
+                    "🟥 2.",
                 ]
             ),
         )
-        self.assertNotIn("USD", message)
+        self.assertNotIn("USD\n54.169", message)
         self.assertNotIn("Sintesi", message)
         self.assertNotIn("Rischio", message)
         self.assertNotIn("Indicazione", message)
@@ -88,7 +88,7 @@ class TelegramMessageTests(unittest.TestCase):
                 "Volume": [900.0, 800.0],
                 "VolumeAvg20": [1000.0, 1000.0],
                 "Close_7d_ago": [110.0, 95.0],
-                "Segnale": ["MANTIENI", "VENDI"],
+                "Segnale": ["MANTIENI STATO ATTUALE", "VENDI"],
                 "Livello_Rischio": ["MEDIO", "ALTO"],
             }
         )

@@ -23,7 +23,7 @@ class SignalRulesTests(unittest.TestCase):
 
         result = compute_signals(df)
 
-        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI")
+        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI STATO ATTUALE")
         self.assertFalse(result.iloc[-1]["Entry_RSI_Filter_Passed"])
 
     def test_buy_allows_rsi_equal_to_65(self) -> None:
@@ -115,7 +115,7 @@ class SignalRulesTests(unittest.TestCase):
         result = compute_signals(df)
 
         self.assertEqual(result.iloc[0]["Segnale"], "ACQUISTA")
-        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI")
+        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI STATO ATTUALE")
         self.assertFalse(result.iloc[-1]["Entry_RSI_Filter_Passed"])
         self.assertFalse(result.iloc[-1]["Trail8_Confirmed"])
 
@@ -150,6 +150,23 @@ class SignalRulesTests(unittest.TestCase):
         self.assertTrue(buy_statuses[4])
         self.assertFalse(sell_statuses[0])
         self.assertFalse(sell_statuses[1])
+
+    def test_published_contract_has_five_buy_and_two_sell_conditions(self) -> None:
+        df = pd.DataFrame(
+            {
+                "Close": [120.0],
+                "SMA50": [110.0],
+                "SMA200": [100.0],
+                "RSI": [55.0],
+                "Volume": [2000.0],
+                "VolumeAvg20": [1000.0],
+                "Close_7d_ago": [115.0],
+                "Trail8_Confirmed": [False],
+            }
+        )
+        buy, sell = live_condition_statuses(df)
+        self.assertEqual(len(buy), 5)
+        self.assertEqual(len(sell), 2)
 
 
 if __name__ == "__main__":

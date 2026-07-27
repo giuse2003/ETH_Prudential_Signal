@@ -1,9 +1,9 @@
 # ETH Model Research Diary
 
-Ultimo aggiornamento: 2026-07-22
+Ultimo aggiornamento: 2026-07-27
 
 Questo file e' il diario operativo del lavoro sul miglioramento del modello
-ETH Prudential Signal.
+ETH-USD Signal.
 
 Nota cronologica:
 
@@ -23,6 +23,37 @@ Regola di lavoro:
 - ogni idea va registrata con dati, risultato e decisione;
 - un miglioramento e' valido solo se regge su piu' periodi, non su un singolo
   evento storico.
+
+## Registro Operativo 2026-07-27 - Coerenza ETH-USD Signal v1
+
+Obiettivo:
+
+- applicare al progetto ETH lo stesso principio di coerenza documentale usato
+  sul progetto BTC-USD;
+- chiarire il mercato effettivo del modello senza cambiare la Baseline;
+- separare cio' che e' operativo oggi da cio' che richiedera un futuro
+  congelamento riproducibile.
+
+Decisione:
+
+- il nome metodologico pubblico diventa **ETH-USD Signal**;
+- `ETH_Prudential_Signal` resta il nome del repository e dell'infrastruttura;
+- `ETH-USD` e' la serie del modello per indicatori, segnali e backtest;
+- `ETH-EUR` resta controvalore informativo e supporto report/dashboard;
+- Coinbase resta live preview e non entra nella candela DAILY chiusa;
+- Telegram continua a pubblicare solo variazioni LIVE stabilizzate;
+- la Baseline ufficiale e le sue condizioni restano invariate;
+- il progetto ETH non dispone ancora del pacchetto congelato con manifest,
+  hash SHA-256, lockfile con hash e `reproduce.py` introdotto nel progetto
+  BTC-USD.
+
+Impatto:
+
+- riallineati README, status, overview, indice documentale e checklist;
+- le metriche operative correnti vengono dichiarate come valori del JSON
+  pubblico `docs/backtest.json`;
+- eventuale congelamento futuro dovra essere trattato come nuova attivita
+  metodologica, con tag e artefatti dedicati.
 
 ## Strategia Ufficiale Corrente
 
@@ -54,27 +85,27 @@ del trailing restano storici/sperimentali finche' non vengono promossi.
 Periodo dati completo disponibile nei segnali:
 
 - inizio: 2017-11-11;
-- ultima candela chiusa: 2026-06-27.
+- ultima candela chiusa nel pacchetto pubblico corrente: 2026-07-25.
 
 Metriche Baseline complete:
 
 | Metrica | Valore |
 |---|---:|
-| Rendimento totale | +980,86% |
-| Rendimento annualizzato | +31,76% |
-| Max drawdown | -52,57% |
-| Sharpe ratio | 0,849 |
-| Profit factor | 4,327 |
-| Operazioni chiuse | 28 |
-| Win rate | 39,29% |
-| Esposizione media | 28,75% |
-| Turnover | 56 cambi esposizione |
+| Rendimento totale | +2843,36% |
+| Rendimento annualizzato | +47,47% |
+| Max drawdown | -40,97% |
+| Sharpe ratio | 1,174 |
+| Profit factor | 7,117 |
+| Operazioni chiuse | 29 |
+| Win rate | 34,48% |
+| Esposizione media | 23,47% |
+| Turnover | 58 cambi esposizione |
 
 Interpretazione:
 
 - la Baseline batte Buy & Hold sul periodo completo;
-- lo Sharpe resta sotto 1, quindi il rapporto rendimento/volatilita' va ancora
-  migliorato;
+- lo Sharpe e' sopra 1 nel pacchetto corrente, ma resta da validare su un
+  campione out-of-sample congelato;
 - il sistema funziona con poche grandi operazioni vincenti e molte piccole
   operazioni deboli;
 - il miglioramento deve concentrarsi su falsi ingressi, false uscite e
@@ -2931,3 +2962,17 @@ Decisione modello:
 
 - nessuna condizione di ingresso o uscita e stata modificata;
 - metriche e baseline restano quelle ufficiali.
+# Aggiornamento 2026-07-27 - Coerenza Coinbase e baseline riproducibile
+
+- Mantenuta senza modifiche la baseline ETH con cinque condizioni di acquisto
+  e due di vendita.
+- Sostituita la fonte runtime Yahoo con Coinbase Advanced Trade `ETH-USD`.
+- Scelta come inizio canonico la prima serie continua, `2016-05-23`, perche le
+  candele `2016-05-21` e `2016-05-22` mancano nello storico precedente.
+- Congelata la baseline v1 al cutoff approvato `2026-07-26`; i run operativi
+  successivi restano dinamici.
+- Uniformata l'azione neutrale a `MANTIENI STATO ATTUALE`.
+- Aggiunti snapshot grezzo, manifest, hash, ambiente bloccato, pubblicazione
+  transazionale e riproduzione offline byte per byte.
+- Dashboard, Telegram e Worker consumano gli output della pipeline unica; il
+  Worker non contiene piu formule del modello.

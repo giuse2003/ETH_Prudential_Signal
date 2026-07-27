@@ -13,14 +13,19 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Config:
+    model_name: str = "ETH-USD Signal"
+    model_version: str = "1.0"
+    data_source: str = "Coinbase Advanced Trade"
+
     # Intervallo dati
-    start_date: str = "2015-01-01"
+    # Prima data della serie Coinbase continua: 2016-05-21 e 2016-05-22
+    # sono assenti nello storico precedente.
+    start_date: str = "2016-05-23"
     end_date: str = "today"
 
-    # Serie usata per i segnali (Yahoo Finance)
-    # "ETH-USD" perché è l'indicatore standard di trading su Yahoo.
-    # Se vuoi cambiare quote a EUR/USD o altre, puoi farlo qui.
-    symbol: str = "ETH-USD"
+    # Mercato Coinbase usato per candele, indicatori, segnali e backtest.
+    product_id: str = "ETH-USD"
+    informational_product_id: str = "ETH-EUR"
 
     # Indicatori tecnici
     sma_fast: int = 50
@@ -36,9 +41,9 @@ class Config:
     # Nota: i pesi sono implementati direttamente nella strategia per chiarezza.
 
     # Esposizione prudente (mappatura segnale -> peso capitale).
-    # MANTIENI usa NaN per indicare: conserva l'esposizione precedente.
+    # MANTIENI STATO ATTUALE usa NaN: conserva l'esposizione precedente.
     # - ACQUISTA -> 100%
-    # - MANTIENI -> esposizione precedente
+    # - MANTIENI STATO ATTUALE -> esposizione precedente
     # - VENDI -> 0%
     exposure_map: dict[str, float] = None  # impostato in __post_init__
 
@@ -49,7 +54,7 @@ class Config:
             "exposure_map",
             {
                 "ACQUISTA": 1.0,
-                "MANTIENI": float("nan"),  # NaN indica di mantenere l'esposizione precedente
+                "MANTIENI STATO ATTUALE": float("nan"),
                 "VENDI": 0.0,
             },
         )

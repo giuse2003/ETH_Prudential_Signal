@@ -1,7 +1,7 @@
 const DATA_VERSION = "20260719-daily-candles";
 const STATUS_ENDPOINT = `./live-status.json?v=${DATA_VERSION}`;
 const CHART_DATA_ENDPOINT = `./chart-data.json?v=${DATA_VERSION}`;
-const BACKTEST_ENDPOINT = `./backtest.json?v=${DATA_VERSION}`;
+const MANIFEST_ENDPOINT = `./manifest.json?v=${DATA_VERSION}`;
 const COINBASE_EUR_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-EUR/spot";
 const COINBASE_USD_ENDPOINT = "https://api.coinbase.com/v2/prices/ETH-USD/spot";
 const COINBASE_CANDLES_ENDPOINT =
@@ -61,6 +61,7 @@ let chartRows = [];
 let chartRange = "180";
 let lastChartHistoryFetchAt = 0;
 let liveCandleSource = null;
+let chartRunId = null;
 
 // Custom currency formatting for Italian locale
 function formatCurrency(value, currency) {
@@ -129,6 +130,9 @@ async function loadBotStatus() {
     
     botData = await res.ok ? await res.json() : null;
     if (botData) {
+      if (chartRunId && botData.run_id !== chartRunId) {
+        throw new Error("Pacchetto dati in aggiornamento; run_id non allineato");
+      }
       updateBotUI(botData);
       if (els.corsHelper) els.corsHelper.style.display = "none";
     }
@@ -143,7 +147,7 @@ async function loadBotStatus() {
 
 function updateBotUI(data) {
   // Update operational signal card
-  const signal = data.signal || "MANTIENI";
+  const signal = data.action || "MANTIENI STATO ATTUALE";
   els.signalVal.textContent = signal;
   els.signalCard.className = "metric highlight-card"; // reset classes
   
@@ -185,7 +189,7 @@ function updateBotUI(data) {
   updateConditionList(els.sellConditions, data.condition_groups?.sell);
 
   // Last update time
-  els.lastUpdate.textContent = data.last_update || "N/D";
+  els.lastUpdate.textContent = data.generated_at_utc || "N/D";
   els.monitorStatus.textContent = data.status || "Attivo";
   els.monitorStatus.className = "info-val monitor-active";
 }
@@ -216,8 +220,10 @@ async function loadChartData() {
   try {
     const response = await fetch(CHART_DATA_ENDPOINT, { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const rows = await response.json();
+    const payload = await response.json();
+    const rows = payload.rows;
     if (!Array.isArray(rows)) throw new Error("Formato grafico non valido");
+    chartRunId = payload.run_id || null;
 
     officialChartRows = rows
       .map((row) => ({
@@ -331,11 +337,14 @@ async function loadBacktestMetrics() {
   if (!els.strategyReturn) return;
 
   try {
-    const response = await fetch(BACKTEST_ENDPOINT, { cache: "no-store" });
+    const response = await fetch(MANIFEST_ENDPOINT, { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const payload = await response.json();
-    const strategy = payload.strategy || {};
-    const buyHold = payload.buy_hold || {};
+    if (chartRunId && payload.run_id !== chartRunId) {
+      throw new Error("Manifest e grafico appartengono a run differenti");
+    }
+    const strategy = payload.metrics?.strategy || {};
+    const buyHold = payload.metrics?.buy_and_hold || {};
 
     const strategyReturn = Number(strategy.total_return);
     const buyHoldReturn = Number(buyHold.total_return);
@@ -357,13 +366,13 @@ async function loadBacktestMetrics() {
       `Rendimento totale ${formatPercent(strategyReturn, { signed: true })}`;
     els.buyHoldComparisonReturn.textContent =
       `Rendimento totale ${formatPercent(buyHoldReturn, { signed: true })}`;
-    if (els.backtestPeriod && period.start_date && period.end_date) {
+    if (els.backtestPeriod && period.evaluation_start && period.evaluation_end) {
       els.backtestPeriod.textContent =
-        `Backtest ${formatDateShort(period.start_date)} - ${formatDateShort(period.end_date)}`;
+        `Backtest ${formatDateShort(period.evaluation_start)} - ${formatDateShort(period.evaluation_end)}`;
     }
-    if (els.backtestPeriodItem && period.start_date && period.end_date) {
+    if (els.backtestPeriodItem && period.evaluation_start && period.evaluation_end) {
       els.backtestPeriodItem.textContent =
-        `Periodo ${period.start_date} - ${period.end_date}`;
+        `Periodo ${period.evaluation_start} - ${period.evaluation_end}`;
     }
 
     const maxReturn = Math.max(Math.abs(strategyReturn), Math.abs(buyHoldReturn), 1);

@@ -1,13 +1,8 @@
-"""
-Generazione report:
-- report testuale
-- CSV storico con indicatori e segnali
-- grafico (prezzo + SMA50/SMA200 + markers buy/sell)
-"""
+"""Generazione deterministica degli artefatti di ETH-USD Signal."""
 
 from __future__ import annotations
 
-import math
+import json
 from pathlib import Path
 
 import matplotlib.dates as mdates
@@ -15,226 +10,163 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from config import CFG
-from strategy.signals import ENTRY_RSI_MAX, explain_latest_row
+from strategy.signals import HOLD_ACTION, live_condition_statuses
+
+
+def write_utf8_text(out_path: str | Path, content: str) -> Path:
+    path = Path(out_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content.replace("\r\n", "\n").encode("utf-8"))
+    return path
+
+
+def save_dataframe_csv(
+    frame: pd.DataFrame,
+    out_path: str | Path,
+    *,
+    index: bool,
+) -> Path:
+    return write_utf8_text(out_path, frame.to_csv(index=index, lineterminator="\n"))
+
+
+def _json_float(value) -> float | None:
+    if value is None or pd.isna(value):
+        return None
+    return float(value)
+
+
+def _condition_groups(
+    buy_statuses: list[bool],
+    sell_statuses: list[bool],
+    live: bool,
+) -> dict:
+    qualifier = " live" if live else ""
+    buy_labels = [
+        f"prezzo{qualifier} sopra SMA200",
+        f"SMA50{qualifier} sopra SMA200",
+        f"RSI{qualifier} tra 40 e 65 per i nuovi ingressi",
+        f"prezzo{qualifier} sopra quello di 7 giorni prima",
+        f"volume ETH-USD{qualifier} sopra media 20 giorni",
+    ]
+    sell_labels = [
+        f"prezzo{qualifier} sotto SMA50",
+        "trailing stop 8% confermato da momentum e volume",
+    ]
+    return {
+        "buy": [
+            {"label": label, "passed": bool(passed)}
+            for label, passed in zip(buy_labels, buy_statuses)
+        ],
+        "sell": [
+            {"label": label, "passed": bool(passed)}
+            for label, passed in zip(sell_labels, sell_statuses)
+        ],
+    }
 
 
 def save_historical_csv(df: pd.DataFrame, out_path: str | Path) -> Path:
-    """
-    Salva CSV con le colonne richieste per la Versione 1.0.
-
-    Colonne esportate:
-    - Data
-    - Close (ETH-USD Close)
-    - ETH-USD
-    - ETH-EUR (Close EUR)
-    - SMA50
-    - SMA200
-    - RSI
-    - ATR
-    - Volume
-    - Segnale
-    - Livello_Rischio
-    """
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    df_out = df.copy()
-    df_out["Data"] = df_out.index.strftime("%Y-%m-%d")
-    df_out["ETH-USD"] = df_out["Close"]
-    
-    if "Close_EUR" in df_out.columns:
-        df_out["ETH-EUR"] = df_out["Close_EUR"]
-    else:
-        df_out["ETH-EUR"] = float("nan")
-
-    cols = [
-        "Data",
-        "Close",
-        "ETH-USD",
-        "ETH-EUR",
-        "SMA50",
-        "SMA200",
-        "RSI",
-        "ATR",
-        "Volume",
-        "Segnale",
-        "Livello_Rischio",
+    output = df.copy()
+    output["Data"] = output.index.strftime("%Y-%m-%d")
+    output["ETH-USD"] = output["Close"]
+    output["Azione"] = output["Segnale"]
+    columns = [
+        "Data", "Open", "High", "Low", "Close", "ETH-USD", "SMA50", "SMA200",
+        "RSI", "ATR", "Volume", "VolumeAvg20", "Azione", "Livello_Rischio",
+        "Official_Sell", "Trail8_Stop_Hit", "Trail8_Confirmed",
     ]
-    
-    # In caso di colonne mancanti per vecchi dataset o altro, creale come NaN
-    for c in cols:
-        if c not in df_out.columns:
-            df_out[c] = float("nan")
-
-    df_out[cols].to_csv(out_path, index=False)
-    return out_path
+    return save_dataframe_csv(output[columns], out_path, index=False)
 
 
-def save_chart_data_json(df: pd.DataFrame, out_path: str | Path) -> Path:
-    """
-    Salva la serie storica compatta usata dalla dashboard e dal comando LIVE.
-    """
-    import json
-
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    rows: list[dict] = []
-    for date, row in df.sort_index().iterrows():
-        rows.append(
-            {
-                "date": pd.Timestamp(date).strftime("%Y-%m-%d"),
-                "open": _json_float(row.get("Open")),
-                "high": _json_float(row.get("High")),
-                "low": _json_float(row.get("Low")),
-                "close": _json_float(row.get("Close")),
-                "sma50": _json_float(row.get("SMA50")),
-                "sma200": _json_float(row.get("SMA200")),
-                "rsi": _json_float(row.get("RSI")),
-                "volume": _json_float(row.get("Volume")),
-                "volume_avg20": _json_float(row.get("VolumeAvg20")),
-                "signal": str(row.get("Segnale", "MANTIENI")),
-            }
-        )
-
-    out_path.write_text(json.dumps(rows, separators=(",", ":")), encoding="utf-8")
-    return out_path
+def save_chart_data_json(
+    df: pd.DataFrame,
+    out_path: str | Path,
+    metadata: dict,
+) -> Path:
+    rows = [
+        {
+            "date": pd.Timestamp(date).strftime("%Y-%m-%d"),
+            "open": _json_float(row.get("Open")),
+            "high": _json_float(row.get("High")),
+            "low": _json_float(row.get("Low")),
+            "close": _json_float(row.get("Close")),
+            "sma50": _json_float(row.get("SMA50")),
+            "sma200": _json_float(row.get("SMA200")),
+            "rsi": _json_float(row.get("RSI")),
+            "volume": _json_float(row.get("Volume")),
+            "volume_avg20": _json_float(row.get("VolumeAvg20")),
+            "action": str(row.get("Segnale", HOLD_ACTION)),
+        }
+        for date, row in df.sort_index().iterrows()
+    ]
+    return write_utf8_text(
+        out_path,
+        json.dumps({**metadata, "mode": "DAILY", "rows": rows}, separators=(",", ":")),
+    )
 
 
 def save_live_status_json(
     *,
-    signal: str,
+    action: str,
     price_usd: float,
     price_eur: float | None,
-    volume_24h_usd: float,
+    volume_24h_eth: float,
     buy_statuses: list[bool],
     sell_statuses: list[bool],
-    rsi: float | None = None,
-    sma50: float | None = None,
-    sma200: float | None = None,
-    atr: float | None = None,
-    risk_level: str = "MEDIO",
+    rsi: float | None,
+    sma50: float | None,
+    sma200: float | None,
+    atr: float | None,
+    risk_level: str,
+    metadata: dict,
     out_path: str | Path,
 ) -> Path:
-    """
-    Salva il segnale LIVE usato da Telegram su richiesta.
-    """
-    import json
-    from datetime import datetime, timezone
-
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    buy_labels = [
-        "prezzo live sopra SMA200 live",
-        "SMA50 live sopra SMA200 live",
-        f"valore RSI live compreso tra 40 e {ENTRY_RSI_MAX:.0f}",
-        "prezzo live sopra quello di 7 giorni prima",
-        "volume 24h live sopra media 20 giorni",
-    ]
-    sell_labels = [
-        "prezzo live sotto SMA50 live",
-        "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
-    ]
     payload = {
-        "signal": signal,
+        **metadata,
+        "mode": "LIVE PREVIEW",
+        "action": action,
         "price_usd": float(price_usd),
         "price_eur": _json_float(price_eur),
-        "volume_24h_usd": float(volume_24h_usd),
-        "last_update": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+        "volume_24h_eth": float(volume_24h_eth),
         "status": "Attivo",
         "rsi": _json_float(rsi),
         "sma50": _json_float(sma50),
         "sma200": _json_float(sma200),
         "atr": _json_float(atr),
         "risk_level": risk_level,
-        "condition_groups": {
-            "buy": [
-                {"label": label, "passed": bool(passed)}
-                for label, passed in zip(buy_labels, buy_statuses)
-            ],
-            "sell": [
-                {"label": label, "passed": bool(passed)}
-                for label, passed in zip(sell_labels, sell_statuses)
-            ],
-        },
+        "condition_groups": _condition_groups(buy_statuses, sell_statuses, live=True),
     }
-    out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    return out_path
+    return write_utf8_text(out_path, json.dumps(payload, indent=2))
 
 
-def save_backtest_json(
+def save_status_json(
+    df: pd.DataFrame,
     *,
-    metrics_strategy,
-    metrics_bh,
+    metadata: dict,
     out_path: str | Path,
-    start_date=None,
-    end_date=None,
-    cost_scenarios: dict | None = None,
 ) -> Path:
-    """
-    Salva le metriche di backtest usate dalla dashboard.
-    """
-    import json
-    from datetime import datetime, timezone
-
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
+    latest = df.iloc[-1]
+    previous = df.iloc[-2] if len(df) >= 2 else None
+    buy_statuses, sell_statuses = live_condition_statuses(df)
     payload = {
-        "period": {
-            "start_date": _json_date(start_date),
-            "end_date": _json_date(end_date),
-        },
-        "strategy": _metrics_payload(metrics_strategy),
-        "buy_hold": _metrics_payload(metrics_bh),
-        "cost_scenarios": {
-            label: _metrics_payload(metrics)
-            for label, metrics in (cost_scenarios or {}).items()
-        },
-        "last_update": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+        **metadata,
+        "mode": "DAILY",
+        "candle_date": df.index[-1].strftime("%Y-%m-%d"),
+        "action": str(latest["Segnale"]),
+        "price_usd": _json_float(latest["Close"]),
+        "price_eur": None,
+        "status": "Attivo",
+        "risk_level": str(latest.get("Livello_Rischio", "MEDIO")),
+        "rsi": _json_float(latest.get("RSI")),
+        "sma50": _json_float(latest.get("SMA50")),
+        "sma200": _json_float(latest.get("SMA200")),
+        "atr": _json_float(latest.get("ATR")),
+        "volume_eth": _json_float(latest.get("Volume")),
+        "volume_avg20_eth": _json_float(latest.get("VolumeAvg20")),
+        "previous_close": _json_float(previous.get("Close") if previous is not None else None),
+        "previous_sma50": _json_float(previous.get("SMA50") if previous is not None else None),
+        "condition_groups": _condition_groups(buy_statuses, sell_statuses, live=False),
     }
-    out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    return out_path
-
-
-def _metrics_payload(metrics) -> dict:
-    payload = {
-        "total_return": _json_float(metrics.total_return),
-        "annualized_return": _json_float(metrics.annualized_return),
-        "max_drawdown": _json_float(metrics.max_drawdown),
-        "num_operations": int(metrics.num_operations),
-        "win_rate": _json_float(metrics.win_rate),
-        "sharpe_ratio": _json_float(metrics.sharpe_ratio),
-        "profit_factor": _json_float(metrics.profit_factor),
-        "average_trade_return": _json_float(metrics.average_trade_return),
-        "median_trade_return": _json_float(metrics.median_trade_return),
-        "average_win": _json_float(metrics.average_win),
-        "average_loss": _json_float(metrics.average_loss),
-        "best_trade": _json_float(metrics.best_trade),
-        "worst_trade": _json_float(metrics.worst_trade),
-        "average_trade_days": _json_float(metrics.average_trade_days),
-        "median_trade_days": _json_float(metrics.median_trade_days),
-        "exposure_ratio": _json_float(metrics.exposure_ratio),
-        "turnover": _json_float(metrics.turnover),
-        "transaction_cost_rate": _json_float(metrics.transaction_cost_rate),
-    }
-    return payload
-
-
-def _json_float(value) -> float | None:
-    if value is None or pd.isna(value):
-        return None
-    number = float(value)
-    if not math.isfinite(number):
-        return None
-    return number
-
-
-def _json_date(value) -> str | None:
-    if value is None or pd.isna(value):
-        return None
-    return pd.Timestamp(value).strftime("%Y-%m-%d")
+    return write_utf8_text(out_path, json.dumps(payload, indent=2))
 
 
 def save_text_report(
@@ -242,234 +174,72 @@ def save_text_report(
     metrics_strategy,
     metrics_bh,
     out_path: str | Path,
+    *,
     price_eur: float | None = None,
     price_usd: float | None = None,
-    backtest_start_date=None,
-    backtest_end_date=None,
 ) -> Path:
-    """
-    Crea il report testuale completo.
-    """
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
     latest = df.iloc[-1]
-    day = df.index[-1].strftime("%Y-%m-%d")
 
-    motivazione = explain_latest_row(df, price_eur=price_eur, price_usd=price_usd)
+    def pct(value: float) -> str:
+        return "n/a" if pd.isna(value) else f"{value * 100:.2f}%"
 
-    # Informazioni su indicatori (richiesti / utili dal report testuale).
-    atr = float(latest.get("ATR", float("nan")))
-    high52w = float(latest.get("High52w", float("nan")))
-    low52w = float(latest.get("Low52w", float("nan")))
-    rischio = latest.get("Livello_Rischio", "MEDIO")
-
-    lines: list[str] = []
-    lines.append("ETHEREUM ANALYSIS")
-    lines.append(f"Data: {day}")
-    lines.append("")
-    lines.append(f"Prezzo USD: {float(latest['Close']):.4f} USD")
-    if price_eur:
-        lines.append(f"Prezzo EUR: {price_eur:.2f} EUR")
-    elif "Close_EUR" in latest and not pd.isna(latest["Close_EUR"]):
-        lines.append(f"Prezzo EUR: {float(latest['Close_EUR']):.2f} EUR")
-    else:
-        lines.append("Prezzo EUR: non disponibile")
-        
-    lines.append(f"SMA50: {float(latest['SMA50']):.4f}")
-    lines.append(f"SMA200: {float(latest['SMA200']):.4f}")
-    lines.append(f"RSI: {float(latest['RSI']):.2f}")
-    lines.append(f"ATR: {atr:.4f}")
-    lines.append(f"Massimo 52w: {high52w:.4f}")
-    lines.append(f"Minimo 52w: {low52w:.4f}")
-    lines.append("")
-    lines.append(f"Punteggio: {float(latest['Punteggio']):.0f}/100")
-    lines.append(f"Segnale: {latest['Segnale']}")
-    lines.append(f"Livello di rischio: {rischio}")
-    lines.append("")
-    lines.append("Motivazione dettagliata:")
-    lines.append(motivazione)
-    lines.append("")
-    if backtest_start_date is not None and backtest_end_date is not None:
-        start_txt = pd.Timestamp(backtest_start_date).strftime("%Y-%m-%d")
-        end_txt = pd.Timestamp(backtest_end_date).strftime("%Y-%m-%d")
-        lines.append(f"BACKTEST ({start_txt} - {end_txt})")
-    else:
-        lines.append("BACKTEST (periodo dati disponibile)")
-    lines.append("")
-
-    def fmt_pct(x: float) -> str:
-        if x != x:
-            return "n/a"
-        return f"{x*100:.2f}%"
-
-    lines.append("Strategia proposta (prudente)")
-    lines.append(f"- Rendimento totale: {fmt_pct(metrics_strategy.total_return)}")
-    lines.append(f"- Rendimento annualizzato: {fmt_pct(metrics_strategy.annualized_return)}")
-    lines.append(f"- Drawdown massimo: {fmt_pct(metrics_strategy.max_drawdown)}")
-    lines.append(f"- Numero operazioni: {metrics_strategy.num_operations}")
-    lines.append(f"- % operazioni vincenti: {metrics_strategy.win_rate*100:.1f}%")
-    lines.append(f"- Sharpe Ratio: {metrics_strategy.sharpe_ratio:.3f}")
-    lines.append(f"- Profit factor: {metrics_strategy.profit_factor:.3f}")
-    lines.append(f"- Rendimento medio trade: {fmt_pct(metrics_strategy.average_trade_return)}")
-    lines.append(f"- Trade migliore: {fmt_pct(metrics_strategy.best_trade)}")
-    lines.append(f"- Trade peggiore: {fmt_pct(metrics_strategy.worst_trade)}")
-    lines.append(f"- Esposizione media: {fmt_pct(metrics_strategy.exposure_ratio)}")
-    lines.append("")
-
-    lines.append("Buy & Hold")
-    lines.append(f"- Rendimento totale: {fmt_pct(metrics_bh.total_return)}")
-    lines.append(f"- Rendimento annualizzato: {fmt_pct(metrics_bh.annualized_return)}")
-    lines.append(f"- Drawdown massimo: {fmt_pct(metrics_bh.max_drawdown)}")
-    # buy&hold non ha "operazioni"
-    lines.append(f"- Sharpe Ratio: {metrics_bh.sharpe_ratio:.3f}")
-
-    out_path.write_text("\n".join(lines), encoding="utf-8")
-    return out_path
+    lines = [
+        CFG.model_name.upper(),
+        f"Candela DAILY: {df.index[-1].strftime('%Y-%m-%d')} UTC",
+        f"Fonte: {CFG.data_source} - {CFG.product_id}",
+        "",
+        f"Azione: {latest['Segnale']}",
+        f"Rischio informativo: {latest.get('Livello_Rischio', 'MEDIO')}",
+        f"Close ETH-USD: {float(latest['Close']):.2f} USD",
+        f"Spot ETH-USD: {price_usd:.2f} USD" if price_usd is not None else "Spot ETH-USD: non disponibile",
+        f"Spot ETH-EUR: {price_eur:.2f} EUR" if price_eur is not None else "Spot ETH-EUR: non disponibile",
+        f"SMA50: {float(latest['SMA50']):.2f}",
+        f"SMA200: {float(latest['SMA200']):.2f}",
+        f"RSI14: {float(latest['RSI']):.2f}",
+        f"ATR14: {float(latest['ATR']):.2f}",
+        "",
+        f"BACKTEST {df.index[0].strftime('%Y-%m-%d')} - {df.index[-1].strftime('%Y-%m-%d')}",
+        "Esecuzione: azione a chiusura t applicata al rendimento t+1",
+        "Costi, spread, slippage, imposte e rendimento della liquidita: non inclusi",
+        "",
+        CFG.model_name,
+        f"- Rendimento totale: {pct(metrics_strategy.total_return)}",
+        f"- Rendimento annualizzato: {pct(metrics_strategy.annualized_return)}",
+        f"- Drawdown massimo: {pct(metrics_strategy.max_drawdown)}",
+        f"- Operazioni completate: {metrics_strategy.num_operations}",
+        f"- Operazioni vincenti: {metrics_strategy.win_rate * 100:.1f}%",
+        f"- Sharpe Ratio: {metrics_strategy.sharpe_ratio:.3f}",
+        f"- Profit factor: {metrics_strategy.profit_factor:.3f}",
+        "",
+        "Buy & Hold ETH-USD",
+        f"- Rendimento totale: {pct(metrics_bh.total_return)}",
+        f"- Rendimento annualizzato: {pct(metrics_bh.annualized_return)}",
+        f"- Drawdown massimo: {pct(metrics_bh.max_drawdown)}",
+        f"- Sharpe Ratio: {metrics_bh.sharpe_ratio:.3f}",
+    ]
+    return write_utf8_text(out_path, "\n".join(lines))
 
 
 def plot_price_and_sma_with_signals(df: pd.DataFrame, out_path: str | Path) -> Path:
-    """
-    Grafico:
-    - prezzo
-    - SMA50 e SMA200
-    - markers:
-      verde = segnale acquisto
-      rosso = segnale vendita (RIDURRE ESPOSIZIONE)
-    """
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    df = df.copy().sort_index()
-
+    path = Path(out_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frame = df.sort_index()
     fig, ax = plt.subplots(figsize=(12, 7))
-
-    ax.plot(df.index, df["Close"], color="white", linewidth=1.2, alpha=0.9, label="Prezzo (ETH-USD)")
-    ax.plot(df.index, df["SMA50"], color="#60a5fa", linewidth=1.0, label=f"SMA{CFG.sma_fast}")
-    ax.plot(df.index, df["SMA200"], color="#a78bfa", linewidth=1.0, label=f"SMA{CFG.sma_slow}")
-
-    buy_labels = {"ACQUISTA"}
-    sell_label = "VENDI"
-
-    buy_df = df[df["Segnale"].isin(buy_labels)]
-    sell_df = df[df["Segnale"] == sell_label]
-
-    ax.scatter(buy_df.index, buy_df["Close"], color="green", s=18, alpha=0.8, label="Acquisto")
-    ax.scatter(sell_df.index, sell_df["Close"], color="red", s=18, alpha=0.8, label="Ridurre esposizione")
-
-    ax.set_title("ETH prezzo + SMA50/SMA200 + segnali prudenziali", fontsize=13)
-    ax.set_xlabel("Data")
+    ax.plot(frame.index, frame["Close"], linewidth=1.2, label="ETH-USD")
+    ax.plot(frame.index, frame["SMA50"], linewidth=1.0, label="SMA50")
+    ax.plot(frame.index, frame["SMA200"], linewidth=1.0, label="SMA200")
+    buys = frame[frame["Segnale"] == "ACQUISTA"]
+    sells = frame[frame["Segnale"] == "VENDI"]
+    ax.scatter(buys.index, buys["Close"], color="#15803d", s=18, label="ACQUISTA")
+    ax.scatter(sells.index, sells["Close"], color="#dc2626", s=18, label="VENDI")
+    ax.set_title("ETH-USD Signal - DAILY Coinbase")
+    ax.set_xlabel("Data UTC")
     ax.set_ylabel("USD")
-
-    # Miglior leggibilità date: non troppo fitte
     ax.xaxis.set_major_locator(mdates.YearLocator(2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-
     ax.grid(True, alpha=0.15)
     ax.legend(loc="upper left")
-
     fig.tight_layout()
-    fig.savefig(out_path, dpi=150)
+    fig.savefig(path, dpi=150)
     plt.close(fig)
-    return out_path
-
-
-def save_status_json(
-    df: pd.DataFrame,
-    price_eur: float | None,
-    price_usd: float | None,
-    out_path: str | Path,
-) -> None:
-    """
-    Salva lo stato corrente in formato JSON per la dashboard.
-    """
-    import json
-    from datetime import datetime
-    import numpy as np
-
-    out_path = Path(out_path)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    latest = df.iloc[-1]
-    
-    # Prezzi (con robustezza se mancano)
-    usd_val = price_usd if price_usd is not None else float(latest["Close"])
-    
-    eur_val = price_eur
-    if eur_val is None:
-        eur_val = latest.get("Close_EUR")
-        if pd.isna(eur_val):
-            eur_val = None
-            
-    # Gestione NaN per il JSON (non supportato nativamente)
-    if eur_val is not None and (np.isnan(eur_val) or eur_val != eur_val):
-        eur_val = None
-    if usd_val is not None and (np.isnan(usd_val) or usd_val != usd_val):
-        usd_val = None
-
-    momentum_col = f"Close_{CFG.momentum_days}d_ago"
-    prev = df.iloc[-2] if len(df) >= 2 else None
-    sell_below_sma50_1d = bool(latest["Close"] < latest["SMA50"])
-
-    condition_groups = {
-        "buy": [
-            {
-                "label": "prezzo sopra SMA200",
-                "passed": bool(latest["Close"] > latest["SMA200"]),
-            },
-            {
-                "label": "SMA50 sopra SMA200",
-                "passed": bool(latest["SMA50"] > latest["SMA200"]),
-            },
-            {
-                "label": f"valore RSI compreso tra 40 e {ENTRY_RSI_MAX:.0f}",
-                "passed": bool(40 <= latest["RSI"] <= ENTRY_RSI_MAX),
-            },
-            {
-                "label": f"prezzo sopra quello di {CFG.momentum_days} giorni prima",
-                "passed": bool(latest["Close"] > latest[momentum_col]),
-            },
-            {
-                "label": "volume sopra media 20 giorni",
-                "passed": bool(latest["Volume"] > latest["VolumeAvg20"]),
-            },
-        ],
-        "sell": [
-            {
-                "label": "prezzo sotto SMA50",
-                "passed": sell_below_sma50_1d,
-            },
-            {
-                "label": "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
-                "passed": bool(latest.get("Trail8_Confirmed", False)),
-            },
-        ],
-    }
-
-    status_data = {
-        "price_usd": usd_val,
-        "price_eur": eur_val,
-        "signal": str(latest["Segnale"]),
-        "risk_level": str(latest.get("Livello_Rischio", "MEDIO")),
-        "last_update": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "status": "Attivo",
-        "rsi": float(latest.get("RSI")) if not pd.isna(latest.get("RSI")) else None,
-        "sma50": float(latest.get("SMA50")) if not pd.isna(latest.get("SMA50")) else None,
-        "sma200": float(latest.get("SMA200")) if not pd.isna(latest.get("SMA200")) else None,
-        "atr": float(latest.get("ATR")) if not pd.isna(latest.get("ATR")) else None,
-        "volume": float(latest.get("Volume")) if not pd.isna(latest.get("Volume")) else None,
-        "volume_avg20": float(latest.get("VolumeAvg20")) if not pd.isna(latest.get("VolumeAvg20")) else None,
-        "close_7d_ago": float(latest.get(momentum_col)) if not pd.isna(latest.get(momentum_col)) else None,
-        "close_last_candle": float(latest.get("Close")) if not pd.isna(latest.get("Close")) else None,
-        "previous_close": float(prev.get("Close")) if prev is not None and not pd.isna(prev.get("Close")) else None,
-        "previous_sma50": float(prev.get("SMA50")) if prev is not None and not pd.isna(prev.get("SMA50")) else None,
-        "below_sma50_1d": sell_below_sma50_1d,
-        "trail8_stop_hit": bool(latest.get("Trail8_Stop_Hit", False)),
-        "trail8_confirmed": bool(latest.get("Trail8_Confirmed", False)),
-        "entry_rsi_filter_passed": bool(latest.get("Entry_RSI_Filter_Passed", False)),
-        "condition_groups": condition_groups,
-    }
-    
-    out_path.write_text(json.dumps(status_data, indent=2), encoding="utf-8")
-
-
+    return path

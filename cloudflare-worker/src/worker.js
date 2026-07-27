@@ -221,30 +221,6 @@ async function processCommand(request, env) {
   await sendTelegramMessage(env, request.chatId, message);
 }
 
-async function fetchGithubChartData(env) {
-  const statusUrl =
-    env.STATUS_JSON_URL ||
-    "https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json";
-  const chartUrl =
-    env.CHART_DATA_URL ||
-    statusUrl.replace(/\/status\.json(\?.*)?$/, "/chart-data.json");
-  const separator = chartUrl.includes("?") ? "&" : "?";
-  const response = await fetch(`${chartUrl}${separator}t=${Date.now()}`, {
-    headers: {
-      Accept: "application/json",
-      "Cache-Control": "no-cache",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`GitHub chart-data HTTP ${response.status}`);
-  }
-  const rows = await response.json();
-  if (!Array.isArray(rows) || rows.length < 210) {
-    throw new Error("chart-data.json non contiene abbastanza storico.");
-  }
-  return rows;
-}
-
 async function fetchGithubLiveStatus(env) {
   const statusUrl =
     env.STATUS_JSON_URL ||
@@ -272,114 +248,14 @@ async function fetchGithubLiveStatus(env) {
 async function buildLiveSignalMessage(env) {
   const live = await fetchGithubLiveStatus(env);
   return formatMonitorMessage(
-    String(live.signal || "MANTIENI"),
+    String(live.action || "MANTIENI STATO ATTUALE"),
     Number(live.price_eur),
     live.condition_groups,
-    "ETH MONITOR LIVE!",
+    "ETH-USD Signal - LIVE PREVIEW",
   );
 }
 
-function buildLiveSnapshot(rows, market) {
-  const cleanRows = rows
-    .filter((row) => Number.isFinite(Number(row.close)) && Number.isFinite(Number(row.volume)))
-    .map((row) => ({
-      date: row.date,
-      close: Number(row.close),
-      volume: Number(row.volume),
-      sma50: Number(row.sma50),
-      sma200: Number(row.sma200),
-    }));
-  if (cleanRows.length < 200) {
-    throw new Error("Storico insufficiente per SMA200 LIVE.");
-  }
-  if (!Number.isFinite(market.priceUsd) || !Number.isFinite(market.volume24hUsd)) {
-    throw new Error("CoinGecko non ha fornito prezzo o volume LIVE validi.");
-  }
-
-  const closesWithLive = cleanRows.map((row) => row.close).concat([market.priceUsd]);
-  const sma50 = average(closesWithLive.slice(-50));
-  const sma200 = average(closesWithLive.slice(-200));
-  const rsi = computeRsi14(closesWithLive);
-  const volumeAvg20 = average(cleanRows.slice(-20).map((row) => row.volume));
-  const close7dAgo = cleanRows[cleanRows.length - 7]?.close;
-
-  const buy = [
-    { label: "prezzo sopra SMA200", passed: market.priceUsd > sma200 },
-    { label: "SMA50 sopra SMA200", passed: sma50 > sma200 },
-    { label: "valore RSI compreso tra 40 e 65", passed: rsi >= 40 && rsi <= 65 },
-    {
-      label: "prezzo sopra quello di 7 giorni prima",
-      passed: market.priceUsd > close7dAgo,
-    },
-    {
-      label: "volume 24h live sopra media 20 giorni",
-      passed: market.volume24hUsd > volumeAvg20,
-    },
-  ];
-  const sell = [
-    {
-      label: "prezzo sotto SMA50",
-      passed: market.priceUsd < sma50,
-    },
-    {
-      label: "trailing stop 8%: momentum 7g >= -5% e volume >= media20 +20%",
-      passed: false,
-    },
-  ];
-
-  return {
-    signal: sell.some((condition) => condition.passed)
-        ? "VENDI"
-        : buy.every((condition) => condition.passed)
-          ? "ACQUISTA"
-        : "MANTIENI",
-    conditionGroups: { buy, sell },
-  };
-}
-
-function average(values) {
-  const finite = values.filter(Number.isFinite);
-  if (!finite.length) return Number.NaN;
-  return finite.reduce((sum, value) => sum + value, 0) / finite.length;
-}
-
-function computeRsi14(closes) {
-  const period = 14;
-  if (closes.length <= period) return Number.NaN;
-
-  let avgGain = 0;
-  let avgLoss = 0;
-  let initialized = false;
-  let seen = 0;
-
-  for (let index = 1; index < closes.length; index += 1) {
-    const delta = closes[index] - closes[index - 1];
-    const gain = Math.max(delta, 0);
-    const loss = Math.max(-delta, 0);
-
-    if (!initialized) {
-      avgGain += gain;
-      avgLoss += loss;
-      seen += 1;
-      if (seen === period) {
-        avgGain /= period;
-        avgLoss /= period;
-        initialized = true;
-      }
-      continue;
-    }
-
-    avgGain = (avgGain * (period - 1) + gain) / period;
-    avgLoss = (avgLoss * (period - 1) + loss) / period;
-  }
-
-  if (!initialized) return Number.NaN;
-  if (avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - 100 / (1 + rs);
-}
-
-function formatMonitorMessage(signal, priceEur, conditionGroups, title = "ETH MONITOR") {
+function formatMonitorMessage(signal, priceEur, conditionGroups, title = "ETH-USD Signal - LIVE PREVIEW") {
   const priceText =
     Number.isFinite(priceEur) && priceEur !== null
       ? `${Math.trunc(priceEur).toLocaleString("it-IT")} EUR`
@@ -388,9 +264,9 @@ function formatMonitorMessage(signal, priceEur, conditionGroups, title = "ETH MO
   return [
     title,
     "",
-    `Segnale: ${signal}`,
+    `Azione: ${signal}`,
     "",
-    "Prezzo:",
+    "Prezzo informativo:",
     priceText,
     "",
     "(per le condizioni: /conditions)",
@@ -418,7 +294,7 @@ function formatSignalConditions(conditionGroups) {
 
 function formatConditionGroup(conditions) {
   return conditions.map((condition, index) => {
-    const marker = condition.passed ? "✅" : "🅾️";
+    const marker = condition.passed ? "🟩" : "🟥";
     return `${marker} ${index + 1}.`;
   });
 }

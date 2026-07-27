@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>ETH Monitor — Dashboard</title>
+    <title>ETH-USD Signal - Dashboard</title>
     <link rel="icon" href="data:," />
     <!-- Google Fonts for premium typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,8 +15,8 @@
     <main class="container">
       <header class="header">
         <div>
-          <h1>ETH Prudential Signal <span class="badge">Live</span></h1>
-          <p class="subtitle">Metodo algoritmico Ethereum con segnali operativi e controllo del drawdown</p>
+          <h1>ETH-USD Signal <span class="badge">Live</span></h1>
+          <p class="subtitle">Metodo algoritmico Ethereum su candele giornaliere ETH-USD</p>
         </div>
         <div class="status" id="status">
           <span class="dot" aria-hidden="true"></span>
@@ -26,7 +26,7 @@
 
       <section class="hero">
         <div class="hero-copy">
-          <div class="label">Strategia Ethereum data-driven</div>
+          <div class="label">Strategia ETH-USD data-driven</div>
           <h2>Entra quando il trend e favorevole. Esci quando il rischio aumenta.</h2>
           <p>
             Il bot controlla Ethereum ogni 10 minuti e invia notifiche Telegram
@@ -47,7 +47,7 @@
 
         <div class="live-panel card">
           <div class="metric highlight-card" id="signalCard">
-            <div class="label">Segnale attuale</div>
+            <div class="label">Azione attuale</div>
             <div class="value" id="signalVal">—</div>
             <div class="hint" id="signalHint">In attesa dell'ultimo run...</div>
           </div>
@@ -73,8 +73,8 @@
             <div class="label">Prezzo + indicatori</div>
             <h2 id="priceChartTitle">Andamento Ethereum con SMA50, SMA200, RSI e volume</h2>
             <p>
-              Le candele chiuse arrivano da Yahoo Finance; quella UTC in corso
-              segue Coinbase e resta separata dai segnali fino alla chiusura.
+              Le candele chiuse e la preview UTC in corso arrivano da Coinbase;
+              soltanto le candele concluse entrano nel segnale DAILY.
             </p>
           </div>
           <div class="chart-controls" aria-label="Periodo grafico">
@@ -100,7 +100,7 @@
           <div class="chart-loading" id="chartLoading">Caricamento grafico...</div>
         </div>
         <p class="chart-note" id="chartNote">
-          Dati storici ETH-USD da Yahoo Finance; candela UTC corrente da Coinbase.
+          Dati storici e candela UTC corrente da Coinbase ETH-USD.
           Indicatori e segnali usano soltanto candele giornaliere chiuse.
         </p>
       </section>
@@ -136,7 +136,7 @@
         <div class="comparison">
           <div class="comparison-row">
             <div>
-              <strong>ETH Prudential Signal</strong>
+              <strong>ETH-USD Signal</strong>
               <span id="strategyComparisonReturn">Rendimento totale —</span>
             </div>
             <div class="bar"><span id="strategyComparisonBar" style="width: 100%"></span></div>
@@ -194,7 +194,7 @@
             di usare informazioni non ancora disponibili.
           </p>
           <ul class="check-list">
-            <li>Dati storici ETH-USD da Yahoo Finance</li>
+            <li>Dati storici Coinbase ETH-USD dal 23 maggio 2016</li>
             <li id="backtestPeriodItem">Periodo dati disponibile</li>
             <li>Confronto con Buy & Hold</li>
             <li>Metriche lorde e scenari costi nel JSON backtest</li>
@@ -300,7 +300,7 @@
 
       <footer>
         <p class="footnote">
-          Nota: ETH Monitor è uno strumento algoritmico informativo. Non costituisce sollecitazione al pubblico risparmio né consulenza finanziaria.
+          Nota: ETH-USD Signal e' uno strumento algoritmico informativo. Non costituisce sollecitazione al pubblico risparmio ne' consulenza finanziaria.
         </p>
       </footer>
     </main>

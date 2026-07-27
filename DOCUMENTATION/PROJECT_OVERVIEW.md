@@ -1,685 +1,83 @@
-# ETH Prudential Signal - Documento di progetto
+# Project Overview
 
-Ultimo aggiornamento: 2026-06-28
+## Identita
 
-Questo documento descrive l'intero progetto ETH Prudential Signal: cosa fa,
-come genera i segnali Ethereum, quali dati usa per backtest e monitoraggio,
-quali servizi esterni integra e come un altro agente IA puo replicarlo,
-testarlo e modificarlo.
+ETH-USD Signal e un modello algoritmico long/cash su Coinbase `ETH-USD`.
+Il nome `ETH_Prudential_Signal` resta riservato a repository, bot e Worker.
 
-Il progetto ha finalita informativa e di monitoraggio tecnico. Non costituisce
-consulenza finanziaria.
-
-## Obiettivo
-
-ETH Prudential Signal monitora Ethereum con dati giornalieri e produce tre
-segnali:
-
-- `ACQUISTA`: le condizioni tecniche di ingresso sono tutte vere.
-- `MANTIENI`: non ci sono condizioni sufficienti per acquistare o vendere.
-- `VENDI`: e' vera almeno una condizione di uscita ufficiale.
-
-Il sistema pubblica lo stato su una dashboard GitHub Pages e risponde via bot
-Telegram ai comandi manuali. Cloudflare Worker e l'unico backend pubblico per
-webhook, iscrizioni e conteggio aggregato.
-
-## Regole della strategia
-
-La strategia usa solo candele giornaliere chiuse. La candela UTC del giorno
-corrente viene esclusa, per evitare segnali basati su dati parziali.
-
-### Condizioni di acquisto
-
-Per generare `ACQUISTA` devono essere vere tutte queste condizioni:
-
-1. prezzo `Close` sopra `SMA200`;
-2. `SMA50` sopra `SMA200`;
-3. `RSI(14)` compreso tra `40` e `65`;
-4. prezzo `Close` sopra quello di 7 giorni prima;
-5. volume giornaliero sopra la media dei volumi a 20 giorni.
-
-Nel codice queste regole sono in `strategy/signals.py`, funzione
-`compute_strict_signal`.
-
-### Condizione di vendita
-
-Per generare `VENDI` deve essere vera almeno una di queste condizioni:
-
-1. prezzo `Close` sotto `SMA50`.
-2. trailing stop 8% dal massimo `Close` raggiunto dopo l'ingresso, confermato
-   da:
-   - momentum 7 giorni uguale o maggiore di `-5%`;
-   - volume relativo almeno `+20%` sopra la media a 20 giorni.
-
-La regola sotto SMA50 a 1 giorno e' la vendita ufficiale corrente. Il
-trailing stop confermato e' stato promosso dopo la validazione del candidato
-combinato con filtro ingresso `RSI <= 65`.
-
-### Mantieni
-
-Se non scatta ne `ACQUISTA` ne `VENDI`, il segnale e `MANTIENI`.
-
-Nel backtest, `MANTIENI` significa: conserva l'esposizione precedente.
-
-## Indicatori calcolati
-
-Gli indicatori sono calcolati in `indicators/technical_indicators.py`.
-
-Indicatori principali:
-
-- `SMA50`: media mobile semplice a 50 giorni.
-- `SMA200`: media mobile semplice a 200 giorni.
-- `RSI(14)`: Relative Strength Index con media Wilder-like.
-- `VolumeAvg20`: volume medio a 20 giorni.
-- `ATR(14)`: Average True Range.
-- `High52w` e `Low52w`: massimo e minimo degli ultimi 365 giorni.
-- `Close_7d_ago`: prezzo di chiusura di 7 giorni prima.
-
-Ethereum viene trattato come mercato aperto 7 giorni su 7:
-
-- periodi annui per statistiche: `365`;
-- finestra 52 settimane: `365` giorni;
-- dati giornalieri: `interval="1d"`.
-
-## Punteggio tecnico e rischio
-
-Il progetto calcola anche un punteggio tecnico e un livello di rischio, ma il
-segnale operativo e deciso dalle condizioni strette sopra descritte.
-
-Il punteggio aggiunge componenti per:
-
-- prezzo sopra SMA200;
-- SMA50 sopra SMA200;
-- RSI;
-- volume sopra media;
-- distanza dalla SMA200.
-
-Il rischio informativo puo essere:
-
-- `BASSO`;
-- `MEDIO`;
-- `ALTO`.
-
-Il rischio diventa `ALTO` se, ad esempio, prezzo e SMA50 sono sotto SMA200,
-oppure RSI eccessivamente alto, oppure distanza dalla SMA200 superiore al 40%.
-
-## Dati usati
-
-### Dati storici per segnali e backtest
-
-Fonte: Yahoo Finance tramite libreria `yfinance`.
-
-Simboli:
-
-- `ETH-USD`: serie principale per segnali e backtest;
-- `ETH-EUR`: serie storica EUR usata come supporto per report/prezzi in euro.
-
-File locali generati:
-
-- `data/ETH-USD_daily.csv`;
-- `data/ETH-EUR_daily.csv`.
-
-Il download e il caricamento sono gestiti da `data/fetch_yahoo.py`.
-
-Il filtro delle sole candele giornaliere chiuse e in
-`data/daily_candles.py`, funzione `keep_closed_daily_candles`.
-
-### Prezzi spot live
-
-Fonte: Coinbase endpoint pubblico:
+## Flusso dati
 
 ```text
-GET https://api.coinbase.com/v2/prices/<PAIR>/spot
+Coinbase ETH-USD DAILY concluse
+  -> validazione e snapshot grezzo
+  -> indicatori
+  -> baseline ETH stateful
+  -> backtest
+  -> DAILY e LIVE PREVIEW
+  -> staging, manifest e hash
+  -> dashboard, Worker e Telegram
 ```
 
-Coppie usate:
+`ETH-EUR` entra soltanto come spot informativo. Non influenza indicatori,
+segnali o backtest. La cache locale contiene esclusivamente dati Coinbase e non
+abilita fallback ad altri provider.
 
-- `ETH-USD`;
-- `ETH-EUR`.
+## Indicatori
 
-Il codice e in `live/coinbase.py`.
+- SMA50 e SMA200: media aritmetica rolling a finestra completa;
+- RSI14: gain/loss separati, EWM `alpha=1/14`, `adjust=False`,
+  `min_periods=14`;
+- VolumeAvg20: media aritmetica rolling del volume base ETH;
+- ATR14: true range ed EWM a 14 periodi;
+- momentum 7 giorni: confronto con `Close.shift(7)`.
 
-I prezzi spot live servono per mostrare un prezzo aggiornato nel report e nel
-bot Telegram, ma i segnali tecnici continuano a usare l'ultima candela
-giornaliera chiusa.
+## Regole ufficiali
+
+Un nuovo ingresso `ACQUISTA` richiede:
+
+1. `Close > SMA200`;
+2. `SMA50 > SMA200`;
+3. `40 <= RSI14 <= 65`;
+4. `Close > Close.shift(7)`;
+5. `Volume > VolumeAvg20`.
+
+`VENDI` ha precedenza e richiede almeno una condizione:
+
+1. `Close < SMA50`;
+2. trailing stop 8% dal massimo post-ingresso, confermato da momentum 7 giorni
+   almeno `-5%` e volume relativo almeno `+20%`.
+
+Altrimenti l'azione e `MANTIENI STATO ATTUALE`. Il filtro RSI massimo limita
+solo i nuovi ingressi e non chiude una posizione esistente.
 
 ## Backtest
 
-Il motore di backtest e in `backtest/backtest.py`.
-
-Regole di esposizione:
-
-- `ACQUISTA` -> esposizione 100%;
-- `MANTIENI` -> conserva esposizione precedente;
-- `VENDI` -> esposizione 0%.
-
-Per evitare look-ahead bias:
-
-- il segnale calcolato alla chiusura del giorno `t` viene applicato ai
-  rendimenti del giorno successivo;
-- nel codice questo avviene con `desired_exposure.shift(1)`.
-
-Metriche calcolate:
-
-- rendimento totale;
-- rendimento annualizzato;
-- drawdown massimo;
-- operazioni completate;
-- win rate;
-- Sharpe ratio annualizzato su 365 giorni.
-
-Una operazione e considerata completata solo quando una posizione long viene
-aperta e poi chiusa. Una posizione ancora aperta a fine serie non entra nel
-conteggio operazioni ne nel win rate.
-
-Il backtest non include:
-
-- commissioni;
-- spread;
-- slippage;
-- imposte;
-- limiti di liquidita.
-
-### Risultato backtest della strategia corrente
-
-La promozione della Baseline ufficiale e' registrata in
-`reports/official_baseline_implementation.md`. Nel run di verifica in EUR fino
-alla candela `2026-06-27`, la nuova Baseline ufficiale ha restituito:
-
-```text
-Strategia corrente
-Rendimento annualizzato:  +42,74%
-Drawdown massimo:         -45,09%
-Operazioni completate:    28
-Profit factor:            5,999
-Sharpe Ratio:             1,079
-```
-
-Le metriche operative della dashboard possono differire leggermente per valuta
-e data dell'ultima candela disponibile, ma le regole ufficiali del modello sono
-quelle descritte sopra.
-
-## Output generati
-
-Eseguendo:
-
-```powershell
-python main.py --force-download
-```
-
-vengono generati:
-
-- `reports/report.txt`: report testuale completo;
-- `reports/historical_signals.csv`: storico indicatori e segnali;
-- `reports/equity_timeseries.csv`: equity line strategia vs Buy & Hold;
-- `reports/price_sma_signals.png`: grafico prezzo/SMA/segnali;
-- `reports/status.json`: stato corrente per dashboard e bot.
-
-Per pubblicare lo stato nella dashboard GitHub Pages, `reports/status.json`
-viene copiato in:
-
-```text
-docs/status.json
-```
-
-## Dashboard web
-
-La dashboard pubblica e servita da GitHub Pages dalla cartella `docs/`.
-
-URL:
-
-```text
-https://giuse2003.github.io/ETH_Prudential_Signal/
-```
-
-File principali:
-
-- `docs/index.html`;
-- `docs/app.js`;
-- `docs/style.css`;
-- `docs/status.json`.
-- `docs/live-status.json`;
-- `docs/chart-data.json`;
-- `docs/backtest.json`.
-
-La dashboard mostra:
-
-- segnale corrente;
-- prezzo ETH;
-- indicatori principali;
-- candele OHLC daily verdi/rosse, SMA50, SMA200, RSI e volumi;
-- conteggio aggregato degli iscritti Telegram.
-
-Le candele concluse arrivano da Yahoo Finance e sono le sole usate dal
-modello. La dashboard aggiunge una candela UTC corrente da Coinbase, marcata
-come provvisoria e priva di indicatori. Quando Yahoo pubblica la candela
-chiusa della stessa data, il refresh storico la sostituisce automaticamente.
-Il monitor ritenta Yahoo a ogni run finche la candela attesa non e processata.
-
-Il conteggio iscritti viene letto dal Worker Cloudflare:
-
-```text
-GET https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count
-```
-
-La risposta contiene solo:
-
-```json
-{"active_subscribers": 1}
-```
-
-Non espone token, chat ID o dati personali.
-
-## Telegram bot
-
-Il bot Telegram e gestito da Cloudflare Worker.
-
-Worker:
-
-```text
-https://eth-prudential-signal.giuse2003.workers.dev
-```
-
-File:
-
-```text
-cloudflare-worker/src/worker.js
-cloudflare-worker/wrangler.toml
-```
-
-Endpoint Worker:
-
-- `GET /`: health check;
-- `GET /subscribers/count`: conteggio iscritti attivi;
-- `POST /webhook`: webhook Telegram.
-
-### Comandi Telegram
-
-Il bot supporta:
-
-- `/segnale`: mostra segnale corrente, prezzo, stato sintetico delle condizioni;
-- `/conditions`: mostra il testo completo delle condizioni di acquisto/vendita;
-- `/iscrivimi`: registra l'utente per notifiche automatiche future;
-- `/disiscrivimi`: disattiva l'iscrizione;
-- `/privacy`: spiega quali dati vengono salvati;
-- `/help`: lista dei comandi.
-
-I comandi manuali rispondono solo alla chat privata dell'utente che li invia.
-Non vengono inviati a tutti gli iscritti.
-
-### Messaggio `/segnale`
-
-Il messaggio e volutamente compatto e usa esclusivamente lo stato LIVE:
-
-```text
-ETH MONITOR LIVE!
-
-Segnale: VENDI
-
-Prezzo:
-55.115 EUR
-
-(per le condizioni: /conditions)
-
-ACQUISTA:
-🅾️ 1.
-🅾️ 2.
-🅾️ 3.
-✅ 4.
-🅾️ 5.
-
-VENDI:
-✅ 1.
-```
-
-I numeri fanno riferimento alle condizioni elencate in `/conditions`.
-
-### Menu comandi Telegram
-
-Il menu Telegram viene aggiornato dal workflow GitHub Actions:
-
-```text
-.github/workflows/telegram-command.yml
-```
-
-Il workflow si chiama `Telegram command menu` e va lanciato manualmente con
-`workflow_dispatch`. Aggiorna Telegram tramite `setMyCommands`.
-
-## Supabase
-
-Supabase salva gli iscritti Telegram.
-
-Schema:
-
-```text
-supabase/telegram_subscribers.sql
-```
-
-Tabella:
-
-```text
-public.telegram_subscribers_eth
-```
-
-Campi principali:
-
-- `telegram_chat_id`: chiave primaria, destinatario Telegram;
-- `telegram_user_id`;
-- `telegram_username`;
-- `telegram_first_name`;
-- `telegram_language_code`;
-- `active`;
-- `subscribed_at`;
-- `unsubscribed_at`;
-- `consent_version`;
-- `consent_source`;
-- campi di diagnostica delivery.
-
-La tabella operativa ETH e `public.telegram_subscribers_eth`, separata da
-eventuali tabelle del progetto BTC anche quando si riusa lo stesso progetto
-Supabase.
-
-Se il progetto Supabase condiviso si chiama ancora `btc-prudential-signal`, va
-rinominato con un nome neutro come `crypto-prudential-signal`. La separazione
-operativa resta comunque affidata alle tabelle dedicate.
-
-La tabella ha Row Level Security attiva e forzata. I ruoli `anon` e
-`authenticated` non hanno accesso; il Worker usa `service_role`.
-
-## GitHub Actions
-
-### Hourly ETH monitor
-
-Workflow:
-
-```text
-.github/workflows/hourly-monitor.yml
-```
-
-Trigger:
-
-- ogni 10 minuti (`cron: "*/10 * * * *"`);
-- manuale (`workflow_dispatch`) per aggiornare i dati, senza invio Telegram.
-
-Funzioni:
-
-1. scarica dati aggiornati;
-2. esclude la candela giornaliera UTC in corso;
-3. calcola indicatori e segnale;
-4. genera `reports/status.json`;
-5. copia lo stato in `docs/status.json`;
-6. committa e pusha l'aggiornamento della dashboard;
-7. non invia segnali DAILY;
-8. salva `live-status.json` e invia una notifica soltanto quando varia almeno
-   una delle 7 condizioni LIVE e la variazione resta stabile per 10 minuti;
-9. salva lo stato in cache `.state`.
-
-Nota: al momento le notifiche automatiche del monitor usano il secret
-`TELEGRAM_CHAT_ID`, quindi sono legate a un destinatario configurato in
-GitHub Actions. Gli iscritti Supabase sono gestiti dal bot, ma il broadcast
-automatico a tutti gli iscritti non e ancora implementato.
-
-### Telegram command menu
-
-Workflow:
-
-```text
-.github/workflows/telegram-command.yml
-```
-
-Serve solo ad aggiornare il menu dei comandi Telegram. Non ascolta piu i
-comandi: quelli sono gestiti dal Worker Cloudflare.
-
-## Servizi esterni usati
-
-### GitHub
-
-Usato per:
-
-- repository del codice;
-- GitHub Actions;
-- GitHub Pages;
-- Raw URL pubblico di `docs/status.json`.
-
-### Yahoo Finance
-
-Usato via `yfinance` per dati storici giornalieri:
-
-- `ETH-USD`;
-- `ETH-EUR`.
-
-### Coinbase
-
-Usato per prezzo spot live:
-
-- `ETH-USD`;
-- `ETH-EUR`.
-
-### Cloudflare Workers
-
-Usato per:
-
-- webhook Telegram;
-- health check;
-- conteggio iscritti.
-
-### Telegram Bot API
-
-Usata per:
-
-- ricezione webhook;
-- invio risposte;
-- registrazione menu comandi;
-- comando `setWebhook`;
-- comando `setMyCommands`.
-
-### Supabase
-
-Usato come database per gli iscritti Telegram.
-
-## Secret e variabili
-
-### Cloudflare Worker
-
-Secret necessari:
-
-```text
-TELEGRAM_BOT_TOKEN
-TELEGRAM_WEBHOOK_SECRET
-SUPABASE_URL
-SUPABASE_SERVICE_ROLE_KEY
-```
-
-Variabile non segreta in `cloudflare-worker/wrangler.toml`:
-
-```text
-STATUS_JSON_URL=https://raw.githubusercontent.com/giuse2003/ETH_Prudential_Signal/master/docs/status.json
-SUBSCRIBERS_TABLE=telegram_subscribers_eth
-```
-
-### GitHub Actions
-
-Secret necessari:
-
-```text
-TELEGRAM_BOT_TOKEN
-TELEGRAM_CHAT_ID
-```
-
-`TELEGRAM_BOT_TOKEN` serve anche al workflow manuale per aggiornare il menu
-Telegram.
-
-## Come replicare il progetto
-
-### 1. Clonare e installare
-
-```powershell
-git clone https://github.com/giuse2003/ETH_Prudential_Signal.git
-cd ETH_Prudential_Signal
-python -m pip install -r requirements.txt
-```
-
-### 2. Eseguire localmente
-
-```powershell
-python main.py --force-download
-```
-
-Controllare:
-
-```text
-reports/report.txt
-reports/status.json
-reports/historical_signals.csv
-reports/equity_timeseries.csv
-```
-
-### 3. Testare
-
-```powershell
-python -m unittest discover -s tests -v
-```
-
-Attualmente i test coprono:
-
-- backtest e conteggio trade;
-- filtro candele giornaliere chiuse;
-- regole di acquisto/vendita;
-- messaggi e comandi Telegram;
-- Worker Cloudflare e formato delle condizioni;
-- iscrizioni Supabase;
-- dashboard, endpoint iscritti e grafico OHLC.
-
-### 4. Configurare Supabase
-
-1. creare un progetto Supabase;
-2. eseguire `supabase/telegram_subscribers.sql` nel SQL Editor;
-3. copiare:
-   - Project URL;
-   - service role key.
-
-### 5. Configurare Cloudflare Worker
-
-```powershell
-cd cloudflare-worker
-npx wrangler login
-npx wrangler secret put TELEGRAM_BOT_TOKEN
-npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
-npx wrangler secret put SUPABASE_URL
-npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-npx wrangler deploy
-```
-
-Verifiche:
-
-```powershell
-curl https://eth-prudential-signal.giuse2003.workers.dev/
-curl https://eth-prudential-signal.giuse2003.workers.dev/subscribers/count
-```
-
-### 6. Collegare Telegram al Worker
-
-Esempio PowerShell:
-
-```powershell
-$BOT_TOKEN = "<token bot>"
-$WORKER_URL = "https://eth-prudential-signal.giuse2003.workers.dev"
-$WEBHOOK_SECRET = "<secret scelto>"
-
-curl -X POST "https://api.telegram.org/bot$BOT_TOKEN/setWebhook" `
-  -H "Content-Type: application/json" `
-  -d "{\"url\":\"$WORKER_URL/webhook\",\"secret_token\":\"$WEBHOOK_SECRET\",\"allowed_updates\":[\"message\"]}"
-```
-
-La risposta attesa:
-
-```json
-{"ok":true,"result":true,"description":"Webhook was set"}
-```
-
-### 7. Aggiornare menu Telegram
-
-Nel repository GitHub:
-
-1. aprire `Actions`;
-2. scegliere `Telegram command menu`;
-3. cliccare `Run workflow`;
-4. branch `main`.
-
-## Come un agente IA dovrebbe modificare o testare il progetto
-
-Prima di cambiare la strategia:
-
-1. leggere `strategy/signals.py`;
-2. leggere `indicators/technical_indicators.py`;
-3. leggere `backtest/backtest.py`;
-4. scrivere un backtest comparativo senza modificare subito il codice;
-5. confrontare rendimento, drawdown, operazioni, win rate e Sharpe;
-6. se la modifica viene accettata, aggiornare:
-   - `strategy/signals.py`;
-   - `reports/generate.py`;
-   - `cloudflare-worker/src/worker.js`;
-   - test in `tests/`;
-   - `docs/status.json` rigenerato.
-
-Comandi minimi di verifica:
-
-```powershell
-python -m unittest discover -s tests -v
-python main.py
-Copy-Item reports\status.json docs\status.json
-& "C:\Program Files\nodejs\node.exe" --check cloudflare-worker\src\worker.js
-```
-
-Deploy Worker:
-
-```powershell
-cd cloudflare-worker
-$env:PATH='C:\Program Files\nodejs;' + $env:PATH
-npx wrangler deploy
-```
-
-Commit:
-
-```powershell
-git status --short
-git add <file modificati>
-git commit -m "<messaggio>"
-git push
-```
-
-## Limitazioni note
-
-- Il backtest non considera costi di transazione, spread o slippage.
-- La strategia e long-only: non apre posizioni short.
-- I segnali si basano su indicatori tecnici giornalieri, non su dati on-chain,
-  macroeconomici o fondamentali.
-- Il prezzo spot Coinbase serve per visualizzazione, non per decidere il
-  segnale.
-- Le notifiche Telegram sono esclusivamente LIVE: nessun messaggio parte dalla
-  nuova candela DAILY. Il messaggio automatico parte solo se cambia il
-  vero/falso di una delle 5 condizioni ACQUISTA o 2 condizioni VENDI.
-- Il broadcast automatico a tutti gli iscritti Supabase non e ancora
-  implementato; il monitor automatico usa il `TELEGRAM_CHAT_ID` configurato nei
-  GitHub Secrets.
-- Render/FastAPI sono stati rimossi: il Worker e l'unico backend pubblico.
-
-## File principali
-
-```text
-config.py                              configurazione generale
-main.py                                esecuzione completa locale
-hourly_monitor.py                      monitor GitHub Actions
-strategy/signals.py                    regole segnale/rischio
-indicators/technical_indicators.py     indicatori tecnici
-backtest/backtest.py                   motore backtest
-reports/generate.py                    report, status JSON, grafico
-data/fetch_yahoo.py                    download/caricamento Yahoo Finance
-data/daily_candles.py                  esclusione candela UTC corrente
-live/coinbase.py                       prezzi spot Coinbase
-cloudflare-worker/src/worker.js        bot Telegram e API pubbliche
-cloudflare-worker/wrangler.toml        configurazione Worker
-supabase/telegram_subscribers.sql      schema database iscritti
-docs/                                  dashboard GitHub Pages
-tests/                                 test automatici
-```
+L'azione calcolata alla chiusura `t` viene applicata al rendimento `t+1`.
+`ACQUISTA` imposta esposizione 100%, `VENDI` 0% e il mantenimento usa
+forward-fill. Strategia e Buy & Hold condividono il periodo post warm-up.
+Annualizzazione e Sharpe usano 365 giorni; i trade aperti a fine serie sono
+esclusi da conteggio e win rate.
+
+## Pubblicazione
+
+Ogni run viene costruito in staging. Tutti i JSON condividono il `run_id`; il
+manifest registra periodo, regole, metriche, commit, ambiente, hash del lock,
+provenienza e hash degli artefatti. La promozione e transazionale e ripristina
+il pacchetto precedente in caso di errore.
+
+## Baseline congelata
+
+La baseline v1 usa cutoff `2026-07-26` e snapshot Coinbase incluso. Il comando
+`reproduce.py` rigenera offline gli output e confronta ambiente, sorgenti,
+input, metriche e byte canonici. I run operativi successivi non modificano la
+baseline.
+
+## Interfacce
+
+- dashboard: legge `manifest.json`, `status.json`, `live-status.json` e
+  `chart-data.json` verificando il `run_id`;
+- Worker: inoltra il pacchetto LIVE e gestisce iscritti/comandi, senza formule;
+- Telegram: mostra `Azione`, prezzo EUR informativo, cinque condizioni buy e
+  due sell con indicatori verdi/rossi;
+- GitHub Actions: ambiente bloccato, cache Coinbase, pipeline unica e
+  pubblicazione di tutti gli artefatti.

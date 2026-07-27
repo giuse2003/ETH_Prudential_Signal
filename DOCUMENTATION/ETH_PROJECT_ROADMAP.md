@@ -1,6 +1,6 @@
-# ETH Prudential Signal - Roadmap Operativa
+# ETH-USD Signal - Roadmap Operativa
 
-Ultimo aggiornamento: 2026-06-28
+Ultimo aggiornamento: 2026-07-27
 
 Questo file tiene traccia delle problematiche riscontrate durante la creazione
 del progetto Ethereum e delle attivita ancora da completare. Va aggiornato a
@@ -12,6 +12,9 @@ ogni avanzamento rilevante.
   `https://github.com/giuse2003/ETH_Prudential_Signal`
 - Dashboard GitHub Pages attiva:
   `https://giuse2003.github.io/ETH_Prudential_Signal/`
+- Nome metodologico pubblico: **ETH-USD Signal**.
+- Nome repository/infrastruttura: `ETH_Prudential_Signal`, mantenuto per
+  compatibilita con URL, bot, Worker e workflow.
 - Branch principale: `master`
 - Dashboard statica pubblicata da `/docs`.
 - Worker Cloudflare ETH deployato:
@@ -25,6 +28,12 @@ ogni avanzamento rilevante.
   - vendita sotto SMA50 oppure `Trail8 -5 / vol +20`.
 - Ultima verifica modello registrata in
   `reports/official_baseline_implementation.md`.
+- Contratto dati corrente:
+  - `ETH-USD` e' il mercato del modello per segnali e backtest operativo;
+  - Coinbase Advanced Trade e l'unica fonte runtime;
+  - `ETH-EUR` resta soltanto spot informativo;
+  - la baseline ETH v1 e congelata al `2026-07-26` con manifest/hash/reproduce;
+  - il run operativo viene pubblicato come pacchetto coerente con `run_id`.
 
 ## Problemi Riscontrati
 
@@ -48,12 +57,12 @@ Correzioni applicate:
 - rimossi i vecchi valori BTC dalla dashboard;
 - aggiornati `PROJECT_OVERVIEW.md` e `SIGNAL_RULE_VERIFICATION_LOG.md`.
 
-Metriche ETH correnti:
+Metriche operative correnti da `docs/backtest.json`:
 
 | Strategia | Rendimento totale | Rendimento annualizzato | Drawdown massimo | Operazioni | Win rate | Sharpe |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| ETH Prudential Signal | +980,86% | +31,80% | -52,57% | 28 | 39,3% | 0,849 |
-| Buy & Hold Ethereum | +438,05% | +21,55% | -93,96% | 0 | n/a | 0,659 |
+| ETH-USD Signal | +2843,36% | +47,47% | -40,97% | 29 | 34,5% | 1,174 |
+| Buy & Hold ETH-USD | +495,28% | +22,74% | -93,96% | 0 | n/a | 0,670 |
 
 ### 2. GitHub Pages non attivo inizialmente
 

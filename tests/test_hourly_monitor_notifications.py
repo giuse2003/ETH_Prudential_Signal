@@ -8,8 +8,8 @@ from state.state_store import MonitorState
 
 
 class HourlyMonitorNotificationTests(unittest.TestCase):
-    def test_forces_daily_download_until_expected_candle_is_processed(self) -> None:
-        self.assertTrue(
+    def test_incremental_run_uses_coinbase_cache(self) -> None:
+        self.assertFalse(
             should_force_daily_download(
                 MonitorState(last_processed_candle_date="2026-07-03"),
                 expected_closed_candle_date="2026-07-04",
@@ -44,7 +44,8 @@ class HourlyMonitorNotificationTests(unittest.TestCase):
 
         self.assertNotIn("should_notify", source)
         self.assertNotIn("ETH MONITOR DAILY!", source)
-        self.assertEqual(source.count("send_telegram_message(cfg, live_msg)"), 1)
+        self.assertIn("title=\"ETH-USD Signal - LIVE PREVIEW\"", source)
+        self.assertNotIn("DAILY!", source)
 
     def test_local_analysis_does_not_send_telegram_messages(self) -> None:
         source = (

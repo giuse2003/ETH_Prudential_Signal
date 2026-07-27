@@ -1,10 +1,10 @@
 # ETH Model Improvement Roadmap
 
-Ultimo aggiornamento: 2026-06-30
+Ultimo aggiornamento: 2026-07-27
 
 ## Obiettivo
 
-Migliorare il modello ETH Prudential Signal partendo dalla baseline attuale,
+Migliorare il modello ETH-USD Signal partendo dalla baseline attuale,
 misurando ogni modifica contro Buy & Hold e contro la strategia corrente.
 
 Il miglioramento non deve essere valutato solo sul rendimento totale. Le
@@ -14,37 +14,49 @@ costi realistici.
 
 ## Baseline Attuale
 
-Stato dopo decisione ufficiale del 2026-06-30:
+Stato dopo decisione di coerenza del 2026-07-27:
 
 - ingresso ufficiale: condizioni storiche Baseline + `RSI <= 65` sui soli
   nuovi ingressi;
 - uscita ufficiale: `Close < SMA50` oppure `Trail8 -5 / vol +20`;
 - varianti non promosse: `trade return >= 15%`, `momentum -6%`, `RSI <= 62`,
   trailing dinamico 15%/8%, volume +10%;
+- mercato del modello: `ETH-USD`;
+- `ETH-EUR` resta controvalore informativo e non una seconda strategia;
 - report canonico della promozione:
   `reports/official_baseline_implementation.md`.
 
-Metriche correnti in USD fino alla candela `2026-06-29`:
+Metriche canoniche della baseline v1 da
+`docs/runs/baseline-v1-2026-07-26/manifest.json`, periodo
+`2016-12-08` -> `2026-07-26`:
 
 | Metrica | Nuova Baseline ufficiale |
 |---|---:|
-| Rendimento annualizzato | 47,94% |
-| Max drawdown | -40,97% |
-| Sharpe Ratio | 1,179 |
-| Profit factor | 7,117 |
-| Operazioni chiuse | 29 |
+| Rendimento totale | +18.663,52% |
+| Rendimento annualizzato | 72,16% |
+| Max drawdown | -45,89% |
+| Sharpe Ratio | 1,357 |
+| Profit factor | 14,009 |
+| Operazioni chiuse | 36 |
+| Win rate | 36,11% |
 
 Le sezioni sotto restano come storico dei test che hanno portato alla
 promozione.
 
-Periodo backtest effettivo:
+Nota: la baseline ETH v1 e congelata al `2026-07-26` e verificabile offline con
+`reproduce.py`. Le sezioni successive restano storico dei test eseguiti sulla
+precedente fonte dati e non descrivono il run corrente.
+
+## Storico Precedente Alla Promozione Corrente
+
+Periodo backtest effettivo del blocco storico:
 
 - inizio: `2017-11-11`;
 - fine: `2026-06-23`;
 - origine periodo: prima data comune reale tra `ETH-USD` e `ETH-EUR` scaricata
   da Yahoo Finance.
 
-Metriche baseline:
+Metriche baseline storiche del blocco precedente:
 
 | Metrica | Strategia prudenziale | Buy & Hold |
 |---|---:|---:|
@@ -106,7 +118,7 @@ Confronto attuale:
 
 Run locale del 2026-06-26 con ultima candela chiusa `2026-06-25`.
 
-Metriche lorde aggiornate:
+Metriche lorde storiche del run 2026-06-26:
 
 | Metrica | Strategia prudenziale | Buy & Hold |
 |---|---:|---:|

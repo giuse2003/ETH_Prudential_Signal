@@ -7,7 +7,7 @@ Strategia prudente basata su:
 
 Output:
 - punteggio 0..100
-- classificazione (ACQUISTA / MANTIENI / VENDI)
+- classificazione (ACQUISTA / MANTIENI STATO ATTUALE / VENDI)
 - livello di rischio informativo (BASSO / MEDIO / ALTO)
 """
 
@@ -23,6 +23,7 @@ ENTRY_RSI_MAX = 65.0
 TRAILING_STOP_PCT = 0.08
 TRAILING_MOMENTUM_MIN = -0.05
 TRAILING_VOLUME_REL_MIN = 0.20
+HOLD_ACTION = "MANTIENI STATO ATTUALE"
 
 
 def _distance_from_sma200_pct(close: pd.Series, sma200: pd.Series) -> pd.Series:
@@ -89,7 +90,7 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     Classificazione stretta:
     ACQUISTA se TUTTE le condizioni rialziste sono vere.
     VENDI se il prezzo chiude sotto SMA50 gia' dopo 1 giorno.
-    Altrimenti MANTIENI.
+    Altrimenti MANTIENI STATO ATTUALE.
     """
     df = df.copy()
 
@@ -146,7 +147,7 @@ def _stateful_signals(
     Il trailing richiede stato di posizione: massimo Close raggiunto da quando
     la posizione e' aperta. Lo stato viene ricostruito scorrendo la serie.
     """
-    signal = np.full(len(df), "MANTIENI", dtype=object)
+    signal = np.full(len(df), HOLD_ACTION, dtype=object)
     trail_stop_hit = pd.Series(False, index=df.index)
     trail_confirmed = pd.Series(False, index=df.index)
 
@@ -260,7 +261,7 @@ def format_condition_message(
     price_eur: float | None,
     buy_statuses: list[bool],
     sell_statuses: list[bool],
-    title: str = "ETH MONITOR",
+    title: str = "ETH-USD Signal - LIVE PREVIEW",
 ) -> str:
     if price_eur is None:
         price_text = "ETH-EUR non disponibile"
@@ -271,9 +272,9 @@ def format_condition_message(
         [
             title,
             "",
-            f"Segnale: {signal}",
+            f"Azione: {signal}",
             "",
-            "Prezzo:",
+            "Prezzo informativo:",
             price_text,
             "",
             "(per le condizioni: /conditions)",
@@ -290,7 +291,7 @@ def format_condition_message(
 def format_telegram_message(
     df_with_signals: pd.DataFrame,
     price_eur: float | None = None,
-    title: str = "ETH MONITOR",
+    title: str = "ETH-USD Signal - LIVE PREVIEW",
 ) -> str:
     """
     Produce il messaggio operativo compatto per Telegram.
@@ -334,7 +335,7 @@ def signal_from_condition_statuses(buy_statuses: list[bool], sell_statuses: list
         return "VENDI"
     if all(buy_statuses):
         return "ACQUISTA"
-    return "MANTIENI"
+    return HOLD_ACTION
 
 
 def live_condition_statuses(
@@ -410,7 +411,7 @@ def _bools_to_key(statuses: list[bool]) -> str:
 
 def _format_condition_numbers(statuses: list[bool]) -> list[str]:
     return [
-        f"{'✅' if passed else '🅾️'} {index}."
+        f"{'🟩' if passed else '🟥'} {index}."
         for index, passed in enumerate(statuses, start=1)
     ]
 
@@ -498,7 +499,7 @@ def explain_latest_row(
     lines = [
         "ETH MONITOR",
         "",
-        f"Segnale: {segnale}",
+        f"Azione: {segnale}",
         f"Rischio: {rischio}",
         "",
         "Prezzo:",
