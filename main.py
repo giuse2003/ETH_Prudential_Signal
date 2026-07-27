@@ -6,6 +6,7 @@ import argparse
 import os
 from pathlib import Path
 
+from config import CFG
 from data.coinbase import fetch_daily_candles
 from pipeline import run_pipeline
 from reproducibility import create_frozen_run
@@ -25,13 +26,14 @@ def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parent
     if args.as_of:
-        output = args.output_dir or root / "docs" / "runs" / f"baseline-v1-{args.as_of}"
+        major_version = CFG.model_version.split(".", maxsplit=1)[0]
+        output = args.output_dir or root / "docs" / "runs" / f"baseline-v{major_version}-{args.as_of}"
         candles = fetch_daily_candles(as_of=args.as_of, refresh_all=args.force_download)
         manifest = create_frozen_run(
             candles,
             as_of=args.as_of,
             output_dir=output,
-            source_tag=f"baseline-v1-{args.as_of}",
+            source_tag=f"baseline-v{major_version}-{args.as_of}",
             initial_capital=args.initial_capital,
         )
         print(f"Baseline congelata e riproducibile: {manifest}")

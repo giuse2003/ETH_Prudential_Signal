@@ -46,6 +46,9 @@ class TelegramCommandTests(unittest.TestCase):
         self.assertNotIn("computeRsi14", source)
         self.assertNotIn("buildLiveSnapshot", source)
         self.assertIn('condition.passed ? "✅" : "🅾️"', source)
+        self.assertIn("Close < SMA50 x 0,98", source)
+        self.assertIn("maggiore di -15%", source)
+        self.assertNotIn("maggiore di -5%", source)
 
 
 if __name__ == "__main__":

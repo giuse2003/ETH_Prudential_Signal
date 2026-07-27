@@ -20,7 +20,7 @@ from config import CFG
 from reports.generate import write_utf8_text
 
 PUBLIC_JSON_FILES = ("status.json", "live-status.json", "chart-data.json")
-BASELINE_MANIFEST = "runs/baseline-v1-2026-07-26/manifest.json"
+BASELINE_MANIFEST = "runs/baseline-v2-2026-07-26/manifest.json"
 
 
 def new_run_metadata() -> dict[str, str]:
@@ -116,13 +116,14 @@ def write_manifest(
                 "Volume ETH-USD > media 20 giorni",
             ],
             "sell": [
-                "Close < SMA50",
-                "Trailing stop 8% dal massimo post-ingresso, confermato da momentum 7d >= -5% e volume relativo >= 20%",
+                "Close < SMA50 * 0.98",
+                "Trailing stop 8% dal massimo post-ingresso, confermato da momentum 7d >= -15% e volume relativo >= 20%",
             ],
             "sell_precedence": True,
             "execution_delay_days": 1,
             "exposure": "0% o 100%; MANTIENI STATO ATTUALE conserva l'esposizione",
-            "fees_and_slippage": "non inclusi",
+            "transaction_costs": "0.6% per lato inclusi per strategia e Buy & Hold",
+            "slippage_spread_taxes_cash_yield": "non inclusi",
         },
         "metrics": metrics,
         "provenance": provenance,

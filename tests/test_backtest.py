@@ -81,6 +81,24 @@ class BacktestMetricsTests(unittest.TestCase):
         self.assertLess(metrics_net.total_return, metrics_gross.total_return)
         self.assertAlmostEqual(equity_net["EquityStrategy"].iloc[-1], 1.0791, places=6)
 
+    def test_buy_hold_pays_purchase_and_final_sale_fees(self) -> None:
+        index = pd.date_range("2026-01-01", periods=2, freq="D")
+        df = pd.DataFrame(
+            {
+                "Close": [100.0, 100.0],
+                "Segnale": ["MANTIENI STATO ATTUALE"] * 2,
+            },
+            index=index,
+        )
+
+        equity, _, metrics = run_backtest(df, transaction_cost_rate=0.006)
+
+        expected = 0.994**2
+        self.assertAlmostEqual(equity["EquityBuyHold"].iloc[-1], expected)
+        self.assertAlmostEqual(metrics.total_return, expected - 1.0)
+        self.assertEqual(metrics.turnover, 2.0)
+        self.assertEqual(metrics.transaction_cost_rate, 0.006)
+
     def test_profit_factor_uses_completed_trade_returns(self) -> None:
         index = pd.date_range("2026-01-01", periods=7, freq="D")
         df = pd.DataFrame(

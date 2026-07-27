@@ -1,83 +1,95 @@
 # Project Overview
 
-## Identita
+## Scopo
 
-ETH-USD Signal e un modello algoritmico long/cash su Coinbase `ETH-USD`.
-Il nome `ETH_Prudential_Signal` resta riservato a repository, bot e Worker.
+ETH-USD Signal produce un'indicazione long/cash giornaliera su Ethereum e una
+preview LIVE. Il modello non esegue ordini e non costituisce consulenza
+finanziaria.
 
 ## Flusso dati
 
-```text
-Coinbase ETH-USD DAILY concluse
-  -> validazione e snapshot grezzo
-  -> indicatori
-  -> baseline ETH stateful
-  -> backtest
-  -> DAILY e LIVE PREVIEW
-  -> staging, manifest e hash
-  -> dashboard, Worker e Telegram
-```
+1. `data/coinbase.py` scarica candele DAILY UTC Coinbase `ETH-USD`.
+2. La candela UTC in corso viene esclusa dallo storico ufficiale.
+3. `indicators/technical_indicators.py` calcola SMA50, SMA200, RSI14, ATR14,
+   media volumi 20 e Close di 7 giorni prima.
+4. `strategy/signals.py` ricostruisce posizione, massimo post-ingresso e azione.
+5. `backtest/backtest.py` applica l'esposizione dal giorno successivo e include
+   la commissione dello 0,6% per lato.
+6. La pipeline pubblica JSON, CSV, report, grafico e manifest come unico bundle.
 
-`ETH-EUR` entra soltanto come spot informativo. Non influenza indicatori,
-segnali o backtest. La cache locale contiene esclusivamente dati Coinbase e non
-abilita fallback ad altri provider.
+`ETH-EUR` viene interrogato soltanto per il prezzo spot informativo LIVE.
 
-## Indicatori
+## Baseline ufficiale
 
-- SMA50 e SMA200: media aritmetica rolling a finestra completa;
-- RSI14: gain/loss separati, EWM `alpha=1/14`, `adjust=False`,
-  `min_periods=14`;
-- VolumeAvg20: media aritmetica rolling del volume base ETH;
-- ATR14: true range ed EWM a 14 periodi;
-- momentum 7 giorni: confronto con `Close.shift(7)`.
-
-## Regole ufficiali
-
-Un nuovo ingresso `ACQUISTA` richiede:
+`ACQUISTA` richiede tutte le condizioni:
 
 1. `Close > SMA200`;
 2. `SMA50 > SMA200`;
-3. `40 <= RSI14 <= 65`;
+3. `40 <= RSI14 <= 65` per i nuovi ingressi;
 4. `Close > Close.shift(7)`;
 5. `Volume > VolumeAvg20`.
 
 `VENDI` ha precedenza e richiede almeno una condizione:
 
-1. `Close < SMA50`;
-2. trailing stop 8% dal massimo post-ingresso, confermato da momentum 7 giorni
-   almeno `-5%` e volume relativo almeno `+20%`.
+1. `Close < SMA50 * 0,98`;
+2. trailing stop 8% dal massimo Close post-ingresso, con momentum 7 giorni
+   `>= -15%` e volume relativo `>= +20%`.
 
-Altrimenti l'azione e `MANTIENI STATO ATTUALE`. Il filtro RSI massimo limita
-solo i nuovi ingressi e non chiude una posizione esistente.
+Altrimenti l'azione e `MANTIENI STATO ATTUALE`. Il limite RSI 65 filtra solo i
+nuovi ingressi. Il superamento di RSI 65 non vende una posizione gia aperta.
+
+## Stato ed esposizione
+
+- `ACQUISTA`: esposizione desiderata 100%;
+- `VENDI`: esposizione desiderata 0%;
+- `MANTIENI STATO ATTUALE`: conserva l'esposizione precedente;
+- segnale a chiusura `t`: applicato al rendimento `t+1`;
+- vendita SMA50: valutata anche se la posizione ricostruita e gia chiusa, ma il
+  turnover cambia soltanto quando cambia l'esposizione.
 
 ## Backtest
 
-L'azione calcolata alla chiusura `t` viene applicata al rendimento `t+1`.
-`ACQUISTA` imposta esposizione 100%, `VENDI` 0% e il mantenimento usa
-forward-fill. Strategia e Buy & Hold condividono il periodo post warm-up.
-Annualizzazione e Sharpe usano 365 giorni; i trade aperti a fine serie sono
-esclusi da conteggio e win rate.
+La strategia paga lo 0,6% su ogni cambio completo di esposizione. Buy & Hold
+paga lo 0,6% all'acquisto iniziale e alla liquidazione finale. Annualizzazione
+e Sharpe usano 365 giorni; il risk-free e zero. Un trade aperto al cutoff non
+entra in numero operazioni o win rate.
+
+Spread, slippage, imposte e rendimento cash sono esclusi.
+
+## DAILY e LIVE
+
+- DAILY usa solo candele concluse e genera lo storico ufficiale.
+- LIVE PREVIEW aggiunge prezzo e volume 24h provvisori e ricalcola le stesse
+  regole senza modificare lo storico DAILY.
+- Il monitor notifica Telegram solo quando cambia una delle sette condizioni
+  LIVE e il cambiamento supera la stabilizzazione prevista.
 
 ## Pubblicazione
 
-Ogni run viene costruito in staging. Tutti i JSON condividono il `run_id`; il
-manifest registra periodo, regole, metriche, commit, ambiente, hash del lock,
-provenienza e hash degli artefatti. La promozione e transazionale e ripristina
-il pacchetto precedente in caso di errore.
+Ogni run viene costruito in staging. I JSON condividono lo stesso `run_id`; il
+manifest registra periodo, regole, costi, metriche, commit, ambiente,
+provenienza e hash. La promozione del bundle e transazionale.
 
-## Baseline congelata
+Dashboard e Worker consumano gli artefatti pubblicati e non ricalcolano il
+modello.
 
-La baseline v1 usa cutoff `2026-07-26` e snapshot Coinbase incluso. Il comando
-`reproduce.py` rigenera offline gli output e confronta ambiente, sorgenti,
-input, metriche e byte canonici. I run operativi successivi non modificano la
-baseline.
+## Versionamento interno
 
-## Interfacce
+- Baseline ufficiale: `docs/runs/baseline-v2-2026-07-26/`.
+- Vecchia baseline: `docs/runs/baseline-v1-2026-07-26/`.
+- Il numero interno non viene esposto nel nome del bot o nei messaggi.
+- Ogni pacchetto congelato ha un tag, hash sorgenti, snapshot e manifest propri.
 
-- dashboard: legge `manifest.json`, `status.json`, `live-status.json` e
-  `chart-data.json` verificando il `run_id`;
-- Worker: inoltra il pacchetto LIVE e gestisce iscritti/comandi, senza formule;
-- Telegram: mostra `Azione`, prezzo EUR informativo, cinque condizioni buy e
-  due sell con indicatori verdi/rossi;
-- GitHub Actions: ambiente bloccato, cache Coinbase, pipeline unica e
-  pubblicazione di tutti gli artefatti.
+Il checkout corrente riproduce la Baseline ufficiale. La vecchia baseline si
+riproduce dal tag storico e nel checkout corrente viene verificata come archivio
+immutabile.
+
+## Motivazione della promozione
+
+I test completi con commissione 0,6%, walk-forward retrospettivo, ritardo di
+esecuzione, PBO e Deflated Sharpe favoriscono la configurazione fissa con soglia
+SMA50 al 2% e momentum Trail8 a -15%. La selezione annuale non offre un vantaggio
+sufficiente a giustificarne complessita e instabilita di ranking.
+
+Dettagli: `reports/official_baseline_implementation.md` e
+`reports/walk_forward_coinbase_0_6.md`.

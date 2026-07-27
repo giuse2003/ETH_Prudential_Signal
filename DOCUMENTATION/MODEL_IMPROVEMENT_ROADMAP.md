@@ -14,38 +14,28 @@ costi realistici.
 
 ## Baseline Attuale
 
-Stato dopo decisione di coerenza del 2026-07-27:
+Stato dopo la promozione del 2026-07-27:
 
-- ingresso ufficiale: condizioni storiche Baseline + `RSI <= 65` sui soli
-  nuovi ingressi;
-- uscita ufficiale: `Close < SMA50` oppure `Trail8 -5 / vol +20`;
-- varianti non promosse: `trade return >= 15%`, `momentum -6%`, `RSI <= 62`,
-  trailing dinamico 15%/8%, volume +10%;
-- mercato del modello: `ETH-USD`;
-- `ETH-EUR` resta controvalore informativo e non una seconda strategia;
-- report canonico della promozione:
-  `reports/official_baseline_implementation.md`.
+- cinque ingressi invariati, incluso `RSI <= 65` sui soli nuovi ingressi;
+- uscita ufficiale `Close < SMA50 * 0,98` oppure
+  `Trail8 / momentum >= -15% / volume >= +20%`;
+- mercato e fonte: Coinbase Advanced Trade `ETH-USD`;
+- costo ufficiale del backtest: 0,6% per lato;
+- report canonico: `reports/official_baseline_implementation.md`;
+- manifest interno: `docs/runs/baseline-v2-2026-07-26/manifest.json`.
 
-Metriche canoniche della baseline v1 da
-`docs/runs/baseline-v1-2026-07-26/manifest.json`, periodo
-`2016-12-08` -> `2026-07-26`:
+| Metrica | Baseline ufficiale | Buy & Hold |
+|---|---:|---:|
+| Rendimento totale | 56.672,64% | 23.431,28% |
+| Rendimento annualizzato | 93,12% | 76,25% |
+| Max drawdown | -43,00% | -94,01% |
+| Sharpe Ratio | 1,615 | 1,074 |
+| Operazioni chiuse | 30 | n/a |
 
-| Metrica | Nuova Baseline ufficiale |
-|---|---:|
-| Rendimento totale | +18.663,52% |
-| Rendimento annualizzato | 72,16% |
-| Max drawdown | -45,89% |
-| Sharpe Ratio | 1,357 |
-| Profit factor | 14,009 |
-| Operazioni chiuse | 36 |
-| Win rate | 36,11% |
-
-Le sezioni sotto restano come storico dei test che hanno portato alla
-promozione.
-
-Nota: la baseline ETH v1 e congelata al `2026-07-26` e verificabile offline con
-`reproduce.py`. Le sezioni successive restano storico dei test eseguiti sulla
-precedente fonte dati e non descrivono il run corrente.
+La vecchia baseline e congelata separatamente in
+`docs/runs/baseline-v1-2026-07-26/`. Tutte le sezioni successive sono archivio
+cronologico: le parole "baseline" e "ufficiale" al loro interno descrivono lo
+stato vigente alla data del test, non il modello operativo corrente.
 
 ## Storico Precedente Alla Promozione Corrente
 
@@ -806,7 +796,10 @@ Una variante dovrebbe essere considerata migliore solo se:
 - non aumenta il numero di operazioni in modo eccessivo;
 - funziona su piu' sottoperiodi, non solo sul periodo completo.
 
-## Prossima Iterazione Consigliata
+## Iterazione Consigliata Nel Piano Storico (archiviata)
+
+Questa sezione appartiene al piano precedente alla promozione del 2026-07-27 e
+non descrive le priorita correnti.
 
 Priorita' 1:
 
@@ -836,3 +829,13 @@ Priorita' 4:
 - testare gestione esposizione non binaria sui candidati piu' robusti;
 - stressare i candidati con costi 0,50% e rendimento liquidita';
 - completata: valutazione combinazioni prudenti fra stop ingresso 9% e trailing confermato.
+
+## Prossima Iterazione Corrente
+
+- non modificare ulteriormente le soglie durante il primo ciclo operativo;
+- monitorare divergenze tra DAILY e LIVE, turnover e costi effettivi;
+- confrontare periodicamente la Baseline ufficiale con vecchia baseline e
+  Buy & Hold senza riottimizzare sui nuovi dati;
+- registrare ogni nuovo trade chiuso e ogni uscita Trail8 in un audit append-only;
+- rivalutare il modello soltanto con un protocollo dichiarato prima del test e
+  con un nuovo identificatore interno se cambia una regola.

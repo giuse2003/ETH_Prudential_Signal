@@ -1,0 +1,170 @@
+{
+  "run_id": "baseline-v2-2026-07-26",
+  "run_type": "frozen-baseline",
+  "as_of": "2026-07-26",
+  "project": "ETH-USD Signal",
+  "model_version": "2.0",
+  "data_source": "Coinbase Advanced Trade",
+  "market": "ETH-USD",
+  "timezone": "UTC",
+  "source": {
+    "repository": "https://github.com/giuse2003/ETH_Prudential_Signal",
+    "tag": "baseline-v2-2026-07-26",
+    "identity": "Git tag plus SHA-256 hashes of model source files normalized to LF",
+    "files": {
+      "config.py": "ed8d8b46675832d6344651797bd7f2584cd23248d593b46e0b0d0a08a37f2397",
+      "backtest/backtest.py": "fb6bda4f5379db83156cf88d3d6320cb1e5e9ac79fd622d1c40877ac042e7572",
+      "data/coinbase.py": "9175195adf37731cbfb6b262ca7b4c06e5178fdf8ccb814e0d154b08f38b7b61",
+      "indicators/technical_indicators.py": "10e98a7b9cf37ce1f88935aacfc30be7d9cbc9e5c0db831e320a9f065cb42ba3",
+      "pipeline.py": "0cb48bd3d2ed66ab37a69568e3db6a3f77715ba204d6010f685999bf5ba654bc",
+      "reports/generate.py": "a3d0f5cd01e0e7b09589e48bb05c0085addb844c235abd8df8ccd691b68d22d5",
+      "reproducibility.py": "e915657f34a09a67dd8c58d5ffe78a763b763701fc158259f294ab94ff9d8e9e",
+      "strategy/signals.py": "011bfd6412bf5f5008dfc7ba58cac6e1835c844f7010204aebb32753fd003e65"
+    }
+  },
+  "environment": {
+    "python": "3.13.0",
+    "dependencies": {
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.4.9",
+      "contourpy": "1.3.3",
+      "cycler": "0.12.1",
+      "fonttools": "4.63.0",
+      "idna": "3.18",
+      "kiwisolver": "1.5.0",
+      "packaging": "26.2",
+      "pillow": "12.3.0",
+      "pyparsing": "3.3.2",
+      "python-dateutil": "2.9.0.post0",
+      "six": "1.17.0",
+      "tzdata": "2026.3",
+      "urllib3": "2.7.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "matplotlib": "3.10.9",
+      "requests": "2.34.2"
+    },
+    "requirements_lock": "../../../requirements.lock",
+    "requirements_lock_sha256": "fab3e8cfa60b28ba3c8d3999d5a78c1077b20eb8b2066e74811d9b4ddd39073b"
+  },
+  "input": {
+    "snapshot": "raw_candles.csv",
+    "snapshot_sha256": "09504484b0d115c6b130dbfc82f05f5dc9137ce11b1cf12604f9a1c96132c357",
+    "api_base_url": "https://api.coinbase.com/api/v3/brokerage/market",
+    "endpoint": "/products/ETH-USD/candles",
+    "granularity": "ONE_DAY",
+    "requested_start": "2016-05-23",
+    "inclusive_end": "2026-07-26",
+    "cache_used_for_reproduction": false
+  },
+  "period": {
+    "coinbase_history_start": "2016-05-23",
+    "warmup_end": "2016-12-07",
+    "evaluation_start": "2016-12-08",
+    "evaluation_end": "2026-07-26",
+    "calendar_days": 3518,
+    "observations": 3518
+  },
+  "formulas": {
+    "indicators": {
+      "sma50_sma200": "rolling arithmetic mean; min_periods equals window",
+      "rsi14": "delta; gains/losses clipped at zero; ewm alpha=1/14, adjust=false, min_periods=14",
+      "volume_avg20": "rolling arithmetic mean; min_periods=20; Coinbase base volume in ETH",
+      "atr14": "max(H-L, abs(H-prevClose), abs(L-prevClose)); ewm alpha=1/14, adjust=false, min_periods=14",
+      "momentum7": "Close.shift(7)"
+    },
+    "actions": {
+      "buy": "new entry only when Close>SMA200 and SMA50>SMA200 and 40<=RSI14<=65 and Close>Close.shift(7) and Volume>VolumeAvg20",
+      "sell": "Close<SMA50*0.98 OR stateful trailing stop 8% from post-entry peak confirmed by momentum7>=-15% and relative volume>=20%",
+      "precedence": "sell, then buy, otherwise MANTIENI STATO ATTUALE"
+    },
+    "backtest": {
+      "desired_exposure": "ACQUISTA=1; VENDI=0; hold=forward-fill previous exposure; initial=0",
+      "effective_exposure": "desired_exposure.shift(1); initial=0",
+      "eth_return": "Close.pct_change()",
+      "strategy_return": "effective_exposure * eth_return - turnover * 0.006",
+      "equity": "cumprod(1 + daily_return)",
+      "buy_and_hold": "Close / first Close, with 0.6% purchase fee and 0.6% final sale fee",
+      "annualized_return": "(final_equity/initial_equity) ** (365/(observations-1)) - 1",
+      "max_drawdown": "min(equity/equity.cummax() - 1)",
+      "sharpe": "sqrt(365) * mean(daily_return) / sample_std(daily_return, ddof=1); risk-free=0",
+      "trades": "only completed 0-to-long-to-0 positions; open final position excluded",
+      "fees": "0.6% per side included for strategy and Buy & Hold",
+      "slippage_spread_taxes_cash_yield": "excluded"
+    }
+  },
+  "metrics": {
+    "strategy": {
+      "total_return": 566.7264499626586,
+      "annualized_return": 0.9312080082742844,
+      "max_drawdown": -0.4299646722120246,
+      "num_operations": 30,
+      "win_rate": 0.5,
+      "sharpe_ratio": 1.6148009161043904,
+      "profit_factor": 14.94397361521486,
+      "average_trade_return": 0.4913615587843692,
+      "median_trade_return": -0.005016367113274911,
+      "average_win": 1.0531996649781832,
+      "average_loss": -0.07047654740944485,
+      "best_trade": 8.62812021482895,
+      "worst_trade": -0.12876755547893204,
+      "average_trade_days": 31.633333333333333,
+      "median_trade_days": 28.0,
+      "exposure_ratio": 0.26975554292211484,
+      "turnover": 60.0,
+      "transaction_cost_rate": 0.006
+    },
+    "buy_and_hold": {
+      "total_return": 234.31282261951222,
+      "annualized_return": 0.7625167394094554,
+      "max_drawdown": -0.940116304238034,
+      "num_operations": 0,
+      "win_rate": 0.0,
+      "sharpe_ratio": 1.073996567087056,
+      "profit_factor": null,
+      "average_trade_return": null,
+      "median_trade_return": null,
+      "average_win": null,
+      "average_loss": null,
+      "best_trade": null,
+      "worst_trade": null,
+      "average_trade_days": null,
+      "median_trade_days": null,
+      "exposure_ratio": 1.0,
+      "turnover": 2.0,
+      "transaction_cost_rate": 0.006
+    }
+  },
+  "artifacts": {
+    "raw_candles.csv": {
+      "path": "raw_candles.csv",
+      "sha256": "09504484b0d115c6b130dbfc82f05f5dc9137ce11b1cf12604f9a1c96132c357",
+      "bytes": 206216
+    },
+    "status.json": {
+      "path": "status.json",
+      "sha256": "9a56288996d0384428aa94117675fada3f826c0e8e98dbbbc94ff5ed4e4ff93f",
+      "bytes": 1397
+    },
+    "chart-data.json": {
+      "path": "chart-data.json",
+      "sha256": "04b74a54ddc0f1140c7f1e88a3594796ed840dba07c64e4e02f846f765e6330a",
+      "bytes": 809657
+    },
+    "historical_signals.csv": {
+      "path": "historical_signals.csv",
+      "sha256": "51e57c3fd6a1a10aec601f6ea63e54e3e67502247ef8261119e416e1ec14908a",
+      "bytes": 639731
+    },
+    "equity_timeseries.csv": {
+      "path": "equity_timeseries.csv",
+      "sha256": "730ad8791d746071ff4098a5145c062603550d8fd9767ea7c13b42e43be42b1a",
+      "bytes": 300551
+    },
+    "report.txt": {
+      "path": "report.txt",
+      "sha256": "8c83460eed6a3a2f5123653d6de88bfd419ed4ccc82ee4c93568a8ff733d366c",
+      "bytes": 831
+    }
+  }
+}

@@ -2,119 +2,77 @@
 
 Ultimo aggiornamento: 2026-07-27
 
-Questo file indica dove sono memorizzate le informazioni che riguardano la
-costruzione, i test, le decisioni e lo stato ufficiale del modello ETH
-Prudential Signal.
+## Fonti dello stato corrente
 
-Nota organizzativa:
+| Documento | Contenuto |
+|---|---|
+| `../README.md` | Regole, risultati e uso del progetto |
+| `PROJECT_STATUS.md` | Stato operativo corrente |
+| `PROJECT_OVERVIEW.md` | Architettura dati, modello e pubblicazione |
+| `../EVALUATION_VALUES.md` | Metriche canoniche non arrotondate |
+| `../REPRODUCIBILITY.md` | Riproduzione e versionamento interno |
+| `../reports/official_baseline_implementation.md` | Dossier della promozione |
+| `SIGNAL_RULE_VERIFICATION_LOG.md` | Verifica delle regole correnti |
 
-- la documentazione progettuale stabile vive in `DOCUMENTATION/`;
-- `README.md` resta nella root come pagina iniziale standard del repository;
-- i report di test restano in `../reports/` perche' sono output tecnici
-  rigenerabili dagli script.
+Questi documenti descrivono la **Baseline ufficiale**. Il numero `v2` e usato
+soltanto internamente per directory, manifest, tag e metadati.
 
-## Stato Ufficiale Corrente
+## Contratto corrente
 
-- `../README.md`: descrizione pubblica del progetto e regole operative
-  correnti.
-- `PROJECT_OVERVIEW.md`: documento tecnico generale per capire dati,
-  indicatori, segnali, backtest, dashboard e Telegram.
-- `PROJECT_STATUS.md`: stato operativo aggiornato del progetto.
-- `../reports/official_baseline_implementation.md`: report canonico della
-  promozione della nuova Baseline ufficiale.
+- nome pubblico: **ETH-USD Signal**;
+- dati modello: Coinbase Advanced Trade `ETH-USD`;
+- dati informativi: spot Coinbase `ETH-EUR`;
+- storico canonico: dal `2016-05-23`;
+- pacchetto ufficiale interno: `../docs/runs/baseline-v2-2026-07-26/`;
+- vecchia baseline: `../docs/runs/baseline-v1-2026-07-26/`;
+- run operativo: `../docs/manifest.json`;
+- commissione backtest: `0,6%` per lato.
 
-Contratto corrente del 2026-07-27:
-
-- nome metodologico pubblico: **ETH-USD Signal**;
-- repository, bot e Worker mantengono i nomi `ETH_Prudential_Signal` e
-  `eth-prudential-signal`;
-- `ETH-USD` e' la serie ufficiale per indicatori, segnali e backtest operativo;
-- `ETH-EUR` resta supporto informativo, non una seconda strategia;
-- Coinbase e l'unica fonte runtime del modello;
-- la baseline ETH v1 e congelata al `2026-07-26` in
-  `../docs/runs/baseline-v1-2026-07-26/`;
-- il run operativo giornaliero e descritto da `../docs/manifest.json`.
-
-## Diario e Decisioni
-
-- `ETH_MODEL_RESEARCH_DIARY.md`: diario cronologico completo delle analisi sul
-  modello, incluse ipotesi, test, scarti, decisioni e allineamenti dashboard.
-- `DECISION_LOG.md`: registro sintetico delle decisioni che modificano segnali
-  o metriche.
-- `MODEL_IMPROVEMENT_ROADMAP.md`: roadmap di miglioramento del modello, con
-  storico dei test e riepilogo della Baseline promossa.
-- `ETH_PROJECT_ROADMAP.md`: roadmap operativa del progetto, inclusi
-  infrastruttura, dashboard, Telegram e documentazione.
-- `BASELINE_SYNC_CHECKLIST.md`: controlli obbligatori per mantenere allineati
-  modello, dashboard, Telegram, Worker, workflow e documentazione.
-
-## Report di Validazione
-
-- `../reports/final_promotion_gate.md`: gate finale che ha stabilito la
-  promuovibilita' del candidato principale.
-- `../reports/final_combined_candidate_validation.md`: confronto finale tra
-  Baseline precedente e candidato combinato.
-- `../reports/combined_walkforward_validation.md`: validazione cronologica e
-  confronto con variante `trade return >= 15%`.
-- `../reports/residual_2023_exit_audit.md`: audit dell'unica uscita residua
-  sottoperformante del 2023.
-- `../reports/signal_component_analysis.md`: separazione tra modelli di ingresso,
-  uscita e combinazioni.
-
-## Cronologia Sintetica
-
-| Data | Fase | Dove leggere i dettagli |
-|---|---|---|
-| 2026-06-23 | Creazione progetto ETH, dashboard, primo backtest e correzione metriche copiate dal progetto BTC | `ETH_PROJECT_ROADMAP.md`, `PROJECT_OVERVIEW.md` |
-| 2026-06-24 | Configurazione Worker Cloudflare, Telegram, Supabase e automazioni operative | `ETH_PROJECT_ROADMAP.md`, `PROJECT_STATUS.md`, `DECISION_LOG.md` |
-| 2026-06-26 | Prime analisi di miglioramento: costi, qualita' trade, filtri ingresso, uscite protettive, stop e trailing | `MODEL_IMPROVEMENT_ROADMAP.md`, `../reports/` |
-| 2026-06-27 | Analisi trailing/ATR/RSI piu' avanzate e scarto delle varianti deboli o troppo complesse | `MODEL_IMPROVEMENT_ROADMAP.md`, `../reports/` |
-| 2026-06-28 | Analisi separata ingressi/uscite, validazione combinata, gate finale e promozione nuova Baseline ufficiale | `ETH_MODEL_RESEARCH_DIARY.md`, `../reports/final_promotion_gate.md`, `../reports/official_baseline_implementation.md`, `DECISION_LOG.md` |
-| 2026-06-28 | Allineamento Telegram `/conditions`, dashboard, legenda RSI 40/65 e documentazione cronologica | `ETH_MODEL_RESEARCH_DIARY.md`, `../README.md`, `PROJECT_OVERVIEW.md`, `PROJECT_STATUS.md` |
-| 2026-07-19 | Grafico OHLC con candela live Coinbase, polling Yahoo resiliente e rimozione definitiva Render/FastAPI | `ETH_MODEL_RESEARCH_DIARY.md`, `DECISION_LOG.md`, `PROJECT_STATUS.md`, `BASELINE_SYNC_CHECKLIST.md` |
-| 2026-07-22 | Telegram riallineato al solo segnale LIVE: rimossi invio e fallback DAILY, mantenute invariate le 7 condizioni | `ETH_MODEL_RESEARCH_DIARY.md`, `DECISION_LOG.md`, `PROJECT_STATUS.md`, `../README.md` |
-| 2026-07-27 | Coerenza ETH-USD Signal v1: contratto dati, metriche operative da JSON e distinzione da baseline congelata BTC-USD | `DECISION_LOG.md`, `PROJECT_STATUS.md`, `PROJECT_OVERVIEW.md`, `BASELINE_SYNC_CHECKLIST.md`, `../README.md` |
-| 2026-07-27 | Migrazione Coinbase-only, baseline v1 congelata e riproduzione offline | `DECISION_LOG.md`, `PROJECT_STATUS.md`, `../REPRODUCIBILITY.md`, `../EVALUATION_VALUES.md` |
-
-## Regole Ufficiali Del Modello
+## Regole ufficiali
 
 ### Acquisto
 
-Per generare `ACQUISTA` devono essere vere tutte le condizioni:
-
 1. `Close > SMA200`;
 2. `SMA50 > SMA200`;
-3. `40 <= RSI(14) <= 65`;
-4. `Close > Close_7d_ago`;
+3. `40 <= RSI14 <= 65` sui nuovi ingressi;
+4. `Close > Close.shift(7)`;
 5. `Volume > VolumeAvg20`.
 
 ### Vendita
 
-Per generare `VENDI` deve essere vera almeno una condizione:
+1. `Close < SMA50 * 0,98`;
+2. Trail8 dal massimo post-ingresso, confermato da momentum 7 giorni
+   `>= -15%` e volume relativo `>= +20%`.
 
-1. `Close < SMA50`;
-2. trailing stop 8% dal massimo `Close` post-ingresso, confermato da:
-   - momentum 7 giorni >= -5%;
-   - volume relativo >= +20% rispetto alla media 20 giorni.
+La vendita ha precedenza. In assenza di una nuova azione viene pubblicato
+`MANTIENI STATO ATTUALE`.
 
-## Regole Non Promosse
+## Ricerca e decisioni
 
-Restano documentate ma non operative:
+- `ETH_MODEL_RESEARCH_DIARY.md`: diario cronologico completo;
+- `DECISION_LOG.md`: decisioni che cambiano modello o infrastruttura;
+- `MODEL_IMPROVEMENT_ROADMAP.md`: stato della ricerca e prossime verifiche;
+- `../reports/condition_ablation_coinbase_0_6.md`: isolamento delle condizioni;
+- `../reports/walk_forward_coinbase_0_6.md`: walk-forward, PBO, DSR e ritardo;
+- `../reports/coinbase_fee_0_6_comparison.md`: vecchia baseline e Buy & Hold con
+  commissioni.
 
-- `trade return >= 15%` come ulteriore conferma del trailing;
-- `momentum >= -6%`;
-- `RSI <= 62`;
-- volume relativo `+10%`;
-- trailing dinamico 15%/8%;
-- trailing stop puro senza conferma momentum/volume;
-- stop loss fisso da ingresso.
+I report precedenti al 2026-07-27 sono archivio storico. Quando usano la parola
+"baseline" si riferiscono alla baseline vigente alla data del singolo report,
+non necessariamente alla Baseline ufficiale corrente.
 
-## Principio Di Reversibilita'
+## Cronologia essenziale
 
-Ogni modifica al modello deve lasciare traccia in almeno uno di questi file:
+| Data | Decisione |
+|---|---|
+| 2026-06-28 | Promozione del filtro RSI65 e Trail8 confermato |
+| 2026-06-30 | Uscita SMA50 portata a una candela |
+| 2026-07-22 | Telegram reso esclusivamente LIVE |
+| 2026-07-27 | Migrazione completa a Coinbase e congelamento vecchia baseline |
+| 2026-07-27 | Promozione della nuova Baseline ufficiale dopo test completi allo 0,6% |
 
-- diario cronologico: `ETH_MODEL_RESEARCH_DIARY.md`;
-- decisione sintetica: `DECISION_LOG.md`;
-- report tecnico in `../reports/`;
-- stato corrente: `PROJECT_STATUS.md`;
-- se diventa ufficiale, anche `../README.md` e `PROJECT_OVERVIEW.md`.
+## Controlli trasversali
+
+Prima di ogni modifica ufficiale usare `BASELINE_SYNC_CHECKLIST.md`. Ogni
+promozione deve aggiornare codice, test, `/conditions`, manifest, dashboard,
+documenti correnti e pacchetto congelato, lasciando intatti i pacchetti storici.

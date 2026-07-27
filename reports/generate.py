@@ -49,8 +49,8 @@ def _condition_groups(
         f"volume ETH-USD{qualifier} sopra media 20 giorni",
     ]
     sell_labels = [
-        f"prezzo{qualifier} sotto SMA50",
-        "trailing stop 8% confermato da momentum e volume",
+        f"prezzo{qualifier} oltre il 2% sotto SMA50",
+        "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
     ]
     return {
         "buy": [
@@ -200,7 +200,8 @@ def save_text_report(
         "",
         f"BACKTEST {df.index[0].strftime('%Y-%m-%d')} - {df.index[-1].strftime('%Y-%m-%d')}",
         "Esecuzione: azione a chiusura t applicata al rendimento t+1",
-        "Costi, spread, slippage, imposte e rendimento della liquidita: non inclusi",
+        f"Commissione: {CFG.transaction_cost_rate * 100:.1f}% per lato inclusa",
+        "Spread, slippage, imposte e rendimento della liquidita: non inclusi",
         "",
         CFG.model_name,
         f"- Rendimento totale: {pct(metrics_strategy.total_return)}",

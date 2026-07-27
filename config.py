@@ -14,8 +14,10 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Config:
     model_name: str = "ETH-USD Signal"
-    model_version: str = "1.0"
+    # Versione interna. Non viene mostrata nei messaggi operativi pubblici.
+    model_version: str = "2.0"
     data_source: str = "Coinbase Advanced Trade"
+    transaction_cost_rate: float = 0.006
 
     # Intervallo dati
     # Prima data della serie Coinbase continua: 2016-05-21 e 2016-05-22

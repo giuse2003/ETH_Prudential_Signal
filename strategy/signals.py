@@ -20,8 +20,9 @@ from config import CFG
 
 
 ENTRY_RSI_MAX = 65.0
+SMA50_BREAK_PCT = 0.02
 TRAILING_STOP_PCT = 0.08
-TRAILING_MOMENTUM_MIN = -0.05
+TRAILING_MOMENTUM_MIN = -0.15
 TRAILING_VOLUME_REL_MIN = 0.20
 HOLD_ACTION = "MANTIENI STATO ATTUALE"
 
@@ -32,6 +33,11 @@ def _distance_from_sma200_pct(close: pd.Series, sma200: pd.Series) -> pd.Series:
     """
     # Dove SMA200 è NaN o 0 la distanza diventa NaN/inf -> comparazioni gestiranno a false.
     return (close - sma200) / sma200 * 100.0
+
+
+def _sma50_sell_condition(close, sma50):
+    """Vero quando il Close perde la SMA50 di oltre il margine ufficiale."""
+    return close < sma50 * (1.0 - SMA50_BREAK_PCT)
 
 
 def score_rowwise(df: pd.DataFrame) -> pd.DataFrame:
@@ -89,7 +95,8 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     """
     Classificazione stretta:
     ACQUISTA se TUTTE le condizioni rialziste sono vere.
-    VENDI se il prezzo chiude sotto SMA50 gia' dopo 1 giorno.
+    VENDI se il prezzo chiude oltre il 2% sotto SMA50 oppure se il trailing
+    stop confermato viene attivato.
     Altrimenti MANTIENI STATO ATTUALE.
     """
     df = df.copy()
@@ -117,7 +124,7 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
     )
     filtered_new_entry_cond = official_buy_cond & entry_rsi_filter
 
-    official_sell_cond = close < sma50
+    official_sell_cond = _sma50_sell_condition(close, sma50)
 
     signal, trail_stop_hit, trail_confirmed = _stateful_signals(
         df=df,
@@ -353,7 +360,7 @@ def live_condition_statuses(
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
     sell_statuses = [
-        bool(row["Close"] < row["SMA50"]),
+        bool(_sma50_sell_condition(row["Close"], row["SMA50"])),
         bool(row.get("Trail8_Confirmed", False)),
     ]
     return buy_statuses, sell_statuses
@@ -434,7 +441,7 @@ def _sell_condition_statuses(df_with_signals: pd.DataFrame) -> list[bool]:
 
     row = df_with_signals.iloc[-1]
     return [
-        bool(row["Close"] < row["SMA50"]),
+        bool(_sma50_sell_condition(row["Close"], row["SMA50"])),
         bool(row.get("Trail8_Confirmed", False)),
     ]
 

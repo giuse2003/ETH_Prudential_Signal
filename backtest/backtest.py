@@ -185,7 +185,9 @@ def run_backtest(
         - Close
         - Segnale
     transaction_cost_rate:
-        Costo proporzionale applicato a ogni cambio di esposizione.
+        Costo proporzionale per lato. Per la strategia viene applicato a ogni
+        cambio di esposizione; per Buy & Hold all'acquisto iniziale e alla
+        liquidazione finale.
         Esempio: 0.001 = 0,10% per ingresso o uscita completa.
 
     Returns
@@ -216,16 +218,21 @@ def run_backtest(
     # Equity strategy
     equity_strategy = (1.0 + daily_strategy_returns.fillna(0.0)).cumprod() * float(initial_capital)
 
-    # Buy & Hold:
-    # investiamo 100% in ETH al primo Close disponibile.
+    # Buy & Hold: acquisto al primo Close e liquidazione all'ultimo Close.
+    # La curva include entrambe le commissioni, cosi il confronto usa lo stesso
+    # costo per lato della strategia.
     equity_bh = (df["Close"] / float(df["Close"].iloc[0])) * float(initial_capital)
+    equity_bh = equity_bh * (1.0 - transaction_cost_rate)
+    equity_bh.iloc[-1] *= 1.0 - transaction_cost_rate
+    daily_bh_returns = equity_bh.pct_change()
+    daily_bh_returns.iloc[0] = equity_bh.iloc[0] / float(initial_capital) - 1.0
 
     equity_df = pd.DataFrame(
         {
             "EquityStrategy": equity_strategy,
             "EquityBuyHold": equity_bh,
             "DailyReturnStrategy": daily_strategy_returns,
-            "DailyReturnBuyHold": eth_returns,
+            "DailyReturnBuyHold": daily_bh_returns,
             "EffectiveExposure": effective_exposure,
             "Turnover": turnover,
         },
@@ -271,13 +278,14 @@ def run_backtest(
     )
 
     # Metriche Buy & Hold (nessuna "operazione" significativa per questa metrica)
-    bh_total_return = float(equity_bh.iloc[-1] / equity_bh.iloc[0] - 1.0)
+    bh_total_return = float(equity_bh.iloc[-1] / float(initial_capital) - 1.0)
     bh_annualized_return = float(
-        (equity_bh.iloc[-1] / equity_bh.iloc[0])
+        (equity_bh.iloc[-1] / float(initial_capital))
         ** (CFG.periods_per_year / n_days)
         - 1.0
     )
-    bh_max_dd = _max_drawdown(equity_bh)
+    bh_running_max = equity_bh.cummax().clip(lower=float(initial_capital))
+    bh_max_dd = float((equity_bh / bh_running_max - 1.0).min())
     bh_sharpe = _sharpe_ratio(equity_df["DailyReturnBuyHold"])
 
     metrics_bh = BacktestMetrics(
@@ -288,8 +296,8 @@ def run_backtest(
         win_rate=0.0,
         sharpe_ratio=bh_sharpe,
         exposure_ratio=1.0,
-        turnover=0.0,
-        transaction_cost_rate=0.0,
+        turnover=2.0,
+        transaction_cost_rate=float(transaction_cost_rate),
     )
 
     return equity_df, metrics_strategy, metrics_bh

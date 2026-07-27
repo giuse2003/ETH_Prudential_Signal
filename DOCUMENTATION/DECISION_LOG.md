@@ -2,6 +2,42 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-07-27 - Promozione della Baseline ufficiale
+
+**Decisione:** promuovere il candidato fisso identificato internamente come
+`combo_trail_mom_15_sma_break_2_0` a nuova Baseline ufficiale.
+
+**Regole modificate:**
+
+- uscita SMA50 da `Close < SMA50` a `Close < SMA50 * 0,98`;
+- conferma momentum Trail8 da `>= -5%` a `>= -15%`.
+
+Le cinque condizioni di acquisto, il trailing 8%, il volume relativo `>= +20%`,
+la precedenza della vendita, l'esposizione binaria e
+`MANTIENI STATO ATTUALE` restano invariati.
+
+**Motivazione:** con commissione dello 0,6% per lato il candidato migliora
+rendimento, drawdown e Sharpe nel periodo completo e nel periodo retrospettivo
+2021-2026. Sopravvive inoltre allo stress con una candela aggiuntiva di ritardo.
+La configurazione fissa viene preferita alla selezione annuale per semplicita e
+maggiore stabilita operativa.
+
+**Versionamento:** `v2` resta un identificatore interno. Nei contenuti pubblici
+il modello e chiamato soltanto **Baseline**. La precedente `v1` diventa la
+**vecchia baseline** e rimane immutabile nel relativo pacchetto e tag.
+
+**Costi ufficiali:** 0,6% su ogni ingresso e uscita della strategia; Buy & Hold
+paga acquisto iniziale e liquidazione finale. Spread, slippage, imposte e
+rendimento cash restano esclusi.
+
+**Stato al cutoff:** sulla candela `2026-07-26` la Baseline ufficiale e fuori
+mercato e indica `MANTIENI STATO ATTUALE`; la promozione non genera una nuova
+operazione immediata.
+
+**Riferimenti:** `reports/official_baseline_implementation.md`,
+`reports/condition_ablation_coinbase_0_6.md` e
+`reports/walk_forward_coinbase_0_6.md`.
+
 ## 2026-07-27 - Coerenza ETH-USD Signal v1
 
 **Decisione di coerenza:** il modello pubblico viene descritto come

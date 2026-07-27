@@ -1,128 +1,124 @@
-# Official Baseline Implementation
+# Implementazione della Baseline ufficiale
 
-Data: `2026-06-28`.
+Data di promozione: `2026-07-27`.
 
-Questo report registra la promozione del candidato combinato a Baseline
-ufficiale del progetto.
+## Decisione
 
-## Regole Implementate
+Il candidato fisso identificato internamente come
+`combo_trail_mom_15_sma_break_2_0` viene promosso a **Baseline ufficiale** di
+ETH-USD Signal.
 
-Ingresso:
+Il numero di versione resta un dettaglio interno al progetto:
 
-- condizioni storiche Baseline:
-  - `Close > SMA200`;
-  - `SMA50 > SMA200`;
-  - `RSI >= 40`;
-  - `Close > Close_7d_ago`;
-  - `Volume > VolumeAvg20`;
-- nuovo filtro sui soli nuovi ingressi:
-  - `RSI <= 65`.
+- la Baseline ufficiale usa internamente `model_version = 2.0`;
+- la precedente `model_version = 1.0` diventa la **vecchia baseline**;
+- Telegram, dashboard e report operativi non mostrano `v2` nel nome del modello.
 
-Nota operativa importante:
+## Regole ufficiali
 
-- `RSI <= 65` filtra solo i nuovi ingressi;
-- se la posizione e' gia' aperta e le vecchie condizioni di acquisto restano
-  vere, il sistema mantiene la posizione;
-- questo evita di trasformare il filtro ingresso in una falsa regola di uscita.
+### Acquisto
 
-Uscita:
+Un nuovo `ACQUISTA` richiede tutte le condizioni:
 
-- uscita ufficiale storica:
-  - `Close < SMA50`;
-- nuova uscita protettiva:
-  - trailing stop 8% dal massimo `Close` raggiunto da quando la posizione e'
-    aperta;
-  - il trailing vende solo se confermato da:
-    - momentum 7 giorni >= -5%;
-    - volume relativo >= +20%.
+1. `Close > SMA200`;
+2. `SMA50 > SMA200`;
+3. `40 <= RSI(14) <= 65`;
+4. `Close > Close.shift(7)`;
+5. `Volume ETH-USD > VolumeAvg20`.
 
-Variante non implementata:
+Le cinque regole di acquisto sono identiche a quelle della vecchia baseline.
+Il limite RSI 65 vale soltanto sui nuovi ingressi e non chiude una posizione.
 
-- `trade return >= 15%` come ulteriore conferma del trailing.
+### Vendita
 
-Motivo:
+`VENDI` richiede almeno una condizione:
 
-- migliora solo marginalmente;
-- dipende dal singolo caso 2023;
-- aumenta complessita' e rischio overfit.
+1. `Close < SMA50 * 0,98` nella candela corrente;
+2. perdita di almeno l'8% dal massimo Close post-ingresso e conferma simultanea:
+   momentum a 7 giorni `>= -15%` e volume relativo `>= +20%`.
 
-## File Modificati
+Rispetto alla vecchia baseline cambiano soltanto:
 
-- `strategy/signals.py`
-  - aggiunte costanti ufficiali del modello;
-  - aggiunto filtro `RSI <= 65` sui nuovi ingressi;
-  - aggiunto trailing stop 8% confermato da momentum e volume;
-  - aggiunte colonne diagnostiche:
-    - `Entry_RSI_Filter_Passed`;
-    - `Official_Sell`;
-    - `Trail8_Stop_Hit`;
-    - `Trail8_Confirmed`.
-- `reports/generate.py`
-  - aggiornate condizioni esposte in `status.json` e `live-status.json`.
-- `cloudflare-worker/src/worker.js`
-  - aggiornato testo `/conditions`;
-  - aggiornato fallback di condizioni buy/sell.
-- `tests/test_signal_rules.py`
-  - aggiunti test dedicati al nuovo filtro RSI;
-  - aggiunti test dedicati al trailing stop;
-  - aggiunto test regressione: `RSI <= 65` vale solo sui nuovi ingressi.
-- `tests/test_chart_data_json.py`
-- `tests/test_telegram_message.py`
-  - aggiornati layout condizioni e aspettative Telegram allora in uso.
+- la soglia SMA50, da `Close < SMA50` a `Close < SMA50 * 0,98`;
+- il momentum di conferma Trail8, da `-5%` a `-15%`.
 
-## Verifica Metriche
+Trailing 8%, conferma volume, precedenza della vendita, esposizione binaria e
+azione `MANTIENI STATO ATTUALE` restano invariati.
 
-Verifica locale su `data/indicators_with_signals.csv`, ricalcolando i segnali
-ufficiali fino alla candela `2026-06-27` e misurando il backtest in EUR:
+## Costi ed esecuzione
 
-| Metrica | Valore |
-|---|---:|
-| Annualizzato | +42,74% |
-| Max drawdown | -45,09% |
-| Sharpe | 1,079 |
-| Profit factor | 5,999 |
-| Operazioni | 28 |
-| Uscite Trail8 confermate | 4 |
+- segnale calcolato alla chiusura `t` e applicato al rendimento `t+1`;
+- commissione strategia: `0,6%` su ogni ingresso e uscita;
+- Buy & Hold: `0,6%` all'acquisto e `0,6%` alla vendita finale;
+- spread, slippage, imposte e rendimento cash: esclusi;
+- trade aperti al cutoff: esclusi da numero operazioni e win rate.
 
-Uscite Trail8 confermate:
+## Evidenza della promozione
 
-- `2020-09-04`;
-- `2021-09-07`;
-- `2023-04-20`;
-- `2024-03-15`.
+### Periodo completo 2016-2026
 
-Queste metriche coincidono con il candidato approvato nel gate decisionale.
+Con gli stessi dati Coinbase e commissione dello 0,6% per lato:
 
-## Test Eseguiti
+| Metrica | Vecchia baseline | Baseline ufficiale | Buy & Hold |
+|---|---:|---:|---:|
+| Rendimento totale | 12.080,48% | 56.672,64% | 23.431,28% |
+| Annualizzato | 64,61% | 93,12% | 76,25% |
+| Max drawdown | -51,57% | -43,00% | -94,01% |
+| Sharpe | 1,265 | 1,615 | 1,074 |
+| Trade completati | 36 | 30 | n/a |
 
-```powershell
-python -m py_compile strategy\signals.py reports\generate.py
-node --check cloudflare-worker\src\worker.js
-python -m unittest discover -s tests -v
-```
+### Periodo retrospettivo 2021-2026
 
-Risultato:
+| Metrica | Vecchia baseline | Baseline ufficiale | Buy & Hold |
+|---|---:|---:|---:|
+| Rendimento totale | 194,63% | 834,01% | 161,63% |
+| Annualizzato | 21,41% | 49,35% | 18,85% |
+| Max drawdown | -51,57% | -43,00% | -79,35% |
+| Sharpe | 0,672 | 1,197 | 0,610 |
 
-```text
-Ran 60 tests
-OK
-```
+Nel test con un'ulteriore candela di ritardo la Baseline ufficiale mantiene
+annualizzato 37,44%, drawdown -47,25% e Sharpe 0,983.
 
-Nota:
+Il Deflated Sharpe del candidato sul periodo cucito e 96,80%. Il PBO segnala
+invece instabilita nel ranking delle sole varianti di uscita, motivo per cui non
+viene adottata una riottimizzazione annuale. La regola fissa e piu semplice,
+mantiene i cinque ingressi originali e supera il candidato alternativo nel test
+di ritardo.
 
-- durante i test compare il warning noto sul download Yahoo non riuscito e
-  fallback al file storico temporaneo;
-- il warning non blocca i test.
-- dal 2026-07-19 il webhook FastAPI/Render storico e stato rimosso; il Worker
-  Cloudflare e l'unico backend Telegram. Questa modifica infrastrutturale non
-  cambia le regole o le metriche registrate in questo report.
+Queste analisi sono retrospettive. L'universo delle ipotesi e stato costruito
+dopo avere osservato la serie e non costituisce un vero futuro non visto.
 
-## Stato
+## Stato al cutoff
 
-La nuova Baseline ufficiale e' implementata nel codice.
+Alla candela conclusa `2026-07-26`:
 
-Prossimo passo:
+- azione Baseline ufficiale: `MANTIENI STATO ATTUALE`;
+- esposizione ricostruita: `0%`;
+- ultima vendita effettiva: `2026-07-09`;
+- l'attivazione non richiede un acquisto o una vendita immediata.
 
-- commit e push delle modifiche;
-- dopo il push, monitorare il prossimo run operativo per verificare
-  `status.json`, `live-status.json`, dashboard e Telegram.
+## Artefatti e reversibilita
+
+- Baseline ufficiale: `docs/runs/baseline-v2-2026-07-26/`;
+- vecchia baseline: `docs/runs/baseline-v1-2026-07-26/`;
+- snapshot Coinbase condiviso SHA-256:
+  `09504484b0d115c6b130dbfc82f05f5dc9137ce11b1cf12604f9a1c96132c357`;
+- il manifest e gli artefatti della vecchia baseline non sono stati modificati;
+- il rollback richiede il ripristino del tag storico e del relativo manifest,
+  non la riscrittura della Baseline ufficiale.
+
+## Componenti allineati
+
+- `strategy/signals.py`: soglie e stato posizione;
+- `backtest/backtest.py`: commissioni strategia e Buy & Hold;
+- `reports/generate.py` e `reports/publication.py`: etichette e manifest;
+- `cloudflare-worker/src/worker.js`: testo `/conditions`;
+- `tests/`: confini delle soglie, costi, manifest e riproducibilita;
+- `README.md`, `DOCUMENTATION/` e `REPRODUCIBILITY.md`: contratto corrente.
+
+## Riferimenti
+
+- `reports/condition_ablation_coinbase_0_6.md`;
+- `reports/walk_forward_coinbase_0_6.md`;
+- `reports/coinbase_fee_0_6_comparison.md`;
+- `DOCUMENTATION/DECISION_LOG.md`.

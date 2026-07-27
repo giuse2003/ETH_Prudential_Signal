@@ -46,6 +46,10 @@ class PublicationBundleTests(unittest.TestCase):
                 provenance={"input_candles_sha256": raw_hash},
                 artifact_names=["raw_candles.csv", "status.json", "live-status.json", "chart-data.json"],
             )
+            manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["rules"]["sell"][0], "Close < SMA50 * 0.98")
+            self.assertIn("momentum 7d >= -15%", manifest["rules"]["sell"][1])
+            self.assertIn("0.6% per lato", manifest["rules"]["transaction_costs"])
             validate_bundle(root)
 
 

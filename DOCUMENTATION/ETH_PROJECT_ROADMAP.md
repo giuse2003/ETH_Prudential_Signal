@@ -21,18 +21,20 @@ ogni avanzamento rilevante.
   `https://eth-prudential-signal.giuse2003.workers.dev/`
 - Bot Telegram ETH dedicato creato e collegato via webhook:
   `@ETH_Prudential_Signal_bot`
-- Test Python: 60 test passati nell'ultima verifica completa di promozione
-  modello.
-- Nuova Baseline ufficiale promossa il 2026-06-28:
-  - ingresso storico + `RSI <= 65` sui nuovi ingressi;
-  - vendita sotto SMA50 oppure `Trail8 -5 / vol +20`.
+- Test Python: suite completa e riproduzione offline obbligatorie in CI.
+- Baseline ufficiale promossa il 2026-07-27:
+  - cinque condizioni di acquisto invariate;
+  - vendita `Close < SMA50 * 0,98` oppure
+    `Trail8 / momentum >= -15% / volume >= +20%`;
+  - commissione backtest 0,6% per lato.
 - Ultima verifica modello registrata in
   `reports/official_baseline_implementation.md`.
 - Contratto dati corrente:
   - `ETH-USD` e' il mercato del modello per segnali e backtest operativo;
   - Coinbase Advanced Trade e l'unica fonte runtime;
   - `ETH-EUR` resta soltanto spot informativo;
-  - la baseline ETH v1 e congelata al `2026-07-26` con manifest/hash/reproduce;
+  - la Baseline ufficiale e congelata internamente come `v2` al `2026-07-26`;
+  - la `v1` resta la vecchia baseline immutabile;
   - il run operativo viene pubblicato come pacchetto coerente con `run_id`.
 
 ## Problemi Riscontrati

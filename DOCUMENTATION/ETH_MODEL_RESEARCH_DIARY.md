@@ -2976,3 +2976,55 @@ Decisione modello:
   transazionale e riproduzione offline byte per byte.
 - Dashboard, Telegram e Worker consumano gli output della pipeline unica; il
   Worker non contiene piu formule del modello.
+
+## Promozione 2026-07-27 - Nuova Baseline ufficiale
+
+Obiettivo:
+
+- verificare se una o piu condizioni potessero migliorare rendimento, drawdown
+  e Sharpe senza cambiare i cinque ingressi approvati;
+- usare Coinbase `ETH-USD` e commissione massima 0,6% per lato;
+- applicare i test all'intera storia disponibile invece di attendere 12 mesi.
+
+Protocollo:
+
+- ablation di condizioni e griglie locali;
+- audit evento per evento e trade per trade;
+- walk-forward annuale expanding dal 2021 al 2026;
+- confronto con Buy & Hold;
+- stress con una candela extra di ritardo;
+- PBO/CSCV e Deflated Sharpe;
+- 285 definizioni e 134 percorsi di segnale distinti.
+
+Decisione:
+
+- promuovere il candidato fisso
+  `combo_trail_mom_15_sma_break_2_0`;
+- mantenere invariate tutte le condizioni di acquisto;
+- cambiare l'uscita SMA50 in `Close < SMA50 * 0,98`;
+- cambiare la conferma momentum Trail8 da `>= -5%` a `>= -15%`;
+- mantenere Trail8 all'8% e volume relativo `>= +20%`;
+- non adottare la selezione annuale, perche non migliora lo Sharpe del candidato
+  fisso e presenta ranking meno stabile.
+
+Risultato sul periodo completo 2016-2026, commissione 0,6%:
+
+- rendimento totale 56.672,64%;
+- annualizzato 93,12%;
+- max drawdown -43,00%;
+- Sharpe 1,615;
+- 30 trade completati.
+
+Versionamento:
+
+- il numero `v2` resta interno a manifest, tag e directory;
+- nei messaggi pubblici la strategia viene chiamata Baseline ufficiale;
+- `v1` diventa la vecchia baseline e resta immutabile;
+- alla candela 2026-07-26 entrambe sono fuori mercato, quindi la promozione non
+  genera un'operazione immediata.
+
+Riferimenti:
+
+- `reports/condition_ablation_coinbase_0_6.md`;
+- `reports/walk_forward_coinbase_0_6.md`;
+- `reports/official_baseline_implementation.md`.

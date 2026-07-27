@@ -4,7 +4,13 @@ import unittest
 
 import pandas as pd
 
-from strategy.signals import build_live_signal_frame, compute_signals, live_condition_statuses
+from strategy.signals import (
+    SMA50_BREAK_PCT,
+    TRAILING_MOMENTUM_MIN,
+    build_live_signal_frame,
+    compute_signals,
+    live_condition_statuses,
+)
 
 
 class SignalRulesTests(unittest.TestCase):
@@ -44,7 +50,7 @@ class SignalRulesTests(unittest.TestCase):
         self.assertEqual(result.iloc[-1]["Segnale"], "ACQUISTA")
         self.assertTrue(result.iloc[-1]["Entry_RSI_Filter_Passed"])
 
-    def test_price_below_sma50_triggers_sell_signal(self) -> None:
+    def test_price_more_than_two_percent_below_sma50_triggers_sell(self) -> None:
         df = pd.DataFrame(
             {
                 "Close": [120.0, 119.0],
@@ -61,22 +67,24 @@ class SignalRulesTests(unittest.TestCase):
 
         self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
 
-    def test_single_close_below_sma50_triggers_sell_signal(self) -> None:
+    def test_price_inside_two_percent_sma50_margin_does_not_sell(self) -> None:
         df = pd.DataFrame(
             {
-                "Close": [132.0, 119.0],
-                "SMA50": [130.0, 128.0],
-                "SMA200": [100.0, 100.0],
-                "RSI": [55.0, 56.0],
-                "Volume": [800.0, 850.0],
-                "VolumeAvg20": [1000.0, 1000.0],
-                "Close_7d_ago": [110.0, 111.0],
+                "Close": [99.0],
+                "SMA50": [100.0],
+                "SMA200": [80.0],
+                "RSI": [35.0],
+                "Volume": [800.0],
+                "VolumeAvg20": [1000.0],
+                "Close_7d_ago": [100.0],
             }
         )
 
         result = compute_signals(df)
 
-        self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
+        self.assertEqual(SMA50_BREAK_PCT, 0.02)
+        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI STATO ATTUALE")
+        self.assertFalse(result.iloc[-1]["Official_Sell"])
 
     def test_trailing_stop_confirmed_triggers_sell_signal(self) -> None:
         df = pd.DataFrame(
@@ -97,6 +105,46 @@ class SignalRulesTests(unittest.TestCase):
         self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
         self.assertTrue(result.iloc[-1]["Trail8_Stop_Hit"])
         self.assertTrue(result.iloc[-1]["Trail8_Confirmed"])
+
+    def test_trailing_accepts_ten_percent_negative_momentum(self) -> None:
+        df = pd.DataFrame(
+            {
+                "Close": [100.0, 120.0, 108.0],
+                "SMA50": [90.0, 95.0, 100.0],
+                "SMA200": [80.0, 80.0, 80.0],
+                "RSI": [55.0, 55.0, 55.0],
+                "Volume": [2000.0, 900.0, 1500.0],
+                "VolumeAvg20": [1000.0, 1000.0, 1000.0],
+                "Close_7d_ago": [95.0, 110.0, 120.0],
+            },
+            index=pd.date_range("2026-01-01", periods=3, freq="D"),
+        )
+
+        result = compute_signals(df)
+
+        self.assertEqual(TRAILING_MOMENTUM_MIN, -0.15)
+        self.assertEqual(result.iloc[-1]["Segnale"], "VENDI")
+        self.assertTrue(result.iloc[-1]["Trail8_Confirmed"])
+
+    def test_trailing_rejects_momentum_below_minus_fifteen_percent(self) -> None:
+        df = pd.DataFrame(
+            {
+                "Close": [100.0, 120.0, 100.8],
+                "SMA50": [90.0, 95.0, 100.0],
+                "SMA200": [80.0, 80.0, 80.0],
+                "RSI": [55.0, 55.0, 55.0],
+                "Volume": [2000.0, 900.0, 1500.0],
+                "VolumeAvg20": [1000.0, 1000.0, 1000.0],
+                "Close_7d_ago": [95.0, 110.0, 120.0],
+            },
+            index=pd.date_range("2026-01-01", periods=3, freq="D"),
+        )
+
+        result = compute_signals(df)
+
+        self.assertTrue(result.iloc[-1]["Trail8_Stop_Hit"])
+        self.assertFalse(result.iloc[-1]["Trail8_Confirmed"])
+        self.assertEqual(result.iloc[-1]["Segnale"], "MANTIENI STATO ATTUALE")
 
     def test_rsi_filter_applies_only_to_new_entries_not_existing_position_holds(self) -> None:
         df = pd.DataFrame(

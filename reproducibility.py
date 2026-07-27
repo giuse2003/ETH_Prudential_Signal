@@ -106,6 +106,7 @@ def compute_baseline(candles: pd.DataFrame, initial_capital: float = 1.0) -> Bas
     equity, strategy_metrics, buy_hold_metrics = run_backtest(
         signals[["Close", "Segnale"]],
         initial_capital=initial_capital,
+        transaction_cost_rate=CFG.transaction_cost_rate,
     )
     period = {
         "coinbase_history_start": candles.index[0].strftime("%Y-%m-%d"),
@@ -173,21 +174,22 @@ def _formulas() -> dict:
         },
         "actions": {
             "buy": "new entry only when Close>SMA200 and SMA50>SMA200 and 40<=RSI14<=65 and Close>Close.shift(7) and Volume>VolumeAvg20",
-            "sell": "Close<SMA50 OR stateful trailing stop 8% from post-entry peak confirmed by momentum7>=-5% and relative volume>=20%",
+            "sell": "Close<SMA50*0.98 OR stateful trailing stop 8% from post-entry peak confirmed by momentum7>=-15% and relative volume>=20%",
             "precedence": "sell, then buy, otherwise MANTIENI STATO ATTUALE",
         },
         "backtest": {
             "desired_exposure": "ACQUISTA=1; VENDI=0; hold=forward-fill previous exposure; initial=0",
             "effective_exposure": "desired_exposure.shift(1); initial=0",
             "eth_return": "Close.pct_change()",
-            "strategy_return": "effective_exposure * eth_return",
+            "strategy_return": "effective_exposure * eth_return - turnover * 0.006",
             "equity": "cumprod(1 + daily_return)",
-            "buy_and_hold": "Close / first Close on the evaluation period",
+            "buy_and_hold": "Close / first Close, with 0.6% purchase fee and 0.6% final sale fee",
             "annualized_return": "(final_equity/initial_equity) ** (365/(observations-1)) - 1",
             "max_drawdown": "min(equity/equity.cummax() - 1)",
             "sharpe": "sqrt(365) * mean(daily_return) / sample_std(daily_return, ddof=1); risk-free=0",
             "trades": "only completed 0-to-long-to-0 positions; open final position excluded",
-            "fees_slippage_taxes": "excluded",
+            "fees": "0.6% per side included for strategy and Buy & Hold",
+            "slippage_spread_taxes_cash_yield": "excluded",
         },
     }
 
@@ -276,6 +278,27 @@ def _verify_environment(manifest: dict) -> None:
         raise RuntimeError(f"Dipendenze diverse dal baseline: {installed}")
 
 
+def verify_frozen_artifacts(manifest_path: str | Path) -> dict:
+    """Verifica l'integrita di un pacchetto senza rieseguirne il codice storico."""
+    manifest_path = Path(manifest_path).resolve()
+    run_dir = manifest_path.parent
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("run_type") != "frozen-baseline":
+        raise ValueError("Il manifest non descrive un baseline congelato.")
+    for name, info in manifest["artifacts"].items():
+        if sha256_file(run_dir / info["path"]) != info["sha256"]:
+            raise RuntimeError(f"Artefatto pubblicato non valido: {name}")
+    snapshot = manifest["input"]["snapshot"]
+    if sha256_file(run_dir / snapshot) != manifest["input"]["snapshot_sha256"]:
+        raise RuntimeError("Lo snapshot Coinbase non coincide con il manifest.")
+    return {
+        "run_id": manifest["run_id"],
+        "period": manifest["period"],
+        "metrics": manifest["metrics"],
+        "verified_artifacts": list(manifest["artifacts"]),
+    }
+
+
 def verify_frozen_run(
     manifest_path: str | Path,
     *,
@@ -296,9 +319,7 @@ def verify_frozen_run(
     for name, expected_hash in manifest["source"]["files"].items():
         if sha256_source_file(project_root / name) != expected_hash:
             raise RuntimeError(f"Sorgente modificato rispetto al baseline: {name}")
-    for name, info in manifest["artifacts"].items():
-        if sha256_file(run_dir / info["path"]) != info["sha256"]:
-            raise RuntimeError(f"Artefatto pubblicato non valido: {name}")
+    verify_frozen_artifacts(manifest_path)
 
     candles = pd.read_csv(
         run_dir / manifest["input"]["snapshot"],

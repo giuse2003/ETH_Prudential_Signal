@@ -12,8 +12,8 @@
 
 - [ ] Sono presenti esattamente cinque condizioni `ACQUISTA` e due `VENDI`.
 - [ ] RSI 65 limita solo i nuovi ingressi.
-- [ ] `Close < SMA50` vende dopo una candela.
-- [ ] Il trailing 8% conserva le conferme momentum/volume.
+- [ ] `Close < SMA50 * 0,98` vende dopo una candela.
+- [ ] Il trailing 8% richiede momentum 7 giorni `>= -15%` e volume relativo `>= +20%`.
 - [ ] La vendita ha precedenza.
 - [ ] Le sole azioni sono `ACQUISTA`, `MANTIENI STATO ATTUALE`, `VENDI`.
 
@@ -32,6 +32,7 @@
 - [ ] I test sono verdi.
 - [ ] `reproduce.py` riesce offline da checkout pulito.
 - [ ] Il tag della baseline coincide con il manifest e non viene spostato.
+- [ ] La vecchia baseline e il relativo tag restano immutati.
 
 ## Pubblicazione
 

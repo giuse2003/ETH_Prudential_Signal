@@ -90,7 +90,9 @@ def run_pipeline(
     signals_all = compute_signals(compute_all_indicators(candles))
     evaluated = evaluation_frame(signals_all)
     equity, strategy_metrics, buy_hold_metrics = run_backtest(
-        evaluated[["Close", "Segnale"]], initial_capital=initial_capital
+        evaluated[["Close", "Segnale"]],
+        initial_capital=initial_capital,
+        transaction_cost_rate=CFG.transaction_cost_rate,
     )
 
     usd_market = fetch_product_snapshot(CFG.product_id)
