@@ -1,9 +1,9 @@
 {
-  "run_id": "20260727T135020Z-b654e035",
-  "generated_at_utc": "2026-07-27T13:50:20.777037+00:00",
+  "run_id": "20260727T191755Z-2af6b28b",
+  "generated_at_utc": "2026-07-27T19:17:55.125373+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
-  "model_version": "1.0",
+  "model_version": "2.0",
   "data_source": "Coinbase Advanced Trade",
   "market": "ETH-USD",
   "timezone": "UTC",
@@ -47,11 +47,11 @@
     ],
     "sell": [
       {
-        "label": "prezzo sotto SMA50",
+        "label": "prezzo oltre il 2% sotto SMA50",
         "passed": false
       },
       {
-        "label": "trailing stop 8% confermato da momentum e volume",
+        "label": "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
         "passed": false
       }
     ]

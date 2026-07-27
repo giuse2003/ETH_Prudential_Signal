@@ -1,9 +1,9 @@
 {
-  "run_id": "20260727T135020Z-b654e035",
-  "generated_at_utc": "2026-07-27T13:50:20.777037+00:00",
+  "run_id": "20260727T191755Z-2af6b28b",
+  "generated_at_utc": "2026-07-27T19:17:55.125373+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
-  "model_version": "1.0",
+  "model_version": "2.0",
   "data_source": "Coinbase Advanced Trade",
   "market": "ETH-USD",
   "timezone": "UTC",
@@ -24,42 +24,43 @@
       "Volume ETH-USD > media 20 giorni"
     ],
     "sell": [
-      "Close < SMA50",
-      "Trailing stop 8% dal massimo post-ingresso, confermato da momentum 7d >= -5% e volume relativo >= 20%"
+      "Close < SMA50 * 0.98",
+      "Trailing stop 8% dal massimo post-ingresso, confermato da momentum 7d >= -15% e volume relativo >= 20%"
     ],
     "sell_precedence": true,
     "execution_delay_days": 1,
     "exposure": "0% o 100%; MANTIENI STATO ATTUALE conserva l'esposizione",
-    "fees_and_slippage": "non inclusi"
+    "transaction_costs": "0.6% per lato inclusi per strategia e Buy & Hold",
+    "slippage_spread_taxes_cash_yield": "non inclusi"
   },
   "metrics": {
     "strategy": {
-      "total_return": 186.63524277301624,
-      "annualized_return": 0.7215842468567129,
-      "max_drawdown": -0.45887949067964284,
-      "num_operations": 36,
-      "win_rate": 0.3611111111111111,
-      "sharpe_ratio": 1.3573838337263227,
-      "profit_factor": 14.00916695086703,
-      "average_trade_return": 0.39424955105121134,
-      "median_trade_return": -0.025111687816280315,
-      "average_win": 1.175690962121947,
-      "average_loss": -0.04743472477137823,
-      "best_trade": 8.673305588585027,
-      "worst_trade": -0.10685045699484963,
-      "average_trade_days": 25.555555555555557,
-      "median_trade_days": 11.0,
-      "exposure_ratio": 0.26151222285389425,
-      "turnover": 72.0,
-      "transaction_cost_rate": 0.0
+      "total_return": 566.7264499626586,
+      "annualized_return": 0.9312080082742844,
+      "max_drawdown": -0.4299646722120246,
+      "num_operations": 30,
+      "win_rate": 0.5,
+      "sharpe_ratio": 1.6148009161043904,
+      "profit_factor": 14.94397361521486,
+      "average_trade_return": 0.4913615587843692,
+      "median_trade_return": -0.005016367113274911,
+      "average_win": 1.0531996649781832,
+      "average_loss": -0.07047654740944485,
+      "best_trade": 8.62812021482895,
+      "worst_trade": -0.12876755547893204,
+      "average_trade_days": 31.633333333333333,
+      "median_trade_days": 28.0,
+      "exposure_ratio": 0.26975554292211484,
+      "turnover": 60.0,
+      "transaction_cost_rate": 0.006
     },
     "buy_and_hold": {
-      "total_return": 237.16219512195124,
-      "annualized_return": 0.7647197288654111,
+      "total_return": 234.31282261951222,
+      "annualized_return": 0.7625167394094554,
       "max_drawdown": -0.940116304238034,
       "num_operations": 0,
       "win_rate": 0.0,
-      "sharpe_ratio": 1.0755007254180986,
+      "sharpe_ratio": 1.073996567087056,
       "profit_factor": null,
       "average_trade_return": null,
       "median_trade_return": null,
@@ -70,12 +71,12 @@
       "average_trade_days": null,
       "median_trade_days": null,
       "exposure_ratio": 1.0,
-      "turnover": 0.0,
-      "transaction_cost_rate": 0.0
+      "turnover": 2.0,
+      "transaction_cost_rate": 0.006
     }
   },
   "provenance": {
-    "source_commit": "a64dbdc5f0b6933bdc0bf4b4e3eb48b2716aa85a",
+    "source_commit": "788f5adf972423a3466e2e2001bef84ff7ab89f3",
     "python": "3.13.0",
     "dependencies": {
       "numpy": "2.4.6",
@@ -89,7 +90,7 @@
     "input_first_candle": "2016-05-23",
     "input_last_candle": "2026-07-26",
     "historical_cache_allowed": true,
-    "frozen_baseline_manifest": "runs/baseline-v1-2026-07-26/manifest.json"
+    "frozen_baseline_manifest": "runs/baseline-v2-2026-07-26/manifest.json"
   },
   "artifacts": {
     "raw_candles.csv": {
@@ -99,38 +100,38 @@
     },
     "status.json": {
       "path": "status.json",
-      "sha256": "8494aea01cffd902f8783a2f97a6f3a35ddc484cfcd8cb7a88a6e1239b3ef6a1",
-      "bytes": 1405
+      "sha256": "7052aa4d92a28f7bbc920dc551ed532c2e4afc3d37038b7e5f3b7d72b9d1cd29",
+      "bytes": 1436
     },
     "live-status.json": {
       "path": "live-status.json",
-      "sha256": "15c60c01b84752873638e55914f3f829bd062a1d9cd166711c722611fff20558",
-      "bytes": 1334
+      "sha256": "fa9d5eb79b508ccbbb2e7fce7abf6fc5b0df1ba2d27b87cb7aac122b20102c68",
+      "bytes": 1349
     },
     "chart-data.json": {
       "path": "chart-data.json",
-      "sha256": "82917df644f6b2dd76d958549d7a1e179a835dc123a49e4dcf3f783be714585f",
-      "bytes": 806977
+      "sha256": "a812a1cbe44c9b56201bd8fe3cf6c199600368650f1d4e57e5ac259df992dcbd",
+      "bytes": 809696
     },
     "historical_signals.csv": {
       "path": "historical_signals.csv",
-      "sha256": "4d1ea2b05edbf5a1fe29b911b62fab610d9ba1492dd651db53cd9f7a1cedbc7b",
-      "bytes": 636813
+      "sha256": "51e57c3fd6a1a10aec601f6ea63e54e3e67502247ef8261119e416e1ec14908a",
+      "bytes": 639731
     },
     "equity_timeseries.csv": {
       "path": "equity_timeseries.csv",
-      "sha256": "b609713865c7c18d0adb0fea1220a7cb0402f276d19deb658bc122bc24d88919",
-      "bytes": 301542
+      "sha256": "730ad8791d746071ff4098a5145c062603550d8fd9767ea7c13b42e43be42b1a",
+      "bytes": 300551
     },
     "report.txt": {
       "path": "report.txt",
-      "sha256": "5d02ea9250e76ca16e925bc5248e8a0959d332989800f9c8a3882e4ba8db4d4b",
-      "bytes": 795
+      "sha256": "3c2df7777d809cc818e0ad39f40c6e0270ae014c306df439cb7fc609a778352c",
+      "bytes": 823
     },
     "price_sma_signals.png": {
       "path": "price_sma_signals.png",
-      "sha256": "9eb59e9ef0065057b69f884810ef1488a9ed0d7cdc0b79f9a8f32766e91ec5b8",
-      "bytes": 235522
+      "sha256": "91146377c7c4d16c321e7ae36b0927a3c7972e2b590eb82c86a52494a5c1ee69",
+      "bytes": 234066
     }
   }
 }
