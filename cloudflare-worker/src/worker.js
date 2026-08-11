@@ -272,6 +272,8 @@ function formatMonitorMessage(signal, priceEur, conditionGroups, title = "ETH-US
     "(per le condizioni: /conditions)",
     "",
     ...formatSignalConditions(conditionGroups),
+    "",
+    "🔗 Dashboard: https://giuse2003.github.io/ETH_Prudential_Signal/"
   ].join("\n");
 }
 

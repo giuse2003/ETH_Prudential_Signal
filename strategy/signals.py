@@ -291,6 +291,8 @@ def format_condition_message(
             "",
             "VENDI:",
             *_format_condition_numbers(sell_statuses),
+            "",
+            "🔗 Dashboard: https://giuse2003.github.io/ETH_Prudential_Signal/",
         ]
     )
 
