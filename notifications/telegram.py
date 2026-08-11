@@ -26,6 +26,7 @@ def format_condition_message(
     buy_statuses: list[bool],
     sell_statuses: list[bool],
     title: str = "ETH-USD Signal - LIVE PREVIEW",
+    include_dashboard_link: bool = False,
 ) -> str:
     """Formatta il messaggio LIVE con le icone Telegram approvate."""
     if price_eur is None:
@@ -39,7 +40,7 @@ def format_condition_message(
             for index, passed in enumerate(statuses, start=1)
         ]
 
-    return "\n".join(
+    message = "\n".join(
         [
             title,
             "",
@@ -57,6 +58,15 @@ def format_condition_message(
             *condition_lines(sell_statuses),
         ]
     )
+    if include_dashboard_link:
+        message = "\n".join(
+            [
+                message,
+                "",
+                "🔗 <a href=\"https://giuse2003.github.io/ETH_Prudential_Signal/\">Apri la Dashboard</a>",
+            ]
+        )
+    return message
 
 
 def format_monitor_message(
@@ -169,4 +179,3 @@ def extract_authorized_commands(
 
     next_offset = max(update_ids) + 1 if update_ids else None
     return commands, next_offset
-

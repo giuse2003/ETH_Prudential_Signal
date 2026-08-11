@@ -155,6 +155,7 @@ def main() -> None:
                 buy_statuses=result.buy_statuses,
                 sell_statuses=result.sell_statuses,
                 title="ETH-USD Signal - LIVE PREVIEW",
+                include_dashboard_link=True,
             )
             send_telegram_message(
                 TelegramConfig(bot_token=bot_token, chat_id=admin_chat_id), message

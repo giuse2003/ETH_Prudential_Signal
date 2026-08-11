@@ -45,6 +45,7 @@ class HourlyMonitorNotificationTests(unittest.TestCase):
         self.assertNotIn("should_notify", source)
         self.assertNotIn("ETH MONITOR DAILY!", source)
         self.assertIn("title=\"ETH-USD Signal - LIVE PREVIEW\"", source)
+        self.assertIn("include_dashboard_link=True", source)
         self.assertNotIn("DAILY!", source)
 
     def test_local_analysis_does_not_send_telegram_messages(self) -> None:

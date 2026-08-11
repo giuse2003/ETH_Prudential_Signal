@@ -5,6 +5,7 @@ import unittest
 import pandas as pd
 
 from notifications.telegram import format_condition_message as format_runtime_condition_message
+from notifications.telegram import format_monitor_message
 from strategy.signals import format_telegram_message
 
 
@@ -54,6 +55,28 @@ class RuntimeTelegramMessageTests(unittest.TestCase):
         self.assertIn("ETH-EUR non disponibile", message)
         self.assertIn("VENDI:\n✅ 1.\n🅾️ 2.", message)
 
+    def test_condition_message_can_include_dashboard_link(self) -> None:
+        message = format_runtime_condition_message(
+            signal="VENDI",
+            price_eur=1871.44,
+            buy_statuses=[False] * 5,
+            sell_statuses=[True, False],
+            include_dashboard_link=True,
+        )
+
+        self.assertIn("https://giuse2003.github.io/ETH_Prudential_Signal/", message)
+        self.assertIn("Apri la Dashboard", message)
+
+    def test_monitor_message_includes_dashboard_link(self) -> None:
+        message = format_monitor_message(
+            signal="MANTIENI STATO ATTUALE",
+            risk_level="ALTO",
+            price_eur=1871.44,
+        )
+
+        self.assertIn("https://giuse2003.github.io/ETH_Prudential_Signal/", message)
+        self.assertIn("Apri la Dashboard", message)
+
 
 class FrozenStrategyTelegramMessageTests(unittest.TestCase):
     def test_message_uses_compact_condition_layout(self) -> None:
@@ -97,8 +120,6 @@ class FrozenStrategyTelegramMessageTests(unittest.TestCase):
                     "VENDI:",
                     "🟩 1.",
                     "🟥 2.",
-                    "",
-                    "🔗 <a href=\"https://giuse2003.github.io/ETH_Prudential_Signal/\">Apri la Dashboard</a>",
                 ]
             ),
         )
