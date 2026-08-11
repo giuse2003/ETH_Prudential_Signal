@@ -273,7 +273,7 @@ function formatMonitorMessage(signal, priceEur, conditionGroups, title = "ETH-US
     "",
     ...formatSignalConditions(conditionGroups),
     "",
-    "🔗 Dashboard: https://giuse2003.github.io/ETH_Prudential_Signal/"
+    "🔗 <a href=\"https://giuse2003.github.io/ETH_Prudential_Signal/\">Apri la Dashboard</a>"
   ].join("\n");
 }
 
@@ -418,6 +418,7 @@ async function sendTelegramMessage(env, chatId, text) {
         chat_id: chatId,
         text,
         disable_web_page_preview: true,
+        parse_mode: "HTML",
       }),
     },
   );
