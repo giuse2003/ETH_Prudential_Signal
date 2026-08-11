@@ -91,6 +91,8 @@ def format_monitor_message(
             "",
             "Indicazione:",
             indication,
+            "",
+            "🔗 <a href=\"https://giuse2003.github.io/ETH_Prudential_Signal/\">Apri la Dashboard</a>",
         ]
     )
 
