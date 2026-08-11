@@ -19,7 +19,7 @@
       "pipeline.py": "61115ea6af23f53849409c174ad61cd2d978c14de27d05efd5e499fb8de30418",
       "reports/generate.py": "487f9f7997e75f4eac5769f466107d601b22b2b44e3e2dcc97e96e4b6b4a8442",
       "reproducibility.py": "80edc0f3f79005376b51b6034e9847e7048b0dfa16a3ecf6f2ac7ab26886b0bb",
-      "strategy/signals.py": "9edd001d5cc2d4c8152424365208d4ff89db3c3ddb87972e714a4e21cee80c32"
+      "strategy/signals.py": "36e41405e6a197836bff9f4953b9657e6c398cae77b5668bdad67ad73f73e855"
     }
   },
   "environment": {

@@ -40,8 +40,6 @@ class RuntimeTelegramMessageTests(unittest.TestCase):
                     "VENDI:",
                     "🅾️ 1.",
                     "🅾️ 2.",
-                    "",
-                    "🔗 <a href=\"https://giuse2003.github.io/ETH_Prudential_Signal/\">Apri la Dashboard</a>",
                 ]
             ),
         )
