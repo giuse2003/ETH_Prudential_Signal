@@ -1,6 +1,6 @@
 {
-  "run_id": "20260813T092317Z-6f5ab0f8",
-  "generated_at_utc": "2026-08-13T09:23:17.957734+00:00",
+  "run_id": "20260813T103527Z-3ba02299",
+  "generated_at_utc": "2026-08-13T10:35:27.868567+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "2.0",
@@ -9,14 +9,14 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 1884.35,
-  "price_eur": 1634.42,
-  "volume_24h_eth": 64554.85344132,
+  "price_usd": 1881.01,
+  "price_eur": 1631.11,
+  "volume_24h_eth": 61646.64949735,
   "status": "Attivo",
-  "rsi": 51.66760290193635,
-  "sma50": 1817.7956,
-  "sma200": 2029.40285,
-  "atr": 51.75786282044742,
+  "rsi": 51.13241289526278,
+  "sma50": 1817.7287999999999,
+  "sma200": 2029.3861500000003,
+  "atr": 51.519291391875996,
   "risk_level": "ALTO",
   "condition_groups": {
     "buy": [
@@ -38,7 +38,7 @@
       },
       {
         "label": "volume ETH-USD live sopra media 20 giorni",
-        "passed": true
+        "passed": false
       }
     ],
     "sell": [
