@@ -1,6 +1,6 @@
 {
-  "run_id": "20260812T233932Z-cb0c0981",
-  "generated_at_utc": "2026-08-12T23:39:32.704454+00:00",
+  "run_id": "20260813T004337Z-eaabd067",
+  "generated_at_utc": "2026-08-13T00:43:37.766513+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "2.0",
@@ -8,20 +8,20 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "DAILY",
-  "candle_date": "2026-08-11",
+  "candle_date": "2026-08-12",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 1880.72,
+  "price_usd": 1877.59,
   "price_eur": null,
   "status": "Attivo",
   "risk_level": "ALTO",
-  "rsi": 51.0697169275102,
-  "sma50": 1808.2520000000002,
-  "sma200": 2039.4088499999998,
-  "atr": 55.41071664383251,
-  "volume_eth": 61108.79920688,
-  "volume_avg20_eth": 66250.6839312025,
-  "previous_close": 1871.44,
-  "previous_sma50": 1805.1606,
+  "rsi": 50.571981442697236,
+  "sma50": 1812.503,
+  "sma200": 2034.0525,
+  "atr": 55.21923688355876,
+  "volume_eth": 61807.14029078,
+  "volume_avg20_eth": 64374.014269439,
+  "previous_close": 1880.72,
+  "previous_sma50": 1808.2520000000002,
   "condition_groups": {
     "buy": [
       {
@@ -38,7 +38,7 @@
       },
       {
         "label": "prezzo sopra quello di 7 giorni prima",
-        "passed": true
+        "passed": false
       },
       {
         "label": "volume ETH-USD sopra media 20 giorni",
