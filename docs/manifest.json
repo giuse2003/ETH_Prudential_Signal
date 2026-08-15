@@ -1,6 +1,6 @@
 {
-  "run_id": "20260815T042526Z-e31021c7",
-  "generated_at_utc": "2026-08-15T04:25:26.660408+00:00",
+  "run_id": "20260815T045610Z-45204992",
+  "generated_at_utc": "2026-08-15T04:56:10.638343+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "2.0",
@@ -76,7 +76,7 @@
     }
   },
   "provenance": {
-    "source_commit": "6e44ff510d493517d36ca794dd48ea6670a3e1f3",
+    "source_commit": "fb45c182c6403a5eddbff231aba067592acde0e7",
     "python": "3.13.0",
     "dependencies": {
       "numpy": "2.4.6",
@@ -100,17 +100,17 @@
     },
     "status.json": {
       "path": "status.json",
-      "sha256": "23dee04ce1c99c50eec9fee815bb6d8768a2ed225f1de937cb67e19283ec9211",
+      "sha256": "dcaa05a00e814e885204e6c6246c4409a53cac16b3336a80500777afa0598820",
       "bytes": 1455
     },
     "live-status.json": {
       "path": "live-status.json",
-      "sha256": "11fb344080892e4d5f0794a68157bf573fafdb539e3932401bdfc4a6d04b1ac9",
-      "bytes": 1349
+      "sha256": "792f4dd75dff00014b29947e483164555d9ac8a4e12cc9248d525f05d4ee1157",
+      "bytes": 1369
     },
     "chart-data.json": {
       "path": "chart-data.json",
-      "sha256": "705657d2675da04827c5f5f2a138ea0ae2974cbf1af94bb3b624bf027545d619",
+      "sha256": "5f5622c4cdcad637de9cb1d43584b93453c43365a2b68cc85d2fb994e7d96fc6",
       "bytes": 814194
     },
     "historical_signals.csv": {
@@ -125,7 +125,7 @@
     },
     "report.txt": {
       "path": "report.txt",
-      "sha256": "1762beb3ab99d3c5740d7bb6ea7e5f20b34923994ca319e346059b655a0f56d5",
+      "sha256": "839c3ba904d622872661cfcb8d4275c4b41d169ab5d05b561b7414ad3246a6e8",
       "bytes": 823
     },
     "price_sma_signals.png": {
