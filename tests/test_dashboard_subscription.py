@@ -54,10 +54,14 @@ class DashboardSubscriptionTests(unittest.TestCase):
     def test_live_chart_uses_same_rsi_snapshot_as_live_conditions(self) -> None:
         self.assertIn("function withLiveIndicators", self.javascript)
         self.assertIn("rsi: nullableNumber(botData.rsi)", self.javascript)
+        self.assertIn("volume: nullableNumber(botData.volume_24h_eth)", self.javascript)
+        self.assertIn("closedVolumes.reduce", self.javascript)
         self.assertIn(
             "provisionalRows[latestIndex] = withLiveIndicators",
             self.javascript,
         )
+        self.assertIn("isLiveSegment ? [5, 4] : []", self.javascript)
+        self.assertIn("legend-line-live", self.html)
 
     def test_dashboard_defaults_to_six_month_chart_range(self) -> None:
         self.assertIn('data-range="180">6 mesi', self.html)

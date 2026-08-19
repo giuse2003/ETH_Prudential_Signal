@@ -450,6 +450,12 @@ h1 {
   border: 1px dashed #f8fafc;
   background: transparent;
 }
+.chart-legend .legend-line-live {
+  height: 0;
+  border-top: 2px dashed #f8fafc;
+  border-radius: 0;
+  background: transparent;
+}
 .legend-sma50 { background: #38bdf8; }
 .legend-sma200 { background: #22c55e; }
 .legend-rsi { background: #f7931a; opacity: 0.65; }

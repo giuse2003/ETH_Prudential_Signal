@@ -297,11 +297,20 @@ async function fetchRecentCoinbaseCandles() {
 
 function withLiveIndicators(row) {
   if (!row || !botData) return row;
+  const closedVolumes = officialChartRows
+    .slice(-20)
+    .map((item) => item.volume)
+    .filter(Number.isFinite);
+  const volumeAvg20 = closedVolumes.length === 20
+    ? closedVolumes.reduce((total, value) => total + value, 0) / closedVolumes.length
+    : null;
   return {
     ...row,
     sma50: nullableNumber(botData.sma50),
     sma200: nullableNumber(botData.sma200),
     rsi: nullableNumber(botData.rsi),
+    volume: nullableNumber(botData.volume_24h_eth),
+    volumeAvg20,
   };
 }
 
@@ -482,7 +491,7 @@ function drawTrendChart() {
   if (els.chartLoading) els.chartLoading.style.display = "none";
   if (els.chartNote) {
     const liveNote = last.provisional
-      ? ` Candela UTC in corso da Coinbase (${liveCandleSource === "spot" ? "fallback spot" : "OHLC"}), ancora provvisoria.`
+      ? ` Candela e indicatori UTC in corso da Coinbase (${liveCandleSource === "spot" ? "fallback spot" : "OHLC"}), mostrati con tratto tratteggiato perché ancora provvisori.`
       : "";
     els.chartNote.textContent =
       `Periodo mostrato: ${formatDateShort(first.date)} - ${formatDateShort(last.date)}. ` +
@@ -525,14 +534,21 @@ function drawVolumeBars(ctx, rows, xFor, yFor, panel, candleWidth) {
   rows.forEach((row, index) => {
     if (!Number.isFinite(row.volume)) return;
     const rising = row.close >= row.open;
+    const color = rising ? "34,197,94" : "239,91,102";
     const y = yFor(row.volume);
-    ctx.fillStyle = rising ? "rgba(34,197,94,0.36)" : "rgba(239,91,102,0.36)";
-    ctx.fillRect(
-      xFor(index) - candleWidth / 2,
-      y,
-      candleWidth,
-      Math.max(1, panel.top + panel.height - y)
-    );
+    const x = xFor(index) - candleWidth / 2;
+    const height = Math.max(1, panel.top + panel.height - y);
+
+    ctx.save();
+    ctx.fillStyle = `rgba(${color},${row.provisional ? 0.1 : 0.36})`;
+    ctx.fillRect(x, y, candleWidth, height);
+    if (row.provisional) {
+      ctx.strokeStyle = `rgb(${color})`;
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 2]);
+      ctx.strokeRect(x, y, candleWidth, height);
+    }
+    ctx.restore();
   });
 }
 
@@ -630,26 +646,29 @@ function drawLine(ctx, rows, key, xFor, yFor, color, width) {
   ctx.lineWidth = width;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  ctx.beginPath();
-  let started = false;
+
+  for (let index = 1; index < rows.length; index += 1) {
+    const previous = rows[index - 1];
+    const current = rows[index];
+    if (!Number.isFinite(previous[key]) || !Number.isFinite(current[key])) continue;
+
+    const isLiveSegment = previous.provisional || current.provisional;
+    ctx.setLineDash(isLiveSegment ? [5, 4] : []);
+    ctx.beginPath();
+    ctx.moveTo(xFor(index - 1), yFor(previous[key]));
+    ctx.lineTo(xFor(index), yFor(current[key]));
+    ctx.stroke();
+  }
 
   rows.forEach((row, index) => {
-    const value = row[key];
-    if (!Number.isFinite(value)) {
-      started = false;
-      return;
-    }
-    const x = xFor(index);
-    const y = yFor(value);
-    if (!started) {
-      ctx.moveTo(x, y);
-      started = true;
-    } else {
-      ctx.lineTo(x, y);
-    }
+    if (!row.provisional || !Number.isFinite(row[key])) return;
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#07130d";
+    ctx.beginPath();
+    ctx.arc(xFor(index), yFor(row[key]), 3.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
   });
-
-  ctx.stroke();
   ctx.restore();
 }
 
