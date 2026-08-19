@@ -51,6 +51,14 @@ class DashboardSubscriptionTests(unittest.TestCase):
         self.assertIn("legend-candle-live", self.html)
         self.assertNotIn('drawLine(ctx, rows, "close"', self.javascript)
 
+    def test_live_chart_uses_same_rsi_snapshot_as_live_conditions(self) -> None:
+        self.assertIn("function withLiveIndicators", self.javascript)
+        self.assertIn("rsi: nullableNumber(botData.rsi)", self.javascript)
+        self.assertIn(
+            "provisionalRows[latestIndex] = withLiveIndicators",
+            self.javascript,
+        )
+
     def test_dashboard_defaults_to_six_month_chart_range(self) -> None:
         self.assertIn('data-range="180">6 mesi', self.html)
         self.assertIn('let chartRange = "180"', self.javascript)

@@ -14,6 +14,25 @@ from notifications.telegram import (
     send_telegram_message,
 )
 
+CONDITIONS_HELP_MESSAGE = "\n".join(
+    [
+        "CONDIZIONI ETH MONITOR",
+        "",
+        "Per ACQUISTA devono essere vere tutte queste condizioni:",
+        "1. prezzo sopra SMA200;",
+        "2. SMA50 sopra SMA200;",
+        "3. valore RSI compreso tra 40 e 65;",
+        "4. prezzo sopra quello di 7 giorni prima;",
+        "5. volume sopra media 20 giorni.",
+        "",
+        "Per VENDI deve essere vera almeno una di queste condizioni:",
+        "1. prezzo oltre il 2% sotto SMA50 (Close &lt; SMA50 x 0,98);",
+        "2. trailing stop 8% dal massimo post-ingresso, confermato da:",
+        "   - momentum 7 giorni uguale o maggiore di -15%;",
+        "   - volume almeno 20% sopra la media 20 giorni.",
+    ]
+)
+
 
 def load_published_live_status(project_root: Path) -> dict:
     for path in (
@@ -61,10 +80,16 @@ def main() -> None:
                 message = build_live_signal_message(load_published_live_status(project_root))
             except Exception:
                 message = "Segnale ETH LIVE temporaneamente non disponibile. Riprova tra poco."
+        elif command == "/conditions":
+            message = CONDITIONS_HELP_MESSAGE
         elif command in {"/start", "/help"}:
-            message = "Comando disponibile:\n/segnale - mostra il segnale ETH corrente"
+            message = (
+                "Comandi disponibili:\n"
+                "/segnale - mostra il segnale ETH corrente\n"
+                "/conditions - mostra le condizioni di acquisto e vendita"
+            )
         else:
-            message = "Comando non riconosciuto.\nUsa /segnale"
+            message = "Comando non riconosciuto.\nUsa /segnale o /conditions"
         send_telegram_message(cfg, message)
         response_sent = True
     if next_offset is not None:

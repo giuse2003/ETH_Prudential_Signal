@@ -18,7 +18,7 @@ const CONDITIONS_MESSAGE = [
   "5. volume sopra media 20 giorni.",
   "",
   "Per VENDI deve essere vera almeno una di queste condizioni:",
-  "1. prezzo oltre il 2% sotto SMA50 (Close < SMA50 x 0,98);",
+  "1. prezzo oltre il 2% sotto SMA50 (Close &lt; SMA50 x 0,98);",
   "2. trailing stop 8% dal massimo post-ingresso, confermato da:",
   "   - momentum 7 giorni uguale o maggiore di -15%;",
   "   - volume almeno 20% sopra la media 20 giorni.",
@@ -447,5 +447,4 @@ function corsHeaders(request) {
     Vary: "Origin",
   };
 }
-
 

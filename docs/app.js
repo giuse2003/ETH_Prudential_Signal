@@ -295,6 +295,16 @@ async function fetchRecentCoinbaseCandles() {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
+function withLiveIndicators(row) {
+  if (!row || !botData) return row;
+  return {
+    ...row,
+    sma50: nullableNumber(botData.sma50),
+    sma200: nullableNumber(botData.sma200),
+    rsi: nullableNumber(botData.rsi),
+  };
+}
+
 async function refreshLiveChartCandles() {
   if (!officialChartRows.length) return;
 
@@ -302,6 +312,10 @@ async function refreshLiveChartCandles() {
   const provisionalRows = (await fetchRecentCoinbaseCandles()).filter(
     (row) => row.date > latestOfficialDate
   );
+  if (provisionalRows.length) {
+    const latestIndex = provisionalRows.length - 1;
+    provisionalRows[latestIndex] = withLiveIndicators(provisionalRows[latestIndex]);
+  }
   chartRows = [...officialChartRows, ...provisionalRows];
   liveCandleSource = provisionalRows.length ? "coinbase" : null;
   drawTrendChart();
@@ -314,7 +328,7 @@ function updateLiveChartWithSpot(priceUSD) {
   const existing = chartRows.find((row) => row.provisional && row.date === today);
   const previous = chartRows.filter((row) => row.date < today).at(-1);
   const open = existing?.open ?? previous?.close ?? priceUSD;
-  const liveRow = {
+  const liveRow = withLiveIndicators({
     date: today,
     open,
     high: Math.max(existing?.high ?? open, priceUSD),
@@ -326,7 +340,7 @@ function updateLiveChartWithSpot(priceUSD) {
     volume: null,
     volumeAvg20: null,
     provisional: true,
-  };
+  });
   chartRows = [...chartRows.filter((row) => row.date !== today), liveRow]
     .sort((a, b) => a.date.localeCompare(b.date));
   liveCandleSource = "spot";
