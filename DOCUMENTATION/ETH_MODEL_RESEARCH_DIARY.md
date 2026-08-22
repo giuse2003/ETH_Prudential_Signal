@@ -3028,3 +3028,435 @@ Riferimenti:
 - `reports/condition_ablation_coinbase_0_6.md`;
 - `reports/walk_forward_coinbase_0_6.md`;
 - `reports/official_baseline_implementation.md`.
+
+## Test 2026-08-22 - Rimozione del limite superiore RSI 65
+
+Motivazione:
+
+- tra il 16 e il 21 agosto 2026 ETH ha registrato un rialzo molto rapido;
+- la Baseline e' rimasta fuori mercato;
+- e' stato richiesto di verificare se sostituire `40 <= RSI(14) <= 65` con
+  il solo requisito `RSI(14) >= 40` migliori il modello.
+
+Protocollo:
+
+- test esclusivamente sperimentale, senza modificare i segnali ufficiali;
+- mercato Coinbase `ETH-USD`, candele daily UTC chiuse;
+- periodo valutato `2016-12-08` -> `2026-08-21`;
+- commissione ufficiale conservativa `0,60%` per lato;
+- lasciate invariate tutte le altre condizioni di acquisto;
+- lasciate invariate entrambe le regole di vendita della Baseline v2;
+- aggiunti stress costi, confronto annuale, audit dei nuovi ingressi e 97
+  finestre mobili di 730 giorni.
+
+Risultati periodo completo con commissione `0,60%`:
+
+| Modello | Totale | Annualizzato | Max DD | Sharpe | PF | Trade | Win rate | Esposizione |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Baseline `RSI 40-65` | 56.672,64% | 92,19% | -43,00% | 1,609 | 14,944 | 30 | 50,00% | 26,78% |
+| Variante `RSI >= 40` | 160.216,14% | 113,88% | -42,56% | 1,665 | 19,156 | 34 | 52,94% | 29,09% |
+
+Audit:
+
+- la variante genera 8 nuovi ingressi effettivi;
+- 4 nuovi trade sono positivi e 4 negativi;
+- il vantaggio aggregato e' dominato dall'ingresso del `2017-03-11`, che
+  produce `+1.395,40%` netto nel campione;
+- nel 2025 la variante rende `+17,30%` contro `+29,52%` della Baseline e
+  peggiora il drawdown annuale da `-29,50%` a `-36,15%`;
+- solo il `40,21%` delle finestre mobili biennali migliora il rendimento;
+- solo il `36,08%` migliora lo Sharpe;
+- solo il `43,30%` presenta drawdown uguale o migliore.
+
+Verifica dell'episodio agosto 2026:
+
+- togliere soltanto il tetto RSI non produce alcun nuovo `ACQUISTA` dal 16 al
+  21 agosto;
+- dopo il breakout RSI sale sopra 65, ma `SMA50 > SMA200` resta falsa;
+- quindi questa modifica non avrebbe intercettato il movimento che ha
+  motivato il test.
+
+Decisione:
+
+- non promuovere la variante;
+- mantenere invariata la Baseline ufficiale;
+- il prossimo test dovra valutare un ingresso breakout separato e circoscritto,
+  senza eliminare globalmente la protezione RSI.
+
+File:
+
+- `scripts/run_rsi_upper_cap_removal.py`;
+- `reports/rsi_upper_cap_removal.md`.
+
+Aggiornamento costi operativi comunicato il 2026-08-22:
+
+- promozione VIP Coinbase attiva con commissione maker `0,07%` per lato e
+  taker `0,16%` per lato;
+- aggiunto al test anche lo scenario misto, equivalente a `0,115%` medio per
+  lato quando un'esecuzione e' maker e l'altra taker;
+- per un segnale che richiede esecuzione certa il riferimento operativo
+  principale e' il taker `0,16%`;
+- il maker `0,07%` resta lo scenario ottimistico, perche un ordine limite puo
+  non essere eseguito;
+- il `0,60%` per lato non viene rimosso dalla configurazione: resta lo scenario
+  prudenziale del modello e permette confronti omogenei con i test precedenti.
+
+Risultati con tariffa taker `0,16%` per lato:
+
+| Modello | Totale | Annualizzato | Max DD | Sharpe | PF |
+|---|---:|---:|---:|---:|---:|
+| Baseline `RSI 40-65` | 73.718,82% | 97,46% | -39,87% | 1,665 | 15,995 |
+| Variante `RSI >= 40` | 215.909,13% | 120,56% | -39,44% | 1,722 | 20,471 |
+
+Le nuove tariffe migliorano le metriche nette di entrambi i modelli ma non
+cambiano la conclusione qualitativa: la variante resta poco uniforme nelle
+finestre mobili e non intercetta il rally di agosto 2026.
+
+## Test 2026-08-22 - Trail9 al posto di Trail8
+
+Ipotesi:
+
+- verificare se allargare il trailing stop dall'8% al 9% avrebbe evitato
+  l'uscita del 19 agosto 2025 e il successivo rientro;
+- mantenere invariati ingressi, uscita SMA50 e conferme momentum/volume.
+
+Risultato sull'episodio:
+
+- massimo Close post-ingresso `4.751,46 USD` il 13 agosto 2025;
+- uscita il 19 agosto a `4.075,89 USD`, pari a `-14,22%` dal massimo;
+- momentum 7 giorni `-11,20%`, ancora sopra la soglia `-15%`;
+- volume relativo `+37,27%`, sopra la conferma `+20%`;
+- Trail8 e Trail9 vendono entrambi il 19 agosto;
+- il rientro Baseline resta invariato al 25 agosto 2025.
+
+Confronto storico completo con tariffa taker `0,16%`:
+
+| Modello | Totale | Annualizzato | Max DD | Sharpe | PF | Trade |
+|---|---:|---:|---:|---:|---:|---:|
+| Trail8 ufficiale | 73.718,82% | 97,46% | -39,87% | 1,665 | 15,995 | 30 |
+| Trail9 test | 73.252,37% | 97,33% | -39,87% | 1,664 | 15,989 | 30 |
+
+Audit:
+
+- nell'intera storia Trail9 cambia un solo segnale, quello del 2 agosto 2023;
+- l'uscita viene rinviata al 4 agosto 2023;
+- il rendimento netto del trade scende da `+2,41%` a `+1,77%`;
+- il drawdown del trade passa da `-8,33%` a `-8,91%`.
+
+Decisione:
+
+- non promuovere Trail9;
+- mantenere Trail8 ufficiale;
+- Trail9 non risolve l'episodio per cui e' stato proposto e peggiora
+  leggermente l'unico segnale storico che modifica.
+
+File:
+
+- `scripts/run_trailing_stop_9pct_test.py`;
+- `reports/trailing_stop_8_vs_9.md`.
+
+## Audit 2026-08-22 - Il Trail8 aggiunge valore?
+
+Obiettivo:
+
+- stabilire se il Trail8 e' complessivamente valido oppure interrompe troppi
+  trade convenienti;
+- confrontare la Baseline attuale con la stessa strategia senza trailing;
+- mantenere identici ingressi e uscita `Close < SMA50 * 0,98`.
+
+Metriche con tariffa taker `0,16%` per lato:
+
+| Modello | Totale | Annualizzato | Max DD | Sharpe | PF | Trade | Win rate | Esposizione |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Trail8 ufficiale | 73.718,82% | 97,46% | -39,87% | 1,665 | 15,995 | 30 | 50,00% | 26,78% |
+| Senza trailing | 53.714,46% | 91,13% | -48,92% | 1,451 | 18,313 | 24 | 58,33% | 31,60% |
+
+Audit delle sequenze:
+
+- 15 sequenze operative vengono realmente modificate dal Trail8;
+- 9 sequenze migliorano e 6 peggiorano;
+- principali miglioramenti: marzo 2017, maggio/settembre 2020, maggio e
+  settembre 2021, febbraio e dicembre 2024;
+- principali peggioramenti: dicembre 2017 e agosto 2025;
+- nel segmento luglio-settembre 2025 Trail8 rende `+51,24%` contro `+62,93%`
+  restando dentro, delta `-11,68` punti percentuali;
+- nel segmento novembre 2017-febbraio 2018 Trail8 rende `+40,02%` contro
+  `+195,26%`, delta `-155,24` punti percentuali.
+
+Decisione:
+
+- Trail8 e' valido a livello di portafoglio: aumenta rendimento annualizzato e
+  Sharpe e riduce il max drawdown di circa 9 punti;
+- non e' perfetto: divide alcuni trade e abbassa win rate e profit factor;
+- non rimuovere Trail8;
+- trattare i falsi stop come problema specifico da analizzare senza allargare
+  indiscriminatamente la soglia.
+
+File:
+
+- `scripts/run_trail8_value_audit.py`;
+- `reports/trail8_value_audit.md`.
+
+## Ricerca 2026-08-22 - Guardrail selettivo per i falsi stop Trail8
+
+Obiettivo:
+
+- studiare una modifica della conferma Trail8 capace di migliorare le 6
+  sequenze peggiorative senza perdere la protezione delle altre 9;
+- usare soltanto dati disponibili alla chiusura della candela, senza look-ahead;
+- lasciare invariati ingressi e uscita ufficiale `Close < SMA50 * 0,98`;
+- non modificare la Baseline durante la fase di ricerca.
+
+Protocollo:
+
+- mercato Coinbase `ETH-USD`, daily UTC chiuso;
+- periodo `2016-12-08` -> `2026-08-21`;
+- riferimento operativo taker Coinbase VIP `0,16%` per lato;
+- stress costi maker `0,07%`, prudenziale `0,60%` e stress `1,00%`;
+- testate `274` regole su ampiezza trailing, momentum, volume, ATR,
+  estensione dalla SMA50 e pendenza SMA50 a 5 giorni;
+- validazione su 97 finestre mobili di 730 giorni e sui sottoperiodi
+  `2017-2019`, `2020-2022` e `2023-oggi`;
+- audit delle 15 sequenze realmente modificate dal trailing.
+
+Risultato della ricerca:
+
+- nessuna regola recupera tutte le 6 sequenze senza danneggiare almeno una
+  delle 9 sequenze protettive;
+- togliere il trailing recupera le 6 sequenze, ma perde tutte le 9 protezioni,
+  riduce lo Sharpe a `1,451` e peggiora il max DD a `-48,92%`;
+- portare globalmente il trailing al 12% aumenta il rendimento, ma peggiora il
+  max DD a `-42,96%` e danneggia 3 sequenze protettive;
+- modificare soltanto momentum o volume non separa in modo affidabile i falsi
+  stop dalle uscite utili.
+
+Candidato che migliora tutte le 6 sequenze:
+
+- Trail11 quando la pendenza SMA50 a 5 giorni e' `<= 4%`;
+- conferma ammessa solo con prezzo almeno `5%` sopra SMA50;
+- soglia momentum portata da `-15%` a `-10%`;
+- annualizzato `111,67%`, max DD `-43,53%`, Sharpe `1,739`, PF `24,073`;
+- migliora tutte le 6 sequenze, ma ne recupera completamente 5;
+- danneggia 2 sequenze protettive, di `-0,65` e `-9,96` punti;
+- non e' considerato prudente per il peggioramento del drawdown.
+
+Miglior compromesso prudente:
+
+- Trail8 resta normale quando la SMA50 e' forte;
+- il trailing si allarga all'11% soltanto quando la SMA50 e' salita non piu
+  del `4%` negli ultimi 5 giorni;
+- il trailing confermato puo vendere soltanto se il Close e' almeno `5%`
+  sopra SMA50;
+- momentum `>= -15%` e volume relativo `>= +20%` restano invariati;
+- annualizzato `110,82%` contro `97,46%` della Baseline;
+- max DD `-39,45%` contro `-39,87%`;
+- Sharpe `1,748` contro `1,665`; PF `20,843` contro `15,995`;
+- migliora 4 delle 6 sequenze peggiorative e ne recupera completamente 3;
+- danneggia una sola sequenza protettiva, giugno-agosto 2023, per `-0,65`
+  punti percentuali;
+- nelle 97 finestre biennali migliora il rendimento nel `98,97%`, lo Sharpe
+  nel `96,91%` e il drawdown nel `70,10%`; nessuna finestra ha rendimento
+  inferiore alla Baseline.
+
+Decisione:
+
+- non promuovere ancora nessuna variante;
+- mantenere invariata la Baseline ufficiale;
+- conservare il compromesso prudente come miglior candidato di ricerca;
+- il passaggio successivo richiesto prima di una promozione e' una selezione
+  walk-forward realmente fuori campione, per ridurre il rischio di overfitting
+  dovuto alle sole 15 sequenze disponibili.
+
+File:
+
+- `scripts/run_trail8_guardrail_research.py`;
+- `reports/trail8_guardrail_research.md`;
+- `reports/trail8_guardrail_grid.csv`;
+- `reports/trail8_guardrail_events.csv`;
+- `reports/trail8_guardrail_event_features.csv`.
+
+## Validazione 2026-08-22 - Nested walk-forward dei guardrail Trail8
+
+Obiettivo:
+
+- proseguire la verifica del candidato prudente con selezione cronologica;
+- impedire al selettore annuale di usare dati successivi all'anno di training;
+- misurare il rischio di overfitting generato dalle 274 regole esplorate;
+- mantenere invariata la Baseline ufficiale.
+
+Metodo:
+
+- dati Coinbase `ETH-USD`, daily UTC, fino al `2026-08-21`;
+- primo anno di test `2020`, con training iniziale `2016-12-08` -> `2019-12-31`;
+- training expanding aggiornato soltanto a fine anno;
+- candidato eleggibile solo se supera la Baseline in annualizzato, max DD e
+  Sharpe, completa almeno 5 trade e non aggiunge oltre 12 lati di turnover;
+- 274 regole deduplicate in 70 percorsi di segnale realmente distinti;
+- tre policy: gate Baseline/candidato prudente, famiglia prudente da 24
+  percorsi e griglia completa da 70 percorsi;
+- commissione principale taker VIP `0,16%`, stress maker `0,07%`,
+  prudenziale `0,60%` e ritardo aggiuntivo di una candela;
+- bootstrap circolare appaiato con blocchi da 30 e 90 giorni.
+
+Risultato principale 2020-2026, taker `0,16%`:
+
+| Modello | Totale | Annualizzato | Max DD | Sharpe | Trade |
+|---|---:|---:|---:|---:|---:|
+| Baseline | 3.249,48% | 69,64% | -39,87% | 1,460 | 23 |
+| Candidato prudente / gate a due | 3.589,14% | 72,13% | -39,45% | 1,490 | 21 |
+| Candidato tutte-6 | 3.734,91% | 73,13% | -43,53% | 1,476 | 19 |
+| WF famiglia prudente | 2.631,48% | 64,51% | -42,96% | 1,379 | 22 |
+| WF griglia completa | 3.060,99% | 68,17% | -48,92% | 1,406 | 19 |
+
+Selezione cronologica:
+
+- il gate limitato a Baseline e candidato prudente seleziona il candidato in
+  ogni anno dal 2020 al 2026 usando solo il training precedente;
+- rispetto alla Baseline migliora simultaneamente le tre metriche nel 2020,
+  2023 e 2024; e' invariato nel 2021, 2022, 2025 e 2026;
+- non presenta alcun anno classificato come peggiorativo;
+- la riottimizzazione su 24 o 70 percorsi fallisce, soprattutto nel 2021,
+  2023 e 2024: aggiungere alternative aumenta l'overfitting invece di
+  migliorare la scelta.
+
+Sensibilita' temporale:
+
+- partenza 2021: candidato `55,77%` annualizzato, DD `-39,45%`, Sharpe
+  `1,303`; Baseline `53,55%`, `-39,87%`, `1,272`;
+- partenza 2023: candidato `13,74%` annualizzato, DD `-39,45%`, Sharpe
+  `0,585`; Baseline `11,24%`, `-39,87%`, `0,513`;
+- il vantaggio non dipende soltanto dal blocco 2020.
+
+Costi e bootstrap:
+
+- il candidato conserva il vantaggio con maker `0,07%`, taker `0,16%` e
+  stress prudenziale `0,60%`;
+- bootstrap 30 giorni: probabilita' di sovraperformance `93,70%`, vantaggio
+  osservato di ricchezza finale `+10,14%`, intervallo 5%-95%
+  `-0,26%` -> `+28,69%`;
+- bootstrap 90 giorni: probabilita' `93,70%`, intervallo
+  `-0,35%` -> `+27,57%`;
+- il limite inferiore leggermente negativo non consente una confidenza piena
+  al 95%.
+
+Stress decisivo:
+
+- con una candela ulteriore di ritardo, il candidato scende a `54,48%`
+  annualizzato, DD `-44,86%`, Sharpe `1,222`;
+- nello stesso stress la Baseline ottiene `57,78%`, DD `-44,38%`, Sharpe
+  `1,282`;
+- il vantaggio richiede quindi esecuzione coerente con il backtest alla
+  candela giornaliera immediatamente successiva e non sopporta un giorno
+  completo aggiuntivo di ritardo.
+
+Interpretazione e decisione:
+
+- il candidato prudente supera il miglior test storico cronologico disponibile;
+- il test resta `pseudo out-of-sample`, non genuinamente fuori campione,
+  perche la regola e l'universo sono stati definiti dopo avere osservato tutta
+  la serie storica;
+- nessun altro riutilizzo dei dati passati puo creare un campione davvero mai
+  visto;
+- non promuovere ora il candidato e non modificare la Baseline;
+- congelare esattamente il candidato prudente e avviare da questa data un
+  paper/shadow test prospettico: solo le candele successive al `2026-08-21`
+  costituiranno vero out-of-sample.
+
+File:
+
+- `scripts/run_trail8_guardrail_walkforward.py`;
+- `reports/trail8_guardrail_walkforward.md`;
+- `reports/trail8_guardrail_walkforward_selections.csv`;
+- `reports/trail8_guardrail_walkforward_metrics.csv`;
+- `reports/trail8_guardrail_walkforward_yearly.csv`;
+- `reports/trail8_guardrail_walkforward_bootstrap.csv`;
+- `reports/trail8_guardrail_walkforward_equity.csv`.
+
+## Gate statistico finale 2026-08-22 - Candidato guardrail Trail8
+
+Obiettivo:
+
+- applicare l'ultimo controllo retrospettivo prima di qualsiasi eventuale
+  promozione del candidato prudente;
+- misurare separatamente qualita' assoluta della strategia, vantaggio
+  incrementale sulla Baseline, rischio di overfitting e stabilita' dei valori;
+- mantenere invariata la Baseline ufficiale.
+
+Protocollo:
+
+- dati Coinbase `ETH-USD`, daily UTC chiuso, fino al `2026-08-21`;
+- commissione taker VIP `0,16%` per lato;
+- `274` regole provate, corrispondenti a `70` percorsi di segnale distinti;
+- PBO/CSCV su 10 blocchi e 252 suddivisioni training/test;
+- Sharpe corretto per selezione multipla su 70 e 274 prove;
+- probabilita' che il rendimento giornaliero incrementale del candidato sia
+  migliore di quello della Baseline;
+- walk-forward expanding con purge di 30 e 90 giorni prima di ogni anno;
+- griglia locale di 45 combinazioni: Trail `10-12%`, soglia slope SMA50
+  `3,75-4,25%`, estensione sopra SMA50 `4-6%`;
+- stress con un giorno completo aggiuntivo di ritardo.
+
+Risultati principali sul periodo 2020-2026:
+
+| Modello | Annualizzato | Max DD | Sharpe |
+|---|---:|---:|---:|
+| Baseline | 69,64% | -39,87% | 1,460 |
+| Candidato prudente / gate a due | 72,13% | -39,45% | 1,490 |
+
+Esito dei controlli:
+
+- metriche aggregate: `PASS`, il candidato migliora annualizzato, drawdown e
+  Sharpe;
+- Deflated Sharpe corretto per 274 prove: `99,97%`, `PASS`;
+- probabilita' del vantaggio incrementale sulla Baseline: `85,75%`, sotto la
+  soglia prudenziale del `90%`, `FAIL`;
+- PBO della griglia locale: `41,67%`, sotto il limite del `50%`, `PASS`;
+- PBO della ricerca ampia: `75,40%` sui 70 percorsi e `73,41%` sulla famiglia
+  conservativa, avvertimento di overfitting nella selezione ampia;
+- stabilita' locale: solo il `44,44%` delle 45 combinazioni vicine migliora
+  contemporaneamente annualizzato, drawdown e Sharpe, contro il minimo
+  richiesto del `70%`, `FAIL`;
+- walk-forward con purge 30 e 90 giorni: il candidato resta a `72,13%`,
+  `-39,45%` e `1,490`, `PASS`;
+- con un giorno aggiuntivo di ritardo il candidato ottiene `54,48%`
+  annualizzato contro `57,78%` della Baseline e perde anche su drawdown e
+  Sharpe, avvertimento operativo.
+
+Interpretazione:
+
+- lo Sharpe corretto molto alto conferma che la strategia nel suo complesso
+  non e' un risultato casuale rispetto a zero; non dimostra pero' che la
+  modifica sia superiore alla Baseline;
+- il bootstrap precedente stimava una probabilita' di sovraperformance del
+  `93,70%`, mentre il test probabilistico giornaliero incrementale restituisce
+  `85,75%`: entrambi indicano un vantaggio probabile, ma non abbastanza stabile
+  da essere considerato conclusivo;
+- la fragilita' e' concentrata soprattutto intorno alla soglia slope SMA50:
+  `4,00%` migliora le metriche, `4,25%` produce un peggioramento del drawdown;
+- anche l'estensione al `6%` perde il vantaggio osservato con `4-5%`;
+- l'ampiezza Trail tra `10%` e `12%` incide poco nello storico disponibile,
+  quindi da sola non risolve il problema di selezione;
+- tutte le prove restano pseudo-fuori-campione, perche' la famiglia di regole
+  e' stata definita dopo aver osservato lo storico.
+
+Decisione:
+
+- verdetto finale del gate: **FAIL**;
+- non promuovere il guardrail Trail8 e non modificare segnali, dashboard o bot;
+- mantenere la Baseline ufficiale invariata;
+- congelare il candidato prudente come ipotesi di ricerca, senza ulteriori
+  ottimizzazioni sugli stessi dati;
+- usare un confronto shadow prospettico e riesaminare il candidato dopo nuovi
+  eventi in cui esso diverge realmente dalla Baseline. Un controllo a sei mesi
+  puo' essere informativo, ma senza nuovi eventi Trail8 divergenti non produce
+  nuova evidenza utile.
+
+File:
+
+- `scripts/run_trail8_guardrail_final_gate.py`;
+- `reports/trail8_guardrail_final_gate.md`;
+- `reports/trail8_guardrail_final_gate_checks.csv`;
+- `reports/trail8_guardrail_final_gate_pbo.csv`;
+- `reports/trail8_guardrail_final_gate_dsr.csv`;
+- `reports/trail8_guardrail_final_gate_purged.csv`;
+- `reports/trail8_guardrail_parameter_plateau.csv`.
