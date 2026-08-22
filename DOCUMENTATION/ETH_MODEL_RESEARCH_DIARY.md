@@ -3460,3 +3460,276 @@ File:
 - `reports/trail8_guardrail_final_gate_dsr.csv`;
 - `reports/trail8_guardrail_final_gate_purged.csv`;
 - `reports/trail8_guardrail_parameter_plateau.csv`.
+
+## Ricerca 2026-08-22 - Ingresso alternativo sul breakout del 17 agosto 2026
+
+Obiettivo:
+
+- capire perche' la Baseline sia rimasta fuori dal rialzo iniziato il 17 agosto;
+- verificare se un secondo percorso di ingresso possa intercettare accelerazioni
+  simili senza rimuovere indiscriminatamente i filtri prudenziali;
+- mantenere invariati ingressi ordinari, uscite ufficiali, dashboard e bot.
+
+Caso osservato su Coinbase `ETH-USD`:
+
+- dal Close del 16 agosto (`1.874,13 USD`) al 21 agosto (`2.515,80 USD`) il
+  movimento e' stato `+34,24%`;
+- il 17 agosto: Close `1.911,94`, RSI `56,61`, momentum 7g `+2,16%`, volume
+  relativo `+53,06%`, SMA50 crescente `+1,69%` in 5 giorni e breakout del
+  massimo precedente a 7 giorni `+1,45%`;
+- il segnale e' rimasto bloccato perche' il Close era ancora `-4,80%` sotto
+  SMA200 e SMA50 era sotto SMA200;
+- il 19 agosto il Close ha superato SMA200 del `12,40%`, ma RSI era gia'
+  `82,16`, oltre il limite d'ingresso `65`;
+- rimuovere soltanto il limite RSI non avrebbe prodotto alcun acquisto;
+- rimuovere SMA50>SMA200 e il limite RSI avrebbe comprato soltanto il 19
+  agosto, dopo la candela principale, catturando `+11,56%` fino al cutoff.
+
+Protocollo:
+
+- periodo Coinbase completo fino alla candela chiusa del `2026-08-21`;
+- commissioni principali taker `0,16%`, controllo maker `0,07%` e stress
+  `0,60%` per lato;
+- `71` configurazioni, corrispondenti a `28` percorsi di segnale distinti;
+- tre famiglie: ablazione semplice dei filtri, breakout precoce sotto SMA200,
+  impulso eccezionale sopra SMA200;
+- metriche calcolate sia sull'intera serie sia con cutoff `2026-08-16`, in modo
+  che il rialzo studiato non possa migliorare artificialmente il candidato;
+- uscite identiche alla Baseline: `Close < SMA50 * 0,98` oppure Trail8
+  confermato da momentum 7g `>= -15%` e volume relativo `>= +20%`;
+- PBO/CSCV, Deflated Sharpe, probabilita' incrementale, bootstrap a blocchi,
+  regimi storici, costi, ritardi di esecuzione e selezione ancorata al 2019.
+
+Candidato esplorativo selezionato:
+
+- nome ricerca: `early_lb5_vol20_near10_slope0`;
+- non sostituisce l'ingresso ordinario: aggiunge un secondo percorso valido
+  soltanto quando SMA50 e' ancora sotto o uguale a SMA200;
+- Close sopra SMA50;
+- Close non oltre il `10%` sotto SMA200 (`Close >= SMA200 * 0,90`);
+- SMA50 non in calo rispetto a 5 giorni prima;
+- RSI compreso tra `40` e `65`;
+- momentum 7 giorni positivo;
+- volume almeno `20%` sopra la media a 20 giorni;
+- Close sopra il massimo dei 5 Close precedenti;
+- tutte le condizioni devono essere vere sulla candela daily chiusa.
+
+Risultato sul movimento corrente:
+
+- segnale candidato il `2026-08-17` a `1.911,94 USD`;
+- applicazione prudenziale al rendimento giornaliero successivo, senza
+  look-ahead;
+- rendimento simulato dal segnale al 21 agosto: `+31,37%` netto della
+  commissione d'ingresso taker;
+- la Baseline rimane fuori e realizza `0,00%` sullo stesso segmento;
+- con una candela completa aggiuntiva di ritardo il candidato conserva
+  `+31,08%`; con due candele aggiuntive cattura soltanto `+11,56%`.
+
+Metriche con taker `0,16%`:
+
+| Periodo | Modello | Annualizzato | Max DD | Sharpe |
+|---|---|---:|---:|---:|
+| Fino al 16 agosto 2026 | Baseline | 97,65% | -39,87% | 1,666 |
+| Fino al 16 agosto 2026 | Candidato | 120,64% | -36,56% | 1,833 |
+| Fino al 21 agosto 2026 | Baseline | 97,46% | -39,87% | 1,665 |
+| Fino al 21 agosto 2026 | Candidato | 126,68% | -36,56% | 1,877 |
+
+Audit dei segmenti divergenti:
+
+| Segnale alternativo | Vantaggio rispetto alla Baseline | Esito |
+|---|---:|---|
+| 2017-02-01 | +55,10% | favorevole |
+| 2019-03-27 | +18,20% | favorevole |
+| 2023-01-06 | +32,00% | favorevole |
+| 2024-11-06 | +36,33% | favorevole |
+| 2026-01-13 | -11,92% | sfavorevole |
+| 2026-08-17 | +31,37% al cutoff | aperto |
+
+Stabilita' e controlli statistici prima dell'evento:
+
+- 54 configurazioni della famiglia precoce e 14 percorsi distinti;
+- `83,33%` delle combinazioni cattura la candela principale del 19 agosto;
+- `42,59%` migliora contemporaneamente annualizzato, drawdown e Sharpe prima
+  dell'evento; `40,74%` migliora le tre metriche e cattura il target;
+- PBO iniziale di tutti i percorsi distinti `17,46%`; dopo la separazione
+  rigorosa tra ingresso alternativo e gestione Baseline, PBO aggiornato
+  `19,05%`; PBO della sola famiglia precoce invariato a `17,06%`;
+- Deflated Sharpe corretto per 71 prove `100,00%`;
+- probabilita' del vantaggio incrementale candidato-Baseline `99,73%`;
+- bootstrap 30 giorni: probabilita' di sovraperformance `98,35%`, percentile
+  5% del vantaggio `+18,63%`;
+- bootstrap 90 giorni: probabilita' `97,35%`, percentile 5% `+14,39%`;
+- il numero di eventi resta piccolo: prima del caso corrente vi sono soltanto
+  cinque divergenze operative, quattro favorevoli e una sfavorevole.
+
+Selezione cronologica ancorata:
+
+- usando esclusivamente il periodo fino al `2019-12-31`, il selettore sceglie
+  lo stesso candidato `early_lb5_vol20_near10_slope0`;
+- sul successivo periodo `2020-01-01` -> `2026-08-16`, il candidato ottiene
+  annualizzato `82,09%`, DD `-36,56%` e Sharpe `1,580`;
+- sullo stesso periodo la Baseline ottiene `69,86%`, DD `-39,87%` e Sharpe
+  `1,462`;
+- il test e' cronologico ma resta pseudo-fuori-campione, perche' la famiglia di
+  regole e' stata definita dopo aver osservato il caso del 2026.
+
+Decisione:
+
+- esiste un modo tecnicamente coerente per intercettare il movimento: un
+  percorso di breakout precoce separato dall'ingresso ordinario;
+- il risultato e' abbastanza forte da mantenere il candidato e approfondirlo,
+  ma non autorizza ancora la promozione a segnale ufficiale;
+- congelare esattamente la regola sopra indicata ed evitare di aggiustare RSI,
+  volume o distanza SMA200 per eliminare a posteriori il solo trade negativo
+  del gennaio 2026;
+- Baseline, dashboard e bot restano invariati;
+- prossimo controllo: riesaminare separatamente il falso ingresso del
+  `2026-01-13` e confrontarlo con i quattro episodi favorevoli, senza usare il
+  suo esito per scegliere nuove soglie.
+
+File:
+
+- `scripts/run_august_2026_breakout_entry_research.py`;
+- `reports/august_2026_breakout_entry_research.md`;
+- `reports/august_2026_breakout_entry_metrics.csv`;
+- `reports/august_2026_breakout_entry_trades.csv`;
+- `reports/august_2026_breakout_entry_segments.csv`;
+- `reports/august_2026_breakout_entry_statistics.csv`;
+- `reports/august_2026_breakout_entry_anchored.csv`;
+- `reports/august_2026_breakout_entry_delays.csv`.
+
+## Audit 2026-08-22 - Robustezza dei singoli ingressi breakout
+
+Obiettivo:
+
+- confrontare il falso ingresso del `2026-01-13` con i quattro episodi
+  favorevoli precedenti e con il movimento aperto del `2026-08-17`;
+- usare soltanto caratteristiche disponibili sulla candela d'ingresso;
+- verificare se il vantaggio complessivo dipenda da un singolo episodio;
+- non cercare nuove soglie capaci di eliminare a posteriori l'unica perdita.
+
+Caratteristiche dei sei ingressi alternativi:
+
+| Entry | Esito | RSI | Mom. 7g | Volume rel. | Dist. SMA200 | SMA50/SMA200 | Return 90g | Vantaggio Baseline |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 2017-02-01 | favorevole | 61,05 | +1,61% | +21,26% | -0,58% | -13,52% | -1,38% | +55,10% |
+| 2019-03-27 | favorevole | 56,30 | +0,25% | +41,22% | -9,18% | -13,59% | +21,33% | +18,20% |
+| 2023-01-06 | favorevole | 59,16 | +5,82% | +26,52% | -8,66% | -11,88% | -3,56% | +32,00% |
+| 2024-11-06 | favorevole | 61,02 | +2,49% | +204,10% | -7,90% | -14,27% | +1,52% | +36,33% |
+| 2026-01-13 | negativo | 64,75 | +0,84% | +67,73% | -8,63% | -16,17% | -16,66% | -11,92% |
+| 2026-08-17 | aperto | 56,61 | +2,16% | +53,06% | -4,80% | -8,22% | -9,39% | +31,37% al cutoff |
+
+Lettura del falso ingresso di gennaio:
+
+- RSI `64,75`, superiore al massimo `61,05` dei quattro episodi favorevoli;
+- SMA50 distante `-16,17%` da SMA200, contro intervallo favorevole
+  `-14,27%` -> `-11,88%`;
+- rendimento a 90 giorni `-16,66%`, contro intervallo favorevole
+  `-3,56%` -> `+21,33%`;
+- pendenza SMA200 a 20 giorni `+1,57%`, mentre nei quattro episodi favorevoli
+  era compresa tra `-8,09%` e `-1,04%`;
+- questi quattro elementi descrivono un rimbalzo vicino al limite RSI dentro
+  una struttura piu' deteriorata, ma provengono da un solo caso negativo e non
+  costituiscono un filtro validato.
+
+Leave-one-event-out fino al `2026-08-16`:
+
+| Evento favorevole rimosso | Annualizzato candidato | Max DD | Sharpe | Migliora le 3 metriche |
+|---|---:|---:|---:|---|
+| nessuno | 120,64% | -36,56% | 1,832 | SI |
+| 2017-02-01 | 110,88% | -36,56% | 1,762 | SI |
+| 2019-03-27 | 116,87% | -36,56% | 1,810 | SI |
+| 2023-01-06 | 114,41% | -36,56% | 1,785 | SI |
+| 2024-11-06 | 113,70% | -39,87% | 1,782 | SI |
+
+Risultato:
+
+- il candidato continua a superare annualizzato, drawdown e Sharpe della
+  Baseline anche rimuovendo uno alla volta ciascuno dei quattro episodi
+  favorevoli;
+- rimuovendo il caso negativo di gennaio, annualizzato e Sharpe salirebbero a
+  `123,55%` e `1,861`, ma questa informazione non viene usata per modificare la
+  regola.
+
+Statistica a livello di eventi:
+
+- eventi completati `5`, favorevoli `4`, win rate osservato `80,00%`;
+- intervallo Wilson 95% del win rate `37,55%` -> `96,38%`;
+- sign test unilaterale contro probabilita' 50%: p-value `18,75%`, non
+  significativo al 5%;
+- vantaggio composto sui cinque segmenti `+190,59%`;
+- bootstrap di 20.000 campioni da cinque eventi: probabilita' di vantaggio
+  positivo `98,98%`, intervallo 5%-95% `+39,90%` -> `+471,50%`;
+- servirebbero nove perdite consecutive uguali al caso del 13 gennaio per
+  annullare il vantaggio composto dei cinque segmenti osservati. Questa e'
+  soltanto una misura di stress, non una previsione.
+
+Decisione:
+
+- il candidato non dipende da un singolo trade favorevole;
+- il campione a livello di eventi resta troppo piccolo per una promozione
+  automatica, nonostante la robustezza economica e il bootstrap favorevole;
+- non introdurre filtri su RSI, distanza SMA50/SMA200, momentum a 90 giorni o
+  pendenza SMA200 basandosi sul solo errore del gennaio 2026;
+- mantenere congelato `early_lb5_vol20_near10_slope0` come candidato
+  sperimentale e lasciare invariata la Baseline ufficiale;
+- il prossimo dato davvero informativo sara' l'esito completo del trade aperto
+  il `2026-08-17` oppure un nuovo segnale breakout indipendente.
+
+File:
+
+- `scripts/run_breakout_event_robustness_audit.py`;
+- `reports/august_2026_breakout_event_audit.md`;
+- `reports/august_2026_breakout_event_features.csv`;
+- `reports/august_2026_breakout_bad_event_features.csv`;
+- `reports/august_2026_breakout_leave_one_out.csv`;
+- `reports/august_2026_breakout_event_statistics.csv`.
+
+## Verifica 2026-08-22 - Chiusura affidata esclusivamente alla Baseline
+
+Decisione dell'analisi:
+
+- il nuovo percorso breakout viene valutato esclusivamente come ingresso;
+- una volta aperta la posizione, la chiusura deve dipendere dalle regole
+  ufficiali della Baseline, per verificare se proteggono correttamente anche
+  questo tipo di movimento;
+- la condizione breakout non puo' mantenere aperto il trade, sospendere il
+  Trail8 o avere alcuna priorita' sulle condizioni di vendita;
+- rimane invece invariata la priorita' del BUY core originale della Baseline,
+  che fa gia' parte della logica ufficiale del Trail8.
+
+Correzione e verifica tecnica:
+
+- il runner di ricerca e' stato reso esplicito: il percorso alternativo puo'
+  soltanto generare `ACQUISTA` quando la posizione e' chiusa;
+- dopo l'ingresso si applicano esclusivamente `Close < SMA50 * 0,98` oppure
+  Trail8 confermato da momentum 7g `>= -15%` e volume relativo `>= +20%`, con
+  la priorita' BUY originale della Baseline;
+- l'intera serie storica e' stata ricalcolata dopo la separazione;
+- restano invariati candidato, sei eventi divergenti, metriche principali,
+  leave-one-event-out e conclusioni; il PBO complessivo dei percorsi di
+  controllo passa da `17,46%` a `19,05%`, mentre quello della famiglia precoce
+  resta `17,06%`;
+- Baseline ufficiale, dashboard e bot non sono stati modificati.
+
+Stato del trade sperimentale alla candela chiusa del `2026-08-21`:
+
+- ingresso candidato: `2026-08-17` a `1.911,94 USD`;
+- massimo Close raggiunto: `2.515,80 USD` il `2026-08-21`;
+- Trail8 dinamico: `2.314,54 USD`;
+- Close corrente: `2.515,80 USD`, ancora `8,70%` sopra il Trail8;
+- momentum 7g `+33,79%` e volume relativo `+209,88%`: entrambe le conferme
+  del Trail8 sono vere, ma il livello di stop non e' stato raggiunto;
+- livello di uscita SMA50: `1.855,71 USD`, non raggiunto;
+- segnale corrente del candidato: `MANTIENI STATO ATTUALE`;
+- a ogni nuovo massimo Close, il livello Trail8 verra' aggiornato; la prima
+  futura uscita sara' registrata con data, prezzo, regola attivata, rendimento
+  e confronto con il movimento che la Baseline non aveva acquistato.
+
+File:
+
+- `scripts/run_august_2026_breakout_entry_research.py`;
+- `scripts/run_breakout_event_robustness_audit.py`;
+- `reports/august_2026_breakout_entry_research.md`;
+- `reports/august_2026_breakout_event_audit.md`;
+- `reports/august_2026_breakout_exit_state.csv`.
