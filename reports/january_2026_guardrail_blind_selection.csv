@@ -1,0 +1,106 @@
+blind_rank,guardrail,label,family,complexity,breakout_losses,breakout_entries,max_missed_profitable_episodes,min_delta_annualized,min_delta_drawdown,min_delta_sharpe,mean_delta_annualized,mean_delta_sharpe,changed_systems,admissible_pre2026
+1,gap__gm14p5,Blocca se SMA50/SMA200 < -14.5%,gap,1,1,11,0,0.0,0.0,0.0,0.01261916720809464,0.01840062258702524,1,True
+2,gap__gm15p0,Blocca se SMA50/SMA200 < -15.0%,gap,1,1,11,0,0.0,0.0,0.0,0.01261916720809464,0.01840062258702524,1,True
+3,gap__gm15p5,Blocca se SMA50/SMA200 < -15.5%,gap,1,1,11,0,0.0,0.0,0.0,0.01261916720809464,0.01840062258702524,1,True
+4,gap__gm16p0,Blocca se SMA50/SMA200 < -16.0%,gap,1,1,11,0,0.0,0.0,0.0,0.01261916720809464,0.01840062258702524,1,True
+5,gap__gm16p5,Blocca se SMA50/SMA200 < -16.5%,gap,1,1,11,0,0.0,0.0,0.0,0.01261916720809464,0.01840062258702524,1,True
+6,gap__gm17p0,Blocca se SMA50/SMA200 < -17.0%,gap,1,1,11,0,0.0,0.0,0.0,0.01261916720809464,0.01840062258702524,1,True
+7,return90__rm7p5,Blocca se return 90g < -7.5%,return90,1,2,12,0,0.0,0.0,0.0,0.025713486265279473,0.023077075461063745,1,True
+8,gap_return90__gm13p0__rm7p5,Blocca se insieme: SMA50/SMA200 < -13.0% e return 90g < -7.5%,gap_return90,2,2,12,0,0.0,0.0,0.0,0.025713486265279473,0.023077075461063745,1,True
+9,gap_return90__gm14p0__rm7p5,Blocca se insieme: SMA50/SMA200 < -14.0% e return 90g < -7.5%,gap_return90,2,2,12,0,0.0,0.0,0.0,0.025713486265279473,0.023077075461063745,1,True
+10,gap_return90__gm15p0__rm7p5,Blocca se insieme: SMA50/SMA200 < -15.0% e return 90g < -7.5%,gap_return90,2,2,12,0,0.0,0.0,0.0,0.025713486265279473,0.023077075461063745,1,True
+11,gap_return90__gm16p0__rm7p5,Blocca se insieme: SMA50/SMA200 < -16.0% e return 90g < -7.5%,gap_return90,2,2,12,0,0.0,0.0,0.0,0.025713486265279473,0.023077075461063745,1,True
+12,gap_return90__gm17p0__rm7p5,Blocca se insieme: SMA50/SMA200 < -17.0% e return 90g < -7.5%,gap_return90,2,2,12,0,0.0,0.0,0.0,0.025713486265279473,0.023077075461063745,1,True
+13,return90__rm5p0,Blocca se return 90g < -5.0%,return90,1,2,12,0,0.0,0.0,0.0,0.023061434096960376,0.02122139897706965,1,True
+14,gap__gm18p0,Blocca se SMA50/SMA200 < -18.0%,gap,1,2,12,0,0.0,-3.3306690738754696e-16,0.0,0.0005833250163524983,0.007855420944546165,1,True
+15,return90__rm12p5,Blocca se return 90g < -12.5%,return90,1,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+16,slope__sm1p0,Blocca se slope SMA200 20g > -1.0%,slope,1,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+17,slope__sp0p0,Blocca se slope SMA200 20g > 0.0%,slope,1,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+18,slope__sp0p5,Blocca se slope SMA200 20g > 0.5%,slope,1,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+19,slope__sp1p0,Blocca se slope SMA200 20g > 1.0%,slope,1,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+20,slope__sp1p5,Blocca se slope SMA200 20g > 1.5%,slope,1,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+21,gap_return90__gm13p0__rm12p5,Blocca se insieme: SMA50/SMA200 < -13.0% e return 90g < -12.5%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+22,gap_return90__gm14p0__rm12p5,Blocca se insieme: SMA50/SMA200 < -14.0% e return 90g < -12.5%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+23,gap_return90__gm15p0__rm12p5,Blocca se insieme: SMA50/SMA200 < -15.0% e return 90g < -12.5%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+24,gap_return90__gm16p0__rm12p5,Blocca se insieme: SMA50/SMA200 < -16.0% e return 90g < -12.5%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+25,gap_return90__gm17p0__rm12p5,Blocca se insieme: SMA50/SMA200 < -17.0% e return 90g < -12.5%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+26,slope_gap__sm1p0__gm13p0,Blocca se insieme: slope SMA200 20g > -1.0% e SMA50/SMA200 < -13.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+27,slope_gap__sm1p0__gm14p0,Blocca se insieme: slope SMA200 20g > -1.0% e SMA50/SMA200 < -14.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+28,slope_gap__sm1p0__gm15p0,Blocca se insieme: slope SMA200 20g > -1.0% e SMA50/SMA200 < -15.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+29,slope_gap__sm1p0__gm16p0,Blocca se insieme: slope SMA200 20g > -1.0% e SMA50/SMA200 < -16.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+30,slope_gap__sm1p0__gm17p0,Blocca se insieme: slope SMA200 20g > -1.0% e SMA50/SMA200 < -17.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+31,slope_gap__sp0p0__gm13p0,Blocca se insieme: slope SMA200 20g > 0.0% e SMA50/SMA200 < -13.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+32,slope_gap__sp0p0__gm14p0,Blocca se insieme: slope SMA200 20g > 0.0% e SMA50/SMA200 < -14.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+33,slope_gap__sp0p0__gm15p0,Blocca se insieme: slope SMA200 20g > 0.0% e SMA50/SMA200 < -15.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+34,slope_gap__sp0p0__gm16p0,Blocca se insieme: slope SMA200 20g > 0.0% e SMA50/SMA200 < -16.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+35,slope_gap__sp0p0__gm17p0,Blocca se insieme: slope SMA200 20g > 0.0% e SMA50/SMA200 < -17.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+36,slope_gap__sp1p0__gm13p0,Blocca se insieme: slope SMA200 20g > 1.0% e SMA50/SMA200 < -13.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+37,slope_gap__sp1p0__gm14p0,Blocca se insieme: slope SMA200 20g > 1.0% e SMA50/SMA200 < -14.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+38,slope_gap__sp1p0__gm15p0,Blocca se insieme: slope SMA200 20g > 1.0% e SMA50/SMA200 < -15.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+39,slope_gap__sp1p0__gm16p0,Blocca se insieme: slope SMA200 20g > 1.0% e SMA50/SMA200 < -16.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+40,slope_gap__sp1p0__gm17p0,Blocca se insieme: slope SMA200 20g > 1.0% e SMA50/SMA200 < -17.0%,slope_gap,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+41,slope_return90__sm1p0__rm10p0,Blocca se insieme: slope SMA200 20g > -1.0% e return 90g < -10.0%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+42,slope_return90__sm1p0__rm12p5,Blocca se insieme: slope SMA200 20g > -1.0% e return 90g < -12.5%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+43,slope_return90__sm1p0__rm7p5,Blocca se insieme: slope SMA200 20g > -1.0% e return 90g < -7.5%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+44,slope_return90__sp0p0__rm10p0,Blocca se insieme: slope SMA200 20g > 0.0% e return 90g < -10.0%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+45,slope_return90__sp0p0__rm12p5,Blocca se insieme: slope SMA200 20g > 0.0% e return 90g < -12.5%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+46,slope_return90__sp0p0__rm7p5,Blocca se insieme: slope SMA200 20g > 0.0% e return 90g < -7.5%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+47,slope_return90__sp1p0__rm10p0,Blocca se insieme: slope SMA200 20g > 1.0% e return 90g < -10.0%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+48,slope_return90__sp1p0__rm12p5,Blocca se insieme: slope SMA200 20g > 1.0% e return 90g < -12.5%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+49,slope_return90__sp1p0__rm7p5,Blocca se insieme: slope SMA200 20g > 1.0% e return 90g < -7.5%,slope_return90,2,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+50,risk2of3__sm1p0__gm14p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -14.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+51,risk2of3__sm1p0__gm14p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -14.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+52,risk2of3__sm1p0__gm15p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -15.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+53,risk2of3__sm1p0__gm15p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -15.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+54,risk2of3__sm1p0__gm16p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -16.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+55,risk2of3__sm1p0__gm16p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -16.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+56,risk2of3__sp0p0__gm14p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -14.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+57,risk2of3__sp0p0__gm14p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -14.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+58,risk2of3__sp0p0__gm15p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -15.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+59,risk2of3__sp0p0__gm15p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -15.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+60,risk2of3__sp0p0__gm16p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -16.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+61,risk2of3__sp0p0__gm16p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -16.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+62,risk2of3__sp1p0__gm14p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -14.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+63,risk2of3__sp1p0__gm14p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -14.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+64,risk2of3__sp1p0__gm15p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -15.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+65,risk2of3__sp1p0__gm15p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -15.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+66,risk2of3__sp1p0__gm16p0__rm12p5,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -16.0%, return 90g < -12.5%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+67,risk2of3__sp1p0__gm16p0__rm15p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -16.0%, return 90g < -15.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.018385876644930965,0.015839377755886952,1,True
+68,return90__rm10p0,Blocca se return 90g < -10.0%,return90,1,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+69,gap_return90__gm13p0__rm10p0,Blocca se insieme: SMA50/SMA200 < -13.0% e return 90g < -10.0%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+70,gap_return90__gm14p0__rm10p0,Blocca se insieme: SMA50/SMA200 < -14.0% e return 90g < -10.0%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+71,gap_return90__gm15p0__rm10p0,Blocca se insieme: SMA50/SMA200 < -15.0% e return 90g < -10.0%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+72,gap_return90__gm16p0__rm10p0,Blocca se insieme: SMA50/SMA200 < -16.0% e return 90g < -10.0%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+73,gap_return90__gm17p0__rm10p0,Blocca se insieme: SMA50/SMA200 < -17.0% e return 90g < -10.0%,gap_return90,2,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+74,risk2of3__sm1p0__gm14p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -14.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+75,risk2of3__sm1p0__gm15p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -15.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+76,risk2of3__sm1p0__gm16p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > -1.0%, SMA50/SMA200 < -16.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+77,risk2of3__sp0p0__gm14p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -14.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+78,risk2of3__sp0p0__gm15p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -15.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+79,risk2of3__sp0p0__gm16p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 0.0%, SMA50/SMA200 < -16.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+80,risk2of3__sp1p0__gm14p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -14.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+81,risk2of3__sp1p0__gm15p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -15.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+82,risk2of3__sp1p0__gm16p0__rm10p0,"Blocca con almeno 2 rischi: slope SMA200 20g > 1.0%, SMA50/SMA200 < -16.0%, return 90g < -10.0%",risk2of3,3,3,13,0,0.0,0.0,0.0,0.013548249958675207,0.012615542922736367,1,True
+83,return90__rm15p0,Blocca se return 90g < -15.0%,return90,1,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+84,return90__rm17p5,Blocca se return 90g < -17.5%,return90,1,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+85,return90__rm20p0,Blocca se return 90g < -20.0%,return90,1,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+86,return90__rm25p0,Blocca se return 90g < -25.0%,return90,1,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+87,gap_return90__gm13p0__rm15p0,Blocca se insieme: SMA50/SMA200 < -13.0% e return 90g < -15.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+88,gap_return90__gm13p0__rm20p0,Blocca se insieme: SMA50/SMA200 < -13.0% e return 90g < -20.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+89,gap_return90__gm14p0__rm15p0,Blocca se insieme: SMA50/SMA200 < -14.0% e return 90g < -15.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+90,gap_return90__gm14p0__rm20p0,Blocca se insieme: SMA50/SMA200 < -14.0% e return 90g < -20.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+91,gap_return90__gm15p0__rm15p0,Blocca se insieme: SMA50/SMA200 < -15.0% e return 90g < -15.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+92,gap_return90__gm15p0__rm20p0,Blocca se insieme: SMA50/SMA200 < -15.0% e return 90g < -20.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+93,gap_return90__gm16p0__rm15p0,Blocca se insieme: SMA50/SMA200 < -16.0% e return 90g < -15.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+94,gap_return90__gm16p0__rm20p0,Blocca se insieme: SMA50/SMA200 < -16.0% e return 90g < -20.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+95,gap_return90__gm17p0__rm15p0,Blocca se insieme: SMA50/SMA200 < -17.0% e return 90g < -15.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+96,gap_return90__gm17p0__rm20p0,Blocca se insieme: SMA50/SMA200 < -17.0% e return 90g < -20.0%,gap_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+97,slope_return90__sm1p0__rm15p0,Blocca se insieme: slope SMA200 20g > -1.0% e return 90g < -15.0%,slope_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+98,slope_return90__sm1p0__rm20p0,Blocca se insieme: slope SMA200 20g > -1.0% e return 90g < -20.0%,slope_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+99,slope_return90__sp0p0__rm15p0,Blocca se insieme: slope SMA200 20g > 0.0% e return 90g < -15.0%,slope_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+100,slope_return90__sp0p0__rm20p0,Blocca se insieme: slope SMA200 20g > 0.0% e return 90g < -20.0%,slope_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+101,slope_return90__sp1p0__rm15p0,Blocca se insieme: slope SMA200 20g > 1.0% e return 90g < -15.0%,slope_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+102,slope_return90__sp1p0__rm20p0,Blocca se insieme: slope SMA200 20g > 1.0% e return 90g < -20.0%,slope_return90,2,4,14,0,0.0,0.0,0.0,0.0,0.0,0,True
+103,slope__sm2p0,Blocca se slope SMA200 20g > -2.0%,slope,1,0,7,2,-0.11133101915614763,-1.1102230246251565e-16,-0.07236285694484246,-0.08116834344111368,-0.03537478309304509,2,False
+104,gap__gm14p0,Blocca se SMA50/SMA200 < -14.0%,gap,1,1,10,1,-0.0791698302750179,-0.03307775990787265,-0.05185964951333544,-0.03522008839627011,-0.013549564673612458,2,False
+105,gap__gm13p0,Blocca se SMA50/SMA200 < -13.0%,gap,1,2,8,3,-0.22640286574530144,-0.03307775990787243,-0.15004037282432892,-0.15152528777058927,-0.09235447689711074,2,False

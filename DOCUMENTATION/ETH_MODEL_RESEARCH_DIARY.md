@@ -3733,3 +3733,319 @@ File:
 - `reports/august_2026_breakout_entry_research.md`;
 - `reports/august_2026_breakout_event_audit.md`;
 - `reports/august_2026_breakout_exit_state.csv`.
+
+## Ricerca 2026-08-23 - RSI e conferma prezzo del breakout precoce
+
+Richiesta analizzata:
+
+- sostituire `RSI 40-65` con il solo limite inferiore `RSI >= 40`;
+- fondere momentum 7 giorni e massimo dei 5 Close precedenti nella regola
+  `Close odierno > media dei 7 Close precedenti`;
+- confrontare anche la formulazione alternativa `Close odierno > massimo dei
+  7 Close precedenti`;
+- indicare tutte le date nelle quali il percorso breakout avrebbe prodotto un
+  ingresso effettivo.
+
+Protocollo:
+
+- dati `ETH-USD` Coinbase dall'inizio della serie valutabile alla candela
+  chiusa del `2026-08-22`;
+- commissione principale taker `0,16%` per lato; controlli maker `0,07%` e
+  stress `0,60%` per lato;
+- esecuzione prudenziale dalla candela successiva al segnale;
+- metriche principali calcolate fino al `2026-08-16`, prima del movimento che
+  ha generato la ricerca, e controllo completo fino al cutoff;
+- tredici varianti tra configurazioni principali, ablazioni e sensibilita' a
+  5/7/10 giorni; dieci percorsi di segnale distinti prima dell'evento;
+- uscite sempre identiche alla Baseline ufficiale;
+- verifica automatica della perfetta coincidenza tra replica Baseline e
+  modello ufficiale e tra candidato attuale e candidato congelato.
+
+Metriche principali pre-evento, commissione taker:
+
+| Variante | Annualizzato | Max DD | Sharpe | Ingressi breakout | Perdite breakout | Profit factor complessivo |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 97,65% | -39,87% | 1,666 | 0 | 0 | 15,995 |
+| Attuale: RSI 40-65 + momentum7 + massimo5 | 120,64% | -36,56% | 1,833 | 6 | 1 | 16,830 |
+| RSI >=40 + momentum7 + massimo5 | 125,29% | -36,56% | 1,835 | 12 | 5 | 13,005 |
+| RSI 40-65 + media7 | 115,79% | -39,17% | 1,755 | 13 | 6 | 11,012 |
+| RSI >=40 + media7 | 118,08% | -38,66% | 1,760 | 14 | 7 | 10,953 |
+| RSI 40-65 + massimo7 | 120,64% | -36,56% | 1,833 | 6 | 1 | 16,830 |
+| RSI >=40 + massimo7 | 125,29% | -36,56% | 1,835 | 12 | 5 | 13,005 |
+
+Date degli ingressi breakout effettivi:
+
+- candidato attuale e `RSI 40-65 + massimo7`: `2017-02-01`, `2019-03-27`,
+  `2023-01-06`, `2024-11-06`, `2026-01-13`, `2026-08-17`;
+- `RSI >=40 + momentum7 + massimo5` e `RSI >=40 + massimo7`:
+  `2017-02-01`, `2018-05-03`, `2019-03-27`, `2020-01-15`, `2022-03-28`,
+  `2023-01-06`, `2023-10-24`, `2024-11-06`, `2025-05-13`, `2025-06-10`,
+  `2026-01-06`, `2026-08-17`;
+- `RSI 40-65 + media7`: `2017-02-01`, `2018-05-07`, `2018-05-14`,
+  `2019-03-27`, `2020-01-19`, `2020-05-07`, `2023-01-06`, `2023-11-20`,
+  `2024-11-06`, `2025-05-29`, `2025-06-11`, `2026-01-13`, `2026-07-28`;
+- `RSI >=40 + media7`: `2017-02-01`, `2018-05-03`, `2018-05-14`,
+  `2019-03-27`, `2020-01-15`, `2020-05-07`, `2022-03-28`, `2023-01-06`,
+  `2023-10-24`, `2024-11-06`, `2025-05-12`, `2025-06-10`, `2026-01-06`,
+  `2026-07-28`.
+
+Lettura della rimozione del tetto RSI:
+
+- annualizzato pre-evento `+4,65` punti rispetto al candidato attuale;
+- drawdown massimo invariato e Sharpe quasi identico (`1,833` -> `1,835`);
+- gli ingressi breakout raddoppiano da 6 a 12 e le perdite passano da 1 a 5;
+- nuove operazioni favorevoli: `2020-01-15` `+55,05%` e `2023-10-24`
+  `+25,11%`;
+- nuove operazioni sfavorevoli: `2018-05-03` `-12,85%`, `2022-03-28`
+  `-5,28%`, `2025-05-13` `-10,16%`, `2025-06-10` `-8,68%`;
+- l'ingresso negativo di gennaio 2026 viene anticipato dal 13 al 6 gennaio e
+  passa da `-11,92%` a `-11,18%`, senza eliminare l'errore;
+- PSR diretto di vantaggio sul candidato attuale `76,77%`; bootstrap 30/90
+  giorni soltanto `63,10%`/`63,75%`, con percentile 5% `-39,25%`/`-41,90%`;
+- il maggiore rendimento non si traduce quindi in un miglioramento robusto
+  della qualita' del segnale.
+
+Lettura della media7:
+
+- la media7 e' molto piu' permissiva e misura un recupero di breve periodo,
+  non un breakout;
+- con RSI >=40 produce 14 ingressi, dei quali 7 perdenti;
+- rispetto al candidato attuale peggiora annualizzato (`118,08%` contro
+  `120,64%`), drawdown (`-38,66%` contro `-36,56%`) e Sharpe (`1,760` contro
+  `1,833`);
+- introduce fra gli altri i falsi ingressi `2018-05-14` `-20,85%` e
+  `2020-05-07` `-11,93%`;
+- sul movimento corrente era gia' dentro dal `2026-07-28` a `1.919,90 USD` e
+  realizza `+29,23%` sul solo segmento 17-22 agosto, contro `+26,48%` del
+  candidato entrato il 17 agosto; questo vantaggio locale non compensa il
+  peggioramento storico;
+- PSR diretto `48,31%` e bootstrap 30/90 giorni `41,00%`/`40,95%`: nessuna
+  evidenza di vantaggio sul candidato attuale.
+
+Lettura del massimo7:
+
+- `Close > massimo dei 7 Close precedenti` assorbe logicamente il requisito
+  momentum7 e, nello storico disponibile, genera esattamente gli stessi
+  segnali del candidato `momentum7 + massimo5`;
+- con RSI 40-65 replica tutte le sei date e tutte le metriche del candidato;
+- con il solo RSI >=40 replica tutte le dodici date e le metriche della
+  corrispondente variante senza tetto;
+- e' quindi una formulazione piu' semplice e coerente con un breakout, ma
+  rimane logicamente un poco piu' severa e non va confusa con un'identita'
+  matematica universale.
+
+Controlli di robustezza:
+
+- PBO/CSCV sulle varianti: `82,54%`, valore elevato che segnala instabilita'
+  nella selezione della configurazione apparentemente migliore;
+- il candidato attuale conserva bootstrap contro la Baseline `98,35%` a 30g
+  e `97,35%` a 90g;
+- il solo RSI senza tetto conserva buone metriche assolute, ma il confronto
+  diretto con il candidato attuale non e' abbastanza forte per sostituirlo;
+- risultati coerenti sotto commissione maker/taker/stress e con ritardi di
+  una o due candele; la media7 e' meno sensibile al ritardo nel caso corrente
+  soltanto perche' era gia' esposta dal 28 luglio.
+
+Decisione:
+
+- non modificare la Baseline ufficiale, il bot o la dashboard;
+- non adottare la media7 come sostituzione delle condizioni 6 e 8;
+- mantenere `RSI >=40` senza tetto come variante shadow, non come nuovo
+  candidato ufficiale;
+- mantenere congelata la formulazione attuale del candidato per non alterare
+  il test prospettico gia' iniziato;
+- annotare `Close > massimo dei 7 Close precedenti` come formulazione
+  equivalente osservata e piu' semplice da riesaminare alla prossima decisione,
+  senza cambiare ora il candidato congelato.
+
+File:
+
+- `scripts/run_breakout_rsi_confirmation_research.py`;
+- `reports/breakout_rsi_confirmation_research.md`;
+- `reports/breakout_rsi_confirmation_metrics.csv`;
+- `reports/breakout_rsi_confirmation_entries.csv`;
+- `reports/breakout_rsi_confirmation_triggers.csv`;
+- `reports/breakout_rsi_confirmation_yearly.csv`;
+- `reports/breakout_rsi_confirmation_costs.csv`;
+- `reports/breakout_rsi_confirmation_delays.csv`;
+- `reports/breakout_rsi_confirmation_statistics.csv`.
+
+## Ricerca 2026-08-23 - Guardrail per il falso breakout di gennaio 2026
+
+Motivazione:
+
+- le varianti breakout entrano il `2026-01-06` quando si usa `RSI >=40`
+  senza tetto oppure il `2026-01-13` con `RSI 40-65`;
+- entrambe escono il `2026-01-20` a `2.936,50 USD`, rispettivamente con
+  `-11,18%` e `-11,92%` netti;
+- il prezzo non ha recuperato i livelli di ingresso entro la candela chiusa
+  del `2026-08-22`;
+- obiettivo del test: evitare l'episodio usando informazioni disponibili ex
+  ante, senza una regola associata alle date e senza modificare la Baseline.
+
+Diagnosi comune alle due entrate:
+
+| Data | Close | RSI | Slope SMA200 20g | SMA50/SMA200 | Return 90g |
+|---|---:|---:|---:|---:|---:|
+| 2026-01-06 | 3.295,59 | 68,55 | +1,24% | -16,50% | -27,21% |
+| 2026-01-13 | 3.323,38 | 64,75 | +1,57% | -16,17% | -16,66% |
+
+Il solo tetto RSI non e' sufficiente: rinvia l'entrata dal 6 al 13 gennaio,
+ma non elimina il falso recupero. Il regime distintivo e' la combinazione tra
+SMA200 ancora crescente e SMA50 molto distante sotto SMA200.
+
+Protocollo:
+
+- dati `ETH-USD` Coinbase dall'inizio della serie alla candela chiusa del
+  `2026-08-22`;
+- commissione taker `0,16%` per lato, con controlli maker `0,07%`, stress
+  `0,60%` e ritardi aggiuntivi di 1-2 candele;
+- 106 guardrail per ciascuno dei due sistemi breakout, per un totale di 212
+  percorsi: filtri singoli, coppie e regole due-rischi-su-tre;
+- soglie testate intorno a slope SMA200 20g, distanza SMA50/SMA200 e rendimento
+  a 90 giorni;
+- uscite e condizioni ufficiali invariate;
+- confronto separato fino al `2026-01-05`, prima dell'episodio usato per
+  formulare il guardrail;
+- verifica di conservazione di tutti gli episodi breakout favorevoli e del
+  movimento iniziato il `2026-08-17`.
+
+Candidato principale shadow:
+
+> Bloccare il solo ingresso breakout quando sono vere insieme entrambe:
+> `SMA200 slope 20g > 0%` e `SMA50/SMA200 < -15%`.
+
+Risultati con commissione taker:
+
+| Sistema | Guardrail | Rendimento totale | Annualizzato | Max DD | Sharpe | Profit factor | Operazioni | Breakout loss |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| RSI 40-65, senza guardrail | no | +271.202,84% | 125,74% | -36,56% | 1,869 | 16,830 | 33 | 1 |
+| RSI 40-65, guardrail | si | +307.926,92% | 128,71% | -36,56% | 1,897 | 19,020 | 32 | 0 |
+| RSI >=40, senza guardrail | no | +331.993,15% | 130,49% | -36,56% | 1,870 | 13,005 | 38 | 5 |
+| RSI >=40, guardrail | si | +428.934,67% | 136,65% | -36,56% | 1,928 | 15,709 | 36 | 3 |
+
+Effetti sulle operazioni:
+
+- elimina il falso ingresso del `2026-01-13` dal sistema RSI 40-65;
+- elimina il falso ingresso del `2026-01-06` dal sistema RSI >=40;
+- nella variante RSI >=40 elimina anche il precedente indipendente del
+  `2018-05-03`, chiuso a `-12,85%`;
+- conserva tutti gli episodi breakout favorevoli precedenti;
+- conserva l'ingresso del `2026-08-17` a `1.911,94 USD`, ancora aperto al
+  cutoff con `+26,47%` netto;
+- il drawdown massimo complessivo resta `-36,56%`: il guardrail migliora il
+  percorso e il profit factor, ma non elimina il principale drawdown storico.
+
+Robustezza e limiti:
+
+- tutte le nove combinazioni vicine con slope tra `-1%` e `+1%` e distanza
+  tra `-16%` e `-14%` evitano gennaio, conservano agosto e non perdono episodi
+  favorevoli;
+- i risultati restano coerenti sotto costi maker/taker/stress e ritardi di
+  una o due candele;
+- fino al `2026-01-05` il sistema RSI 40-65 resta esattamente invariato;
+- nel sistema RSI >=40 il guardrail migliora lo storico precedente eliminando
+  il trade negativo del 2018;
+- limite decisivo: nel percorso RSI 40-65 il guardrail incide storicamente su
+  una sola operazione, proprio gennaio 2026; il precedente indipendente esiste
+  soltanto nel percorso RSI >=40. Il campione e' quindi troppo piccolo per una
+  promozione definitiva.
+
+Decisione:
+
+- nessuna modifica a Baseline, bot, dashboard o candidato congelato;
+- registrare la regola combinata come `guardrail candidato shadow`;
+- non confondere il miglioramento successivo a gennaio con una validazione
+  fuori campione, poiche' il caso ha motivato la costruzione della regola;
+- riesaminare il guardrail quando un nuovo ingresso breakout si presenta nello
+  stesso regime oppure quando il trade aperto del 17 agosto verra' chiuso.
+
+File:
+
+- `scripts/run_january_2026_entry_guardrail_research.py`;
+- `tests/test_january_2026_entry_guardrail.py`;
+- `reports/january_2026_entry_guardrail_research.md`;
+- `reports/january_2026_entry_guardrail_grid.csv`;
+- `reports/january_2026_entry_guardrail_trades.csv`;
+- `reports/january_2026_entry_guardrail_yearly.csv`;
+- `reports/january_2026_entry_guardrail_robustness.csv`;
+- `reports/january_2026_entry_guardrail_entry_features.csv`.
+
+## Validazione 2026-08-23 - Replay cieco pre-2026 del guardrail
+
+Domanda:
+
+- verificare se il pacchetto `breakout RSI 40-65 + guardrail` possa essere
+  promosso a Baseline ufficiale;
+- evitare di scegliere una soglia soltanto perche' cancella a posteriori il
+  falso ingresso del 6/13 gennaio 2026.
+
+Protocollo temporale:
+
+- selezione dei 105 guardrail alternativi usando esclusivamente dati chiusi
+  entro il `2026-01-05`;
+- nessun punteggio di selezione utilizza l'esito di gennaio 2026 o il movimento
+  iniziato il 17 agosto 2026;
+- vincoli pre-2026: nessun episodio breakout favorevole perso e nessun
+  peggioramento di annualizzato, drawdown o Sharpe nei due sistemi analizzati;
+- apertura del blocco 2026 soltanto dopo il congelamento della graduatoria;
+- avvertenza metodologica: le famiglie slope SMA200, distanza SMA50/SMA200 e
+  return 90g erano state individuate dopo aver osservato gennaio. Il replay e'
+  cieco sulle soglie e sugli esiti 2026, ma non sulle feature iniziali.
+
+Esito della selezione pre-2026:
+
+- emerge al primo posto la sola distanza `SMA50/SMA200`;
+- sei soglie, comprese tra `-14,5%` e `-17,0%`, sono perfettamente
+  indistinguibili sul periodo di selezione;
+- tutte conservano gli episodi favorevoli e riducono le perdite breakout
+  aggregate pre-2026 da entrambe le varianti;
+- il guardrail combinato `SMA200 slope20 > 0%` e `SMA50/SMA200 < -15%` e'
+  ammissibile ma occupa il rank 33, perche' e' meno aggressivo e lascia vive
+  piu' operazioni negative della variante RSI senza tetto.
+
+Apertura del holdout 2026:
+
+- soglie distanza `-14,5%`, `-15,0%`, `-15,5%` e `-16,0%` bloccano sia il 6
+  sia il 13 gennaio;
+- soglie `-16,5%` e `-17,0%`, equivalenti nel periodo di selezione, non
+  bloccano gennaio;
+- esito del gate per la classe cieca: `4/6` evitano gennaio;
+- tutte le sei soglie (`6/6`) conservano l'ingresso del `2026-08-17`;
+- il guardrail combinato evita entrambe le entrate di gennaio, conserva agosto
+  e resta identico al candidato RSI 40-65 in tutto il periodo pre-2026.
+
+Lettura:
+
+- il replay conferma che la distanza eccessiva tra SMA50 e SMA200 contiene
+  informazione utile gia' prima del caso gennaio 2026;
+- non identifica pero' una soglia unica: selezionare `-15%` dopo aver aperto il
+  2026 conserverebbe una componente di scelta a posteriori;
+- il gate retrospettivo e' quindi superato soltanto in parte;
+- la regola combinata e' preferita come shadow perche' blocca soltanto quando
+  alla distanza profonda si aggiunge SMA200 ancora crescente, riducendo il
+  rischio di eliminare recuperi validi.
+
+Decisione congelata:
+
+> Shadow breakout bloccato soltanto quando `SMA200Slope20 > 0%` e
+> `SMA50VsSMA200 < -15%` sono vere contemporaneamente.
+
+- stato: `shadow_frozen` dal `2026-08-23`;
+- nessuna modifica a Baseline, bot, dashboard, entrate o uscite ufficiali;
+- nessuna promozione immediata a Baseline;
+- promozione riesaminabile alla prima nuova attivazione indipendente del
+  guardrail, senza un'attesa prefissata in mesi;
+- in quella occasione si dovra' registrare il breakout bloccato, il successivo
+  andamento fino all'uscita che sarebbe stata applicata, il drawdown evitato o
+  subito e il costo opportunita' rispetto all'ingresso non eseguito.
+
+File:
+
+- `scripts/run_january_2026_guardrail_blind_validation.py`;
+- `reports/january_2026_guardrail_blind_validation.md`;
+- `reports/january_2026_guardrail_blind_selection.csv`;
+- `reports/january_2026_guardrail_blind_holdout.csv`;
+- `reports/january_2026_guardrail_blind_periods.csv`;
+- `reports/january_2026_guardrail_blind_trades.csv`;
+- `reports/january_2026_guardrail_shadow_spec.json`.

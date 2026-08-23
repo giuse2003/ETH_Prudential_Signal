@@ -1,0 +1,34 @@
+{
+  "status": "shadow_frozen",
+  "frozen_on": "2026-08-23",
+  "market": "ETH-USD",
+  "timeframe": "1d_utc_closed_candles",
+  "entry_path": "current_rsi40_65_mom7_high5",
+  "guardrail": {
+    "scope": "breakout_entry_only",
+    "block_when_all_true": [
+      {
+        "feature": "SMA200Slope20",
+        "operator": ">",
+        "value": 0.0
+      },
+      {
+        "feature": "SMA50VsSMA200",
+        "operator": "<",
+        "value": -0.15
+      }
+    ]
+  },
+  "unchanged": [
+    "official_baseline_entry",
+    "official_baseline_exit",
+    "trail8_exit",
+    "bot",
+    "dashboard"
+  ],
+  "promotion_gate": {
+    "retrospective_gate": "partial_pass",
+    "requires_new_independent_shadow_activation": true,
+    "fixed_waiting_months": null
+  }
+}
