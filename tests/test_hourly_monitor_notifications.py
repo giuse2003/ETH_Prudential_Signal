@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
-from hourly_monitor import should_force_daily_download
+from hourly_monitor import should_force_daily_download, should_send_live_alert
 from state.state_store import MonitorState
 
 
@@ -59,6 +60,26 @@ class HourlyMonitorNotificationTests(unittest.TestCase):
 
         self.assertNotIn("send_telegram_message", source)
         self.assertNotIn("TELEGRAM_BOT_TOKEN", source)
+
+    def test_condition_schema_migration_saves_baseline_without_notification(self) -> None:
+        state = MonitorState(
+            last_live_conditions_key="BUY:10001|SELL:00",
+            live_pending_conditions_key="BUY:10001|SELL:00",
+            live_pending_since_utc="2026-08-28T09:00:00+00:00",
+        )
+        current_key = "BUY_STANDARD:10001|BUY_BREAKOUT:11100001|SELL:00"
+
+        must_notify, reason = should_send_live_alert(
+            state,
+            current_key,
+            datetime(2026, 8, 28, 10, 0, tzinfo=timezone.utc),
+        )
+
+        self.assertFalse(must_notify)
+        self.assertIn("schema condizioni LIVE aggiornato", reason)
+        self.assertEqual(state.last_live_conditions_key, current_key)
+        self.assertIsNone(state.live_pending_conditions_key)
+        self.assertIsNone(state.live_pending_since_utc)
 
 
 if __name__ == "__main__":

@@ -4231,3 +4231,6 @@ Telegram e Worker:
 - conteggio al controllo: un iscritto attivo;
 - il messaggio LIVE mostra azione, stato `DENTRO/FUORI`, cinque condizioni
   standard, otto breakout, due vendite e collegamento alla dashboard.
+- aggiunta una migrazione della chiave condizioni: al primo run v3 il passaggio
+  dal vecchio schema a sette stati al nuovo schema `5+8+2` salva una nuova
+  baseline LIVE senza inviare un falso avviso Telegram.

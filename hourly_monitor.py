@@ -39,6 +39,10 @@ def _parse_iso_utc(value: str | None) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
+def _condition_key_schema(value: str) -> tuple[str, ...]:
+    return tuple(part.partition(":")[0] for part in value.split("|") if part)
+
+
 def should_send_live_alert(
     state: MonitorState,
     live_conditions_key: str,
@@ -50,6 +54,13 @@ def should_send_live_alert(
         state.live_pending_conditions_key = None
         state.live_pending_since_utc = None
         return False, "baseline LIVE salvata senza notifica"
+    if _condition_key_schema(state.last_live_conditions_key) != _condition_key_schema(
+        live_conditions_key
+    ):
+        state.last_live_conditions_key = live_conditions_key
+        state.live_pending_conditions_key = None
+        state.live_pending_since_utc = None
+        return False, "schema condizioni LIVE aggiornato; nuova baseline salvata senza notifica"
     if live_conditions_key != state.last_live_conditions_key:
         state.last_live_conditions_key = live_conditions_key
         state.live_pending_conditions_key = live_conditions_key
