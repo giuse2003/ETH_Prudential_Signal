@@ -4197,3 +4197,37 @@ Reversibilita':
   `reports/breakout_official_promotion_2026-08-28.md`;
 - ogni futura attivazione del breakout dovra essere registrata con ingresso,
   uscita, rendimento, drawdown e confronto con il percorso standard.
+
+## Pubblicazione 2026-08-28 - Baseline v3 operativa
+
+Versionamento e push:
+
+- commit del modello: `b95ce23` - `Promuove il breakout protetto nella Baseline`;
+- tag annotato pubblicato: `baseline-v3-2026-08-27`;
+- integrati senza sovrascrittura i pacchetti automatici gia presenti sul
+  remoto;
+- commit del pacchetto operativo: `d77fc29` -
+  `Pubblica pacchetto operativo Baseline v3`;
+- branch remoto `master` allineato al pacchetto v3.
+
+Pacchetto pubblico verificato:
+
+- run operativo: `20260828T100344Z-600cfc99`;
+- ultima candela chiusa: `2026-08-27`;
+- azione DAILY e LIVE: `MANTIENI STATO ATTUALE`;
+- stato operativo: `FUORI`;
+- gruppi pubblicati: 5 condizioni standard, 8 breakout e 2 vendita;
+- dashboard GitHub Pages caricata senza errori con metriche v3 e i due
+  percorsi `ACQUISTA`;
+- test CI e deploy GitHub Pages conclusi con successo sul commit `d77fc29`.
+
+Telegram e Worker:
+
+- Cloudflare Worker `eth-prudential-signal` pubblicato;
+- Version ID: `b7c329dc-4c46-492f-8a63-3b65c37e7696`;
+- `/live-preview`, `/subscribers/health` e `/subscribers/count` verificati con
+  risposta HTTP 200;
+- Supabase configurato sulla tabella `telegram_subscribers_eth`;
+- conteggio al controllo: un iscritto attivo;
+- il messaggio LIVE mostra azione, stato `DENTRO/FUORI`, cinque condizioni
+  standard, otto breakout, due vendite e collegamento alla dashboard.
