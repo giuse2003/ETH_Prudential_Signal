@@ -18,12 +18,24 @@ CONDITIONS_HELP_MESSAGE = "\n".join(
     [
         "CONDIZIONI ETH MONITOR",
         "",
-        "Per ACQUISTA devono essere vere tutte queste condizioni:",
+        "ACQUISTA si attiva quando e' completo almeno uno dei due percorsi.",
+        "",
+        "PERCORSO 1 - TREND CONFERMATO:",
         "1. prezzo sopra SMA200;",
         "2. SMA50 sopra SMA200;",
         "3. valore RSI compreso tra 40 e 65;",
         "4. prezzo sopra quello di 7 giorni prima;",
         "5. volume sopra media 20 giorni.",
+        "",
+        "PERCORSO 2 - BREAKOUT PROTETTO:",
+        "1. SMA50 sotto o uguale a SMA200;",
+        "2. prezzo sopra SMA50 e almeno al 90% di SMA200;",
+        "3. SMA50 non in calo rispetto a 5 giorni prima;",
+        "4. valore RSI compreso tra 40 e 65;",
+        "5. prezzo sopra quello di 7 giorni prima;",
+        "6. volume almeno 20% sopra la media 20 giorni;",
+        "7. Close sopra tutti i 5 Close precedenti;",
+        "8. guardrail superato: il breakout viene bloccato solo se SMA200 sale da 20 giorni e SMA50 e' oltre il 15% sotto SMA200.",
         "",
         "Per VENDI deve essere vera almeno una di queste condizioni:",
         "1. prezzo oltre il 2% sotto SMA50 (Close &lt; SMA50 x 0,98);",
@@ -49,14 +61,19 @@ def load_published_live_status(project_root: Path) -> dict:
 def build_live_signal_message(payload: dict) -> str:
     groups = payload.get("condition_groups", {})
     buy_statuses = [bool(item.get("passed")) for item in groups.get("buy", [])]
+    breakout_statuses = [
+        bool(item.get("passed")) for item in groups.get("buy_breakout", [])
+    ]
     sell_statuses = [bool(item.get("passed")) for item in groups.get("sell", [])]
-    if len(buy_statuses) != 5 or len(sell_statuses) != 2:
-        raise ValueError("Il pacchetto LIVE non contiene le sette condizioni ETH ufficiali.")
+    if len(buy_statuses) != 5 or len(breakout_statuses) != 8 or len(sell_statuses) != 2:
+        raise ValueError("Il pacchetto LIVE non contiene le condizioni ETH ufficiali.")
     return format_condition_message(
         signal=str(payload["action"]),
         price_eur=payload.get("price_eur"),
         buy_statuses=buy_statuses,
+        breakout_statuses=breakout_statuses,
         sell_statuses=sell_statuses,
+        position_open=bool(payload.get("position_open", False)),
         title="ETH-USD Signal - LIVE PREVIEW",
     )
 

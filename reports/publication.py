@@ -20,7 +20,7 @@ from config import CFG
 from reports.generate import write_utf8_text
 
 PUBLIC_JSON_FILES = ("status.json", "live-status.json", "chart-data.json")
-BASELINE_MANIFEST = "runs/baseline-v2-2026-07-26/manifest.json"
+BASELINE_MANIFEST = "runs/baseline-v3-2026-08-27/manifest.json"
 
 
 def new_run_metadata() -> dict[str, str]:
@@ -108,18 +108,31 @@ def write_manifest(
         **metadata,
         "period": period,
         "rules": {
-            "buy": [
+            "buy_logic": "tutte le condizioni del percorso standard OR tutte le condizioni del breakout protetto",
+            "buy_standard": [
                 "Close > SMA200",
                 "SMA50 > SMA200",
                 "40 <= RSI14 <= 65 per nuovi ingressi",
                 "Close > Close 7 giorni prima",
                 "Volume ETH-USD > media 20 giorni",
             ],
+            "buy_breakout": [
+                "SMA50 <= SMA200",
+                "Close > SMA50 e Close >= SMA200 * 0.90",
+                "SMA50 >= SMA50 di 5 giorni prima",
+                "40 <= RSI14 <= 65",
+                "Close > Close 7 giorni prima",
+                "Volume ETH-USD >= media 20 giorni * 1.20",
+                "Close > massimo dei 5 Close precedenti",
+                "guardrail: non insieme SMA200 slope20 > 0% e SMA50/SMA200 < -15%",
+            ],
             "sell": [
                 "Close < SMA50 * 0.98",
                 "Trailing stop 8% dal massimo post-ingresso, confermato da momentum 7d >= -15% e volume relativo >= 20%",
             ],
             "sell_precedence": True,
+            "breakout_operational_start": "2026-08-28",
+            "operational_state_at_promotion": "FUORI; nessun ingresso retroattivo il 2026-08-17",
             "execution_delay_days": 1,
             "exposure": "0% o 100%; MANTIENI STATO ATTUALE conserva l'esposizione",
             "transaction_costs": "0.6% per lato inclusi per strategia e Buy & Hold",

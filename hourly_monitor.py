@@ -153,7 +153,9 @@ def main() -> None:
                 signal=result.live_action,
                 price_eur=result.price_eur,
                 buy_statuses=result.buy_statuses,
+                breakout_statuses=result.breakout_statuses,
                 sell_statuses=result.sell_statuses,
+                position_open=result.position_open,
                 title="ETH-USD Signal - LIVE PREVIEW",
                 include_dashboard_link=True,
             )

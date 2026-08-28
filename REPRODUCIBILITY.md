@@ -15,19 +15,24 @@ python -m venv .venv
 ## Baseline ufficiale
 
 Il nome pubblico resta **Baseline**. Il pacchetto usa internamente il percorso
-`docs/runs/baseline-v2-2026-07-26/` e il tag `baseline-v2-2026-07-26`.
+`docs/runs/baseline-v3-2026-08-27/` e il tag `baseline-v3-2026-08-27`.
 
 Verifica offline completa dal checkout ufficiale:
 
 ```powershell
-python reproduce.py --manifest docs/runs/baseline-v2-2026-07-26/manifest.json
+python reproduce.py --manifest docs/runs/baseline-v3-2026-08-27/manifest.json
 ```
 
 Il comando controlla versione Python, dipendenze, hash del lock, hash dei
 sorgenti, snapshot Coinbase, metriche e byte degli output rigenerati. Non
 contatta la rete.
 
-## Vecchia baseline
+## Baseline precedenti
+
+La baseline precedente e immutabile in
+`docs/runs/baseline-v2-2026-07-26/` e nel tag `baseline-v2-2026-07-26`.
+Il checkout corrente ne verifica gli artefatti senza rieseguire le vecchie
+regole.
 
 La vecchia baseline e immutabile in
 `docs/runs/baseline-v1-2026-07-26/` e nel tag `baseline-v1-2026-07-26`.
@@ -47,8 +52,8 @@ git worktree add ..\ETH_Prudential_Signal-v1 baseline-v1-2026-07-26
 python ..\ETH_Prudential_Signal-v1\reproduce.py --manifest ..\ETH_Prudential_Signal-v1\docs\runs\baseline-v1-2026-07-26\manifest.json
 ```
 
-La pipeline CI controlla inoltre che la directory della vecchia baseline non
-presenti differenze rispetto al tag storico.
+La pipeline CI controlla inoltre che le directory v1 e v2 non presentino
+differenze rispetto ai rispettivi tag storici.
 
 ## Run operativo
 

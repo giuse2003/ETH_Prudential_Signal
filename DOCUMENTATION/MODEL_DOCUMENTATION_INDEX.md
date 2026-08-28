@@ -1,6 +1,6 @@
 # Model Documentation Index
 
-Ultimo aggiornamento: 2026-07-27
+Ultimo aggiornamento: 2026-08-28
 
 ## Fonti dello stato corrente
 
@@ -11,10 +11,10 @@ Ultimo aggiornamento: 2026-07-27
 | `PROJECT_OVERVIEW.md` | Architettura dati, modello e pubblicazione |
 | `../EVALUATION_VALUES.md` | Metriche canoniche non arrotondate |
 | `../REPRODUCIBILITY.md` | Riproduzione e versionamento interno |
-| `../reports/official_baseline_implementation.md` | Dossier della promozione |
+| `../reports/breakout_official_promotion_2026-08-28.md` | Dossier della promozione v3 |
 | `SIGNAL_RULE_VERIFICATION_LOG.md` | Verifica delle regole correnti |
 
-Questi documenti descrivono la **Baseline ufficiale**. Il numero `v2` e usato
+Questi documenti descrivono la **Baseline ufficiale**. Il numero `v3` e usato
 soltanto internamente per directory, manifest, tag e metadati.
 
 ## Contratto corrente
@@ -23,20 +23,32 @@ soltanto internamente per directory, manifest, tag e metadati.
 - dati modello: Coinbase Advanced Trade `ETH-USD`;
 - dati informativi: spot Coinbase `ETH-EUR`;
 - storico canonico: dal `2016-05-23`;
-- pacchetto ufficiale interno: `../docs/runs/baseline-v2-2026-07-26/`;
+- pacchetto ufficiale interno: `../docs/runs/baseline-v3-2026-08-27/`;
+- baseline precedente: `../docs/runs/baseline-v2-2026-07-26/`;
 - vecchia baseline: `../docs/runs/baseline-v1-2026-07-26/`;
 - run operativo: `../docs/manifest.json`;
 - commissione backtest: `0,6%` per lato.
 
 ## Regole ufficiali
 
-### Acquisto
+### Acquisto - percorso 1
 
 1. `Close > SMA200`;
 2. `SMA50 > SMA200`;
 3. `40 <= RSI14 <= 65` sui nuovi ingressi;
 4. `Close > Close.shift(7)`;
 5. `Volume > VolumeAvg20`.
+
+### Acquisto - percorso 2
+
+1. `SMA50 <= SMA200`;
+2. `Close > SMA50` e `Close >= SMA200 * 0,90`;
+3. SMA50 non in calo a cinque giorni;
+4. `40 <= RSI14 <= 65`;
+5. momentum a sette giorni positivo;
+6. volume almeno 20% sopra la media a 20 giorni;
+7. Close sopra i cinque Close precedenti;
+8. guardrail di regime superato.
 
 ### Vendita
 
@@ -70,6 +82,7 @@ non necessariamente alla Baseline ufficiale corrente.
 | 2026-07-22 | Telegram reso esclusivamente LIVE |
 | 2026-07-27 | Migrazione completa a Coinbase e congelamento vecchia baseline |
 | 2026-07-27 | Promozione della nuova Baseline ufficiale dopo test completi allo 0,6% |
+| 2026-08-28 | Promozione del breakout protetto come secondo percorso di ingresso |
 
 ## Controlli trasversali
 

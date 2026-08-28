@@ -90,7 +90,7 @@ def _build_conditional_signals(df: pd.DataFrame, extra_condition: pd.Series) -> 
     below_sma50_two_days = below_sma50 & below_sma50.shift(1).fillna(False)
     official_sell = below_sma50_two_days | (below_sma50 & extra_condition.fillna(False))
 
-    signal, trail_hit, trail_confirmed = _stateful_signals(
+    signal, trail_hit, trail_confirmed, _, _ = _stateful_signals(
         df=out,
         official_buy_cond=official_buy,
         filtered_new_entry_cond=filtered_buy,

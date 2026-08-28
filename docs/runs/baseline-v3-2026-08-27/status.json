@@ -1,0 +1,95 @@
+{
+  "run_id": "baseline-v3-2026-08-27",
+  "run_type": "frozen-baseline",
+  "as_of": "2026-08-27",
+  "project": "ETH-USD Signal",
+  "model_version": "3.0",
+  "data_source": "Coinbase Advanced Trade",
+  "market": "ETH-USD",
+  "timezone": "UTC",
+  "mode": "DAILY",
+  "candle_date": "2026-08-27",
+  "action": "MANTIENI STATO ATTUALE",
+  "price_usd": 2511.67,
+  "price_eur": null,
+  "status": "Attivo",
+  "position_open": true,
+  "breakout_operational_start": "2026-08-28",
+  "risk_level": "ALTO",
+  "rsi": 77.54551381038712,
+  "sma50": 1977.5586,
+  "sma200": 2016.4785000000002,
+  "atr": 96.17007445985433,
+  "volume_eth": 133639.09943779,
+  "volume_avg20_eth": 107139.119160911,
+  "previous_close": 2506.93,
+  "previous_sma50": 1962.1612,
+  "condition_groups": {
+    "buy": [
+      {
+        "label": "prezzo sopra SMA200",
+        "passed": true
+      },
+      {
+        "label": "SMA50 sopra SMA200",
+        "passed": false
+      },
+      {
+        "label": "RSI tra 40 e 65 per i nuovi ingressi",
+        "passed": false
+      },
+      {
+        "label": "prezzo sopra quello di 7 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "volume ETH-USD sopra media 20 giorni",
+        "passed": true
+      }
+    ],
+    "buy_breakout": [
+      {
+        "label": "SMA50 sotto o uguale a SMA200",
+        "passed": true
+      },
+      {
+        "label": "prezzo sopra SMA50 e almeno al 90% di SMA200",
+        "passed": true
+      },
+      {
+        "label": "SMA50 non in calo rispetto a 5 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "RSI tra 40 e 65",
+        "passed": false
+      },
+      {
+        "label": "prezzo sopra quello di 7 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "volume ETH-USD almeno 20% sopra media 20 giorni",
+        "passed": true
+      },
+      {
+        "label": "Close sopra i 5 Close precedenti",
+        "passed": true
+      },
+      {
+        "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
+        "passed": true
+      }
+    ],
+    "sell": [
+      {
+        "label": "prezzo oltre il 2% sotto SMA50",
+        "passed": false
+      },
+      {
+        "label": "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
+        "passed": false
+      }
+    ]
+  }
+}

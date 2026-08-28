@@ -28,15 +28,19 @@ class TelegramCommandTests(unittest.TestCase):
             "mode": "LIVE PREVIEW",
             "action": "MANTIENI STATO ATTUALE",
             "price_eur": 2630.0,
+            "position_open": False,
             "condition_groups": {
                 "buy": [{"passed": False}] * 5,
+                "buy_breakout": [{"passed": False}] * 8,
                 "sell": [{"passed": True}, {"passed": False}],
             },
         }
         message = build_live_signal_message(payload)
         self.assertTrue(message.startswith("ETH-USD Signal - LIVE PREVIEW"))
         self.assertIn("Azione: MANTIENI STATO ATTUALE", message)
-        self.assertIn("ACQUISTA:\n🅾️ 1.", message)
+        self.assertIn("Stato operativo: FUORI", message)
+        self.assertIn("ACQUISTA - PERCORSO 1:\n🅾️ 1.", message)
+        self.assertIn("ACQUISTA - BREAKOUT PROTETTO:\n🅾️ 1.", message)
         self.assertIn("VENDI:\n✅ 1.", message)
 
     def test_worker_has_no_daily_fallback_for_signal_command(self) -> None:

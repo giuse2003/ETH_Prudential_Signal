@@ -1,19 +1,23 @@
 # ETH-USD Signal Rule Verification Log
 
-Ultimo aggiornamento: 2026-07-27
+Ultimo aggiornamento: 2026-08-28
 
 ## Dataset canonico
 
 - Coinbase Advanced Trade `ETH-USD`, granularita `ONE_DAY`;
-- storico continuo `2016-05-23` - `2026-07-26`;
-- valutazione post warm-up `2016-12-08` - `2026-07-26`;
-- 3.518 osservazioni senza duplicati o giorni mancanti;
+- storico continuo `2016-05-23` - `2026-08-27`;
+- valutazione post warm-up `2016-12-08` - `2026-08-27`;
+- 3.550 osservazioni senza duplicati o giorni mancanti;
 - snapshot SHA-256:
-  `09504484b0d115c6b130dbfc82f05f5dc9137ce11b1cf12604f9a1c96132c357`.
+  `43315c8379173d399882f0a8372056dae9a57032cc92de9926b026245d1ef619`.
 
 ## Regole verificate
 
-- cinque condizioni di acquisto, tutte obbligatorie;
+- percorso standard con cinque condizioni, tutte obbligatorie;
+- percorso breakout protetto con sette conferme e guardrail di regime;
+- logica di ingresso `percorso standard OR breakout protetto`;
+- guardrail verificato sul falso ingresso del 13 gennaio 2026;
+- attivazione operativa dal 28 agosto senza backfill dell'ingresso del 17;
 - RSI14 compreso tra 40 e 65 soltanto sui nuovi ingressi;
 - vendita SMA50 se e solo se `Close < SMA50 * 0,98`;
 - nessuna vendita SMA50 per una chiusura compresa tra SMA50 e il margine 2%;
@@ -29,7 +33,7 @@ Ultimo aggiornamento: 2026-07-27
 
 ## Contratto pubblicato
 
-- esattamente cinque stati `ACQUISTA` e due stati `VENDI`;
+- cinque stati per il percorso standard, otto per il breakout e due `VENDI`;
 - `status.json` e `live-status.json` usano le nuove etichette;
 - `/conditions` espone margine SMA50 2%, momentum -15% e volume +20%;
 - il nome pubblico non contiene il numero di versione interno.
@@ -40,25 +44,24 @@ Periodo completo, commissione 0,6% per lato:
 
 | Strategia | Totale | Annualizzato | Max DD | Trade | Win rate | Sharpe |
 |---|---:|---:|---:|---:|---:|---:|
-| ETH-USD Signal | 56.672,64% | 93,12% | -43,00% | 30 | 50,00% | 1,615 |
-| Buy & Hold | 23.431,28% | 76,25% | -94,01% | n/a | n/a | 1,074 |
+| ETH-USD Signal | 240.310,55% | 122,70% | -39,05% | 32 | 59,38% | 1,845 |
+| Buy & Hold | 30.163,66% | 79,95% | -94,01% | n/a | n/a | 1,097 |
 
-Profit factor strategia: `14.94397361521486`.
+Profit factor strategia: `17.813017225255965`.
 
 ## Stato al cutoff
 
-- azione `2026-07-26`: `MANTIENI STATO ATTUALE`;
-- esposizione: 0%;
-- ultima vendita effettiva: `2026-07-09`.
+- azione operativa `2026-08-27`: `MANTIENI STATO ATTUALE`;
+- stato operativo: `FUORI`;
+- stato storico v3: trade breakout del 17 agosto ancora aperto.
 
 ## Comandi di verifica
 
 ```powershell
 python -m pip install --require-hashes -r requirements.lock
 python -m unittest discover -s tests -v
-python reproduce.py --manifest docs/runs/baseline-v2-2026-07-26/manifest.json
+python reproduce.py --manifest docs/runs/baseline-v3-2026-08-27/manifest.json
 node --check cloudflare-worker/src/worker.js
 ```
 
-La vecchia baseline resta verificata come archivio immutabile e si riproduce
-byte per byte dal tag `baseline-v1-2026-07-26`.
+Le baseline v1 e v2 restano verificate come archivi immutabili.

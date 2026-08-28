@@ -4049,3 +4049,151 @@ File:
 - `reports/january_2026_guardrail_blind_periods.csv`;
 - `reports/january_2026_guardrail_blind_trades.csv`;
 - `reports/january_2026_guardrail_shadow_spec.json`.
+
+## Follow-up 2026-08-28 - Rialzo ancora escluso dalla Baseline
+
+Domanda:
+
+- verificare perche' la Baseline non abbia ancora prodotto `ACQUISTA` durante
+  il rialzo iniziato il 17 agosto;
+- stabilire se il problema dipenda da `RSI <= 65`, da `SMA50 > SMA200` o
+  dalla loro interazione;
+- aggiornare il controllo del candidato breakout senza modificare i segnali
+  operativi.
+
+Dati:
+
+- `ETH-USD` Coinbase daily UTC;
+- ultima candela chiusa `2026-08-27`;
+- costi maker `0,07%`, taker `0,16%` e stress `0,60%` per lato;
+- regole di uscita ufficiali invariate.
+
+Diagnosi:
+
+- il 17 e 18 agosto RSI, momentum e volume erano validi, ma Close e SMA50
+  erano ancora sotto SMA200;
+- dal 19 agosto Close era sopra SMA200, ma RSI era gia' a `82,16` e SMA50
+  restava sotto SMA200;
+- le condizioni ufficiali non sono state vere insieme in alcuna candela;
+- rimuovere soltanto il tetto RSI oppure soltanto il gate SMA50 non avrebbe
+  prodotto un ingresso nel movimento;
+- rimuovere entrambi avrebbe generato un ingresso tardivo il `2026-08-19` a
+  `2.251,69 USD`, ma porta le operazioni storiche da 30 a 42 e peggiora il
+  max drawdown da `-39,87%` a `-43,03%`.
+
+Aggiornamento del candidato shadow protetto:
+
+- ingresso breakout `2026-08-17` a `1.911,94 USD`;
+- Close al cutoff `2.511,67 USD`;
+- rendimento netto provvisorio taker `+31,16%`;
+- massimo drawdown del trade `-3,73%`;
+- posizione ancora aperta, nessuna uscita ufficiale o Trail8;
+- il guardrail conserva agosto ed elimina il falso ingresso del
+  `2026-01-13` chiuso a `-11,92%` senza protezione.
+
+Confronto storico taker:
+
+| Sistema | Annualizzato | Max DD | Sharpe | Profit factor | Operazioni |
+|---|---:|---:|---:|---:|---:|
+| Baseline ufficiale | 97,23% | -39,87% | 1,664 | 15,995 | 30 |
+| Breakout protetto | 129,30% | -36,56% | 1,903 | 19,020 | 32 |
+
+Decisione:
+
+- nessuna rimozione globale di RSI o SMA50 e nessun inseguimento tardivo del
+  prezzo;
+- Baseline, bot, dashboard e Telegram restano invariati;
+- il percorso breakout protetto resta il candidato principale per risolvere
+  questo tipo di movimento;
+- l'esito del trade corrente rafforza il candidato ma non e' una validazione
+  indipendente, poiche' agosto e' l'evento che ne ha motivato lo sviluppo;
+- riesame alla chiusura del trade shadow con le uscite ufficiali oppure alla
+  prima nuova attivazione indipendente;
+- valutare come prossimo passo la visualizzazione separata dello stato shadow
+  nella dashboard, senza promozione automatica ad `ACQUISTA`.
+
+File:
+
+- `reports/august_2026_missed_rally_followup.md`.
+
+## Decisione 2026-08-28 - Promozione del breakout protetto
+
+Decisione dell'utente:
+
+- promuovere il candidato breakout protetto a secondo percorso ufficiale di
+  ingresso;
+- conservare integralmente il percorso standard;
+- non modificare le due condizioni di vendita;
+- non eseguire un acquisto retroattivo relativo al 17 agosto.
+
+Nuova logica ufficiale:
+
+> `ACQUISTA = percorso standard completo OR breakout protetto completo`.
+
+Percorso standard, tutte vere:
+
+1. `Close > SMA200`;
+2. `SMA50 > SMA200`;
+3. `40 <= RSI14 <= 65`;
+4. `Close > Close.shift(7)`;
+5. `Volume > VolumeAvg20`.
+
+Breakout protetto, tutte vere:
+
+1. `SMA50 <= SMA200`;
+2. `Close > SMA50` e `Close >= SMA200 * 0,90`;
+3. `SMA50 >= SMA50.shift(5)`;
+4. `40 <= RSI14 <= 65`;
+5. `Close > Close.shift(7)`;
+6. `Volume >= VolumeAvg20 * 1,20`;
+7. `Close` sopra il massimo dei cinque Close precedenti;
+8. guardrail superato: non devono essere vere insieme slope SMA200 a 20
+   giorni positiva e distanza SMA50/SMA200 inferiore a `-15%`.
+
+Uscite confermate senza variazioni:
+
+- `Close < SMA50 * 0,98`;
+- Trail8 dal massimo Close post-ingresso, con momentum 7 giorni `>= -15%` e
+  volume relativo `>= +20%`.
+
+Risultati congelati al `2026-08-27`, costo prudenziale `0,60%` per lato:
+
+| Metrica | Baseline v3 | Buy & Hold |
+|---|---:|---:|
+| Totale | +240.310,55% | +30.163,66% |
+| Annualizzato | 122,70% | 79,95% |
+| Max drawdown | -39,05% | -94,01% |
+| Sharpe | 1,845 | 1,097 |
+| Profit factor | 17,813 | n/a |
+| Trade completati | 32 | n/a |
+
+Separazione tra ricerca e operativita':
+
+- il replay storico completo entra sul breakout del `2026-08-17` a
+  `1.911,94 USD` e al cutoff mantiene il trade aperto;
+- quel risultato rimane nel backtest per misurare la regola su tutta la serie;
+- lo stato operativo riparte `FUORI`;
+- il nuovo percorso e' abilitato dalle candele chiuse del `2026-08-28`;
+- nessun segnale passato viene ricostruito come acquisto reale;
+- il prossimo ingresso operativo richiede una nuova candela che completi uno
+  dei due percorsi.
+
+Implementazione:
+
+- `strategy/signals.py`: secondo percorso, guardrail, data di attivazione e
+  stato operativo senza backfill;
+- `pipeline.py`: separazione tra replay storico e stato operativo;
+- `reports/generate.py` e `reports/publication.py`: contratto dati v3;
+- dashboard, Telegram, monitor orario e Cloudflare Worker: visualizzazione dei
+  due percorsi e dello stato `DENTRO/FUORI`;
+- test automatici dedicati ad attivazione, guardrail, messaggi e JSON;
+- pacchetto congelato:
+  `docs/runs/baseline-v3-2026-08-27/manifest.json`.
+
+Reversibilita':
+
+- le baseline v1 e v2 restano archiviate e immutabili;
+- il dossier completo della decisione e' in
+  `reports/breakout_official_promotion_2026-08-28.md`;
+- ogni futura attivazione del breakout dovra essere registrata con ingresso,
+  uscita, rendimento, drawdown e confronto con il percorso standard.

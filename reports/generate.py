@@ -37,6 +37,7 @@ def _json_float(value) -> float | None:
 
 def _condition_groups(
     buy_statuses: list[bool],
+    breakout_statuses: list[bool],
     sell_statuses: list[bool],
     live: bool,
 ) -> dict:
@@ -48,6 +49,16 @@ def _condition_groups(
         f"prezzo{qualifier} sopra quello di 7 giorni prima",
         f"volume ETH-USD{qualifier} sopra media 20 giorni",
     ]
+    breakout_labels = [
+        f"SMA50{qualifier} sotto o uguale a SMA200",
+        f"prezzo{qualifier} sopra SMA50 e almeno al 90% di SMA200",
+        f"SMA50{qualifier} non in calo rispetto a 5 giorni prima",
+        f"RSI{qualifier} tra 40 e 65",
+        f"prezzo{qualifier} sopra quello di 7 giorni prima",
+        f"volume ETH-USD{qualifier} almeno 20% sopra media 20 giorni",
+        f"Close{qualifier} sopra i 5 Close precedenti",
+        "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
+    ]
     sell_labels = [
         f"prezzo{qualifier} oltre il 2% sotto SMA50",
         "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
@@ -56,6 +67,10 @@ def _condition_groups(
         "buy": [
             {"label": label, "passed": bool(passed)}
             for label, passed in zip(buy_labels, buy_statuses)
+        ],
+        "buy_breakout": [
+            {"label": label, "passed": bool(passed)}
+            for label, passed in zip(breakout_labels, breakout_statuses)
         ],
         "sell": [
             {"label": label, "passed": bool(passed)}
@@ -72,7 +87,9 @@ def save_historical_csv(df: pd.DataFrame, out_path: str | Path) -> Path:
     columns = [
         "Data", "Open", "High", "Low", "Close", "ETH-USD", "SMA50", "SMA200",
         "RSI", "ATR", "Volume", "VolumeAvg20", "Azione", "Livello_Rischio",
-        "Official_Sell", "Trail8_Stop_Hit", "Trail8_Confirmed",
+        "Standard_Entry", "Breakout_Raw", "Breakout_Guard_Passed",
+        "Breakout_Entry", "Entry_Path", "Position_Open", "Official_Sell",
+        "Trail8_Stop_Hit", "Trail8_Confirmed",
     ]
     return save_dataframe_csv(output[columns], out_path, index=False)
 
@@ -95,6 +112,7 @@ def save_chart_data_json(
             "volume": _json_float(row.get("Volume")),
             "volume_avg20": _json_float(row.get("VolumeAvg20")),
             "action": str(row.get("Segnale", HOLD_ACTION)),
+            "entry_path": str(row.get("Entry_Path", "")),
         }
         for date, row in df.sort_index().iterrows()
     ]
@@ -111,7 +129,9 @@ def save_live_status_json(
     price_eur: float | None,
     volume_24h_eth: float,
     buy_statuses: list[bool],
+    breakout_statuses: list[bool],
     sell_statuses: list[bool],
+    position_open: bool,
     rsi: float | None,
     sma50: float | None,
     sma200: float | None,
@@ -128,12 +148,16 @@ def save_live_status_json(
         "price_eur": _json_float(price_eur),
         "volume_24h_eth": float(volume_24h_eth),
         "status": "Attivo",
+        "position_open": bool(position_open),
+        "breakout_operational_start": "2026-08-28",
         "rsi": _json_float(rsi),
         "sma50": _json_float(sma50),
         "sma200": _json_float(sma200),
         "atr": _json_float(atr),
         "risk_level": risk_level,
-        "condition_groups": _condition_groups(buy_statuses, sell_statuses, live=True),
+        "condition_groups": _condition_groups(
+            buy_statuses, breakout_statuses, sell_statuses, live=True
+        ),
     }
     return write_utf8_text(out_path, json.dumps(payload, indent=2))
 
@@ -146,7 +170,7 @@ def save_status_json(
 ) -> Path:
     latest = df.iloc[-1]
     previous = df.iloc[-2] if len(df) >= 2 else None
-    buy_statuses, sell_statuses = live_condition_statuses(df)
+    buy_statuses, breakout_statuses, sell_statuses = live_condition_statuses(df)
     payload = {
         **metadata,
         "mode": "DAILY",
@@ -155,6 +179,8 @@ def save_status_json(
         "price_usd": _json_float(latest["Close"]),
         "price_eur": None,
         "status": "Attivo",
+        "position_open": bool(latest.get("Position_Open", False)),
+        "breakout_operational_start": "2026-08-28",
         "risk_level": str(latest.get("Livello_Rischio", "MEDIO")),
         "rsi": _json_float(latest.get("RSI")),
         "sma50": _json_float(latest.get("SMA50")),
@@ -164,7 +190,9 @@ def save_status_json(
         "volume_avg20_eth": _json_float(latest.get("VolumeAvg20")),
         "previous_close": _json_float(previous.get("Close") if previous is not None else None),
         "previous_sma50": _json_float(previous.get("SMA50") if previous is not None else None),
-        "condition_groups": _condition_groups(buy_statuses, sell_statuses, live=False),
+        "condition_groups": _condition_groups(
+            buy_statuses, breakout_statuses, sell_statuses, live=False
+        ),
     }
     return write_utf8_text(out_path, json.dumps(payload, indent=2))
 
@@ -189,6 +217,8 @@ def save_text_report(
         f"Fonte: {CFG.data_source} - {CFG.product_id}",
         "",
         f"Azione: {latest['Segnale']}",
+        f"Posizione operativa: {'DENTRO' if bool(latest.get('Position_Open', False)) else 'FUORI'}",
+        "Secondo ingresso breakout operativo dalle candele chiuse del 2026-08-28",
         f"Rischio informativo: {latest.get('Livello_Rischio', 'MEDIO')}",
         f"Close ETH-USD: {float(latest['Close']):.2f} USD",
         f"Spot ETH-USD: {price_usd:.2f} USD" if price_usd is not None else "Spot ETH-USD: non disponibile",

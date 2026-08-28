@@ -1,6 +1,6 @@
 # ETH-USD Signal - Roadmap Operativa
 
-Ultimo aggiornamento: 2026-07-27
+Ultimo aggiornamento: 2026-08-28
 
 Questo file tiene traccia delle problematiche riscontrate durante la creazione
 del progetto Ethereum e delle attivita ancora da completare. Va aggiornato a
@@ -22,8 +22,11 @@ ogni avanzamento rilevante.
 - Bot Telegram ETH dedicato creato e collegato via webhook:
   `@ETH_Prudential_Signal_bot`
 - Test Python: suite completa e riproduzione offline obbligatorie in CI.
-- Baseline ufficiale promossa il 2026-07-27:
-  - cinque condizioni di acquisto invariate;
+- Baseline ufficiale `v3` promossa il 2026-08-28:
+  - percorso 1 con le cinque condizioni di trend confermato;
+  - percorso 2 con breakout protetto e guardrail di regime;
+  - attivazione operativa dalle candele chiuse del `2026-08-28`, stato reale
+    `FUORI` e nessun acquisto retroattivo del 17 agosto;
   - vendita `Close < SMA50 * 0,98` oppure
     `Trail8 / momentum >= -15% / volume >= +20%`;
   - commissione backtest 0,6% per lato.
@@ -33,7 +36,8 @@ ogni avanzamento rilevante.
   - `ETH-USD` e' il mercato del modello per segnali e backtest operativo;
   - Coinbase Advanced Trade e l'unica fonte runtime;
   - `ETH-EUR` resta soltanto spot informativo;
-  - la Baseline ufficiale e congelata internamente come `v2` al `2026-07-26`;
+  - la Baseline ufficiale e congelata internamente come `v3` al `2026-08-27`;
+  - la `v2` resta la baseline precedente immutabile;
   - la `v1` resta la vecchia baseline immutabile;
   - il run operativo viene pubblicato come pacchetto coerente con `run_id`.
 

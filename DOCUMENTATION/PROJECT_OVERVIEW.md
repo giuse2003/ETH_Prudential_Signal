@@ -21,13 +21,27 @@ finanziaria.
 
 ## Baseline ufficiale
 
-`ACQUISTA` richiede tutte le condizioni:
+`ACQUISTA` richiede che sia completo almeno uno dei due percorsi.
+
+Percorso 1, trend confermato:
 
 1. `Close > SMA200`;
 2. `SMA50 > SMA200`;
 3. `40 <= RSI14 <= 65` per i nuovi ingressi;
 4. `Close > Close.shift(7)`;
 5. `Volume > VolumeAvg20`.
+
+Percorso 2, breakout protetto:
+
+1. `SMA50 <= SMA200`;
+2. `Close > SMA50` e `Close >= SMA200 * 0,90`;
+3. SMA50 non in calo rispetto a cinque giorni prima;
+4. `40 <= RSI14 <= 65`;
+5. `Close > Close.shift(7)`;
+6. `Volume >= VolumeAvg20 * 1,20`;
+7. Close sopra il massimo dei cinque Close precedenti;
+8. guardrail superato. Il percorso viene bloccato soltanto quando SMA200 e in
+   crescita a 20 giorni e SMA50 e oltre il 15% sotto SMA200.
 
 `VENDI` ha precedenza e richiede almeno una condizione:
 
@@ -43,6 +57,8 @@ nuovi ingressi. Il superamento di RSI 65 non vende una posizione gia aperta.
 - `ACQUISTA`: esposizione desiderata 100%;
 - `VENDI`: esposizione desiderata 0%;
 - `MANTIENI STATO ATTUALE`: conserva l'esposizione precedente;
+- il breakout e operativo dalle candele chiuse del `2026-08-28` e lo stato
+  reale e ripartito `FUORI`, senza acquisto retroattivo del 17 agosto;
 - segnale a chiusura `t`: applicato al rendimento `t+1`;
 - vendita SMA50: valutata anche se la posizione ricostruita e gia chiusa, ma il
   turnover cambia soltanto quando cambia l'esposizione.
@@ -61,8 +77,8 @@ Spread, slippage, imposte e rendimento cash sono esclusi.
 - DAILY usa solo candele concluse e genera lo storico ufficiale.
 - LIVE PREVIEW aggiunge prezzo e volume 24h provvisori e ricalcola le stesse
   regole senza modificare lo storico DAILY.
-- Il monitor notifica Telegram solo quando cambia una delle sette condizioni
-  LIVE e il cambiamento supera la stabilizzazione prevista.
+- Il monitor notifica Telegram solo quando cambia una condizione dei due
+  percorsi LIVE o di vendita e il cambiamento supera la stabilizzazione.
 
 ## Pubblicazione
 
@@ -75,7 +91,8 @@ modello.
 
 ## Versionamento interno
 
-- Baseline ufficiale: `docs/runs/baseline-v2-2026-07-26/`.
+- Baseline ufficiale: `docs/runs/baseline-v3-2026-08-27/`.
+- Baseline precedente: `docs/runs/baseline-v2-2026-07-26/`.
 - Vecchia baseline: `docs/runs/baseline-v1-2026-07-26/`.
 - Il numero interno non viene esposto nel nome del bot o nei messaggi.
 - Ogni pacchetto congelato ha un tag, hash sorgenti, snapshot e manifest propri.

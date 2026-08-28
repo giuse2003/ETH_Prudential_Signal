@@ -2,6 +2,34 @@
 
 Registro sintetico delle decisioni che influenzano segnali e metriche.
 
+## 2026-08-28 - Promozione del breakout protetto
+
+**Decisione:** aggiungere il breakout protetto come secondo percorso ufficiale
+di ingresso. `ACQUISTA` richiede il completamento del percorso standard
+**oppure** del nuovo percorso; le due regole `VENDI` restano invariate.
+
+**Motivazione:** il percorso standard non ha intercettato il rialzo iniziato il
+17 agosto per la diversa tempistica di SMA200, incrocio SMA50/SMA200 e RSI. La
+rimozione globale dei filtri aumentava operazioni e rischio; il percorso
+separato anticipa soltanto breakout di ricostruzione confermati da recupero
+sopra SMA50, prossimita' a SMA200, slope SMA50, RSI 40-65, momentum, volume e
+massimo a cinque giorni.
+
+**Guardrail:** bloccare il solo percorso breakout quando SMA200 sale da 20
+giorni **e**, contemporaneamente, SMA50 e' oltre il 15% sotto SMA200. Il filtro
+elimina il falso ingresso di gennaio 2026 e conserva gli episodi favorevoli
+osservati.
+
+**Stato e migrazione:** il backtest completo registra l'ingresso storico del
+`2026-08-17`; il sistema operativo riparte `FUORI` e abilita il secondo
+percorso dalle candele chiuse del `2026-08-28`, senza acquisto retroattivo.
+
+**Baseline congelata:** `docs/runs/baseline-v3-2026-08-27/`. Con costo 0,6%
+per lato: annualizzato `122,70%`, max drawdown `-39,05%`, Sharpe `1,845`,
+profit factor `17,813` e 32 trade completati.
+
+**Riferimento:** `reports/breakout_official_promotion_2026-08-28.md`.
+
 ## 2026-07-27 - Promozione della Baseline ufficiale
 
 **Decisione:** promuovere il candidato fisso identificato internamente come

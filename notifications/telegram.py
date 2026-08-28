@@ -24,7 +24,9 @@ def format_condition_message(
     signal: str,
     price_eur: float | None,
     buy_statuses: list[bool],
+    breakout_statuses: list[bool],
     sell_statuses: list[bool],
+    position_open: bool | None = None,
     title: str = "ETH-USD Signal - LIVE PREVIEW",
     include_dashboard_link: bool = False,
 ) -> str:
@@ -45,14 +47,22 @@ def format_condition_message(
             title,
             "",
             f"Azione: {signal}",
+            *(
+                [f"Stato operativo: {'DENTRO' if position_open else 'FUORI'}"]
+                if position_open is not None
+                else []
+            ),
             "",
             "Prezzo informativo:",
             price_text,
             "",
             "(per le condizioni: /conditions)",
             "",
-            "ACQUISTA:",
+            "ACQUISTA - PERCORSO 1:",
             *condition_lines(buy_statuses),
+            "",
+            "ACQUISTA - BREAKOUT PROTETTO:",
+            *condition_lines(breakout_statuses),
             "",
             "VENDI:",
             *condition_lines(sell_statuses),

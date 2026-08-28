@@ -16,13 +16,28 @@ Coinbase `ETH-USD`. Il repository e l'infrastruttura mantengono il nome
 
 ## Baseline ufficiale
 
-`ACQUISTA` richiede contemporaneamente cinque condizioni:
+`ACQUISTA` si attiva quando e completo almeno uno dei due percorsi.
+
+Percorso 1, trend confermato:
 
 1. `Close > SMA200`;
 2. `SMA50 > SMA200`;
 3. `40 <= RSI(14) <= 65` per un nuovo ingresso;
 4. `Close > Close.shift(7)`;
 5. `Volume ETH-USD > VolumeAvg20`.
+
+Percorso 2, breakout protetto:
+
+1. `SMA50 <= SMA200`;
+2. `Close > SMA50` e `Close >= SMA200 * 0,90`;
+3. `SMA50 >= SMA50.shift(5)`;
+4. `40 <= RSI(14) <= 65`;
+5. `Close > Close.shift(7)`;
+6. `Volume ETH-USD >= VolumeAvg20 * 1,20`;
+7. `Close` sopra il massimo dei cinque Close precedenti;
+8. guardrail superato: il breakout viene bloccato soltanto quando sono vere
+   insieme `SMA200 / SMA200.shift(20) - 1 > 0` e
+   `SMA50 / SMA200 - 1 < -0,15`.
 
 `VENDI` scatta quando e vera almeno una delle due condizioni:
 
@@ -46,29 +61,32 @@ iniziale e alla liquidazione finale.
 - **LIVE PREVIEW** aggiunge una riga provvisoria con prezzo e volume rolling
   24h Coinbase, poi ricalcola le stesse regole.
 - Telegram pubblica soltanto variazioni LIVE stabilizzate e mostra sempre
-  cinque condizioni di acquisto e due di vendita.
+  i due percorsi di acquisto e le due condizioni di vendita.
+- Il percorso breakout e operativo dalle candele chiuse del `2026-08-28`.
+  Lo stato reale e ripartito `FUORI`: il segnale storico del 17 agosto non e
+  stato trasformato in un acquisto retroattivo.
 - Il nome della versione interna non viene mostrato nel bot, nella dashboard o
   nei messaggi operativi.
 
 ## Risultati ufficiali
 
-Periodo completo congelato: `2016-12-08` - `2026-07-26`, 3.518 osservazioni.
+Periodo completo congelato: `2016-12-08` - `2026-08-27`, 3.550 osservazioni.
 Commissione inclusa: `0,6%` per lato per entrambi i modelli.
 
 | Metrica | ETH-USD Signal | Buy & Hold |
 |---|---:|---:|
-| Rendimento totale | 56.672,64% | 23.431,28% |
-| Rendimento annualizzato | 93,12% | 76,25% |
-| Max drawdown | -43,00% | -94,01% |
-| Sharpe | 1,615 | 1,074 |
-| Trade completati | 30 | n/a |
-| Win rate | 50,00% | n/a |
-| Profit factor | 14,944 | n/a |
+| Rendimento totale | 240.310,55% | 30.163,66% |
+| Rendimento annualizzato | 122,70% | 79,95% |
+| Max drawdown | -39,05% | -94,01% |
+| Sharpe | 1,845 | 1,097 |
+| Trade completati | 32 | n/a |
+| Win rate | 59,38% | n/a |
+| Profit factor | 17,813 | n/a |
 
 I valori completi sono nel manifest congelato. Il risultato e storico e non
 costituisce una previsione.
 
-## Validazione della promozione
+## Validazione della promozione precedente
 
 La regola ufficiale e il candidato fisso denominato internamente
 `combo_trail_mom_15_sma_break_2_0`. Nel confronto retrospettivo 2021-2026 con
@@ -93,10 +111,11 @@ aver osservato anche parte della serie. Non equivale a un futuro mai visto.
 
 Il versionamento non cambia il nome pubblico del modello:
 
-- Baseline ufficiale: `docs/runs/baseline-v2-2026-07-26/`;
+- Baseline ufficiale: `docs/runs/baseline-v3-2026-08-27/`;
+- baseline precedente: `docs/runs/baseline-v2-2026-07-26/`;
 - vecchia baseline: `docs/runs/baseline-v1-2026-07-26/`;
 - tag storico immutabile: `baseline-v1-2026-07-26`;
-- tag ufficiale: `baseline-v2-2026-07-26`.
+- tag ufficiale: `baseline-v3-2026-08-27`.
 
 La vecchia baseline resta archiviata e non viene usata dal run operativo. Il
 run operativo si aggiorna con ogni nuova candela conclusa e punta sempre al
@@ -109,7 +128,7 @@ Richiede Python `3.13.0`.
 ```powershell
 python -m pip install --require-hashes -r requirements.lock
 python main.py --force-download
-python reproduce.py --manifest docs/runs/baseline-v2-2026-07-26/manifest.json
+python reproduce.py --manifest docs/runs/baseline-v3-2026-08-27/manifest.json
 python -m unittest discover -s tests -v
 ```
 

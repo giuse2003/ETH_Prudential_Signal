@@ -1,8 +1,17 @@
 # Telegram Subscribers Roadmap
 
-Ultimo aggiornamento: 22 luglio 2026
+Ultimo aggiornamento: 28 agosto 2026
 
 Stato generale: `BOT ETH E SUPABASE WORKER ATTIVI - FASE 4 DA IMPLEMENTARE`
+
+Nota di riallineamento del 28 agosto 2026:
+
+- il modello espone cinque condizioni del percorso standard, otto condizioni
+  del breakout protetto e due condizioni di vendita;
+- le notifiche LIVE confrontano l'intero stato dei due percorsi di acquisto e
+  delle vendite;
+- i riferimenti successivi alle "7 condizioni" sono cronologia del contratto
+  precedente e non descrivono il modello corrente.
 
 Nota di stato del 19 luglio 2026:
 
@@ -56,7 +65,7 @@ Bot Telegram
 Database Supabase
         |
         v
-Notifica agli iscritti solo quando varia una delle 7 condizioni LIVE
+Notifica agli iscritti solo quando varia lo stato delle condizioni LIVE
 ```
 
 ## Decisioni gia prese
@@ -67,8 +76,8 @@ Notifica agli iscritti solo quando varia una delle 7 condizioni LIVE
 - Il comando di iscrizione sara `/iscrivimi`.
 - Il comando di revoca sara `/disiscrivimi`.
 - `/segnale` continuera a mostrare esclusivamente il segnale LIVE corrente.
-- Le notifiche collettive partiranno solo quando varia una delle 7 condizioni
-  LIVE.
+- Le notifiche collettive partiranno solo quando varia una condizione LIVE di
+  uno dei due percorsi `ACQUISTA` o di `VENDI`.
 - Non verra inviato un messaggio collettivo ogni ora senza variazioni.
 - Il database persistente previsto e Supabase.
 - `TELEGRAM_CHAT_ID` attuale identifica l'amministratore, non l'elenco degli
@@ -94,7 +103,7 @@ Notifica agli iscritti solo quando varia una delle 7 condizioni LIVE
   aggiornare `/segnale`.
 - Implementare il repository degli iscritti.
 - Aggiungere il pulsante alla dashboard.
-- Modificare l'invio automatico sulle variazioni delle 7 condizioni LIVE.
+- Modificare l'invio automatico sulle variazioni delle condizioni LIVE.
 - Gestire utenti che bloccano il bot o chat non piu raggiungibili.
 - Aggiungere test automatici.
 - Aggiornare documentazione, file di contesto e questa roadmap.

@@ -59,7 +59,7 @@ def _build_signals(df: pd.DataFrame, *, sell_after_days: int) -> pd.DataFrame:
     else:
         raise ValueError("sell_after_days deve essere 1 o 2.")
 
-    signal, trail_hit, trail_confirmed = _stateful_signals(
+    signal, trail_hit, trail_confirmed, _, _ = _stateful_signals(
         df=out,
         official_buy_cond=official_buy,
         filtered_new_entry_cond=filtered_buy,

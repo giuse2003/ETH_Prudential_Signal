@@ -64,7 +64,7 @@ def build_frames(candles: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.
         & (indicators["Close"] > indicators[f"Close_{CFG.momentum_days}d_ago"])
         & (indicators["Volume"] > indicators["VolumeAvg20"])
     )
-    variant_signals, trail_hit, trail_confirmed = _stateful_signals(
+    variant_signals, trail_hit, trail_confirmed, _, _ = _stateful_signals(
         df=indicators,
         official_buy_cond=buy_without_upper_cap,
         filtered_new_entry_cond=buy_without_upper_cap,

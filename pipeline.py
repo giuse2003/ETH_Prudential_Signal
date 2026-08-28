@@ -29,7 +29,13 @@ from reports.publication import (
     validate_bundle,
     write_manifest,
 )
-from strategy.signals import build_live_signal_frame, compute_signals, live_condition_statuses
+from strategy.signals import (
+    BREAKOUT_OPERATIONAL_START,
+    build_live_signal_frame,
+    compute_signals,
+    condition_key_from_statuses,
+    live_condition_statuses,
+)
 
 ARTIFACT_NAMES = [
     "raw_candles.csv",
@@ -54,7 +60,9 @@ class PipelineResult:
     price_eur: float
     volume_24h_eth: float
     buy_statuses: list[bool]
+    breakout_statuses: list[bool]
     sell_statuses: list[bool]
+    position_open: bool
     strategy_metrics: BacktestMetrics
     buy_hold_metrics: BacktestMetrics
     evaluation_start: str
@@ -87,10 +95,17 @@ def run_pipeline(
     metadata = new_run_metadata()
     candles = fetch_daily_candles(refresh_all=refresh_all, now_utc=now_utc)
     provenance = operational_provenance(candles, Path(__file__).resolve().parent)
-    signals_all = compute_signals(compute_all_indicators(candles))
-    evaluated = evaluation_frame(signals_all)
+    indicators = compute_all_indicators(candles)
+    model_evaluated = evaluation_frame(compute_signals(indicators))
+    operational_evaluated = evaluation_frame(
+        compute_signals(
+            indicators,
+            breakout_active_from=BREAKOUT_OPERATIONAL_START,
+            state_reset_date=BREAKOUT_OPERATIONAL_START,
+        )
+    )
     equity, strategy_metrics, buy_hold_metrics = run_backtest(
-        evaluated[["Close", "Segnale"]],
+        model_evaluated[["Close", "Segnale"]],
         initial_capital=initial_capital,
         transaction_cost_rate=CFG.transaction_cost_rate,
     )
@@ -105,20 +120,19 @@ def run_pipeline(
         live_volume_24h=usd_market.volume_24h,
         live_time_utc=now_utc,
     )
-    live_buy, live_sell = live_condition_statuses(live_frame)
+    live_buy, live_breakout, live_sell = live_condition_statuses(live_frame)
     live_latest = live_frame.iloc[-1]
     live_action = str(live_latest["Segnale"])
-    conditions_key = (
-        "BUY:" + "".join("1" if value else "0" for value in live_buy)
-        + "|SELL:" + "".join("1" if value else "0" for value in live_sell)
-    )
+    conditions_key = condition_key_from_statuses(live_buy, live_breakout, live_sell)
     period = {
         "coinbase_history_start": candles.index[0].strftime("%Y-%m-%d"),
-        "warmup_end": (evaluated.index[0] - pd.Timedelta(days=1)).strftime("%Y-%m-%d"),
-        "evaluation_start": evaluated.index[0].strftime("%Y-%m-%d"),
-        "evaluation_end": evaluated.index[-1].strftime("%Y-%m-%d"),
-        "calendar_days": int((evaluated.index[-1] - evaluated.index[0]).days + 1),
-        "observations": int(len(evaluated)),
+        "warmup_end": (model_evaluated.index[0] - pd.Timedelta(days=1)).strftime("%Y-%m-%d"),
+        "evaluation_start": model_evaluated.index[0].strftime("%Y-%m-%d"),
+        "evaluation_end": model_evaluated.index[-1].strftime("%Y-%m-%d"),
+        "calendar_days": int((model_evaluated.index[-1] - model_evaluated.index[0]).days + 1),
+        "observations": int(len(model_evaluated)),
+        "breakout_operational_start": BREAKOUT_OPERATIONAL_START.strftime("%Y-%m-%d"),
+        "operational_position_open": bool(operational_evaluated.iloc[-1]["Position_Open"]),
     }
     metrics = {
         "strategy": _metrics_payload(strategy_metrics),
@@ -129,14 +143,20 @@ def run_pipeline(
         raw_candles = candles.copy().sort_index()
         raw_candles.index.name = "Date"
         save_dataframe_csv(raw_candles, staging / "raw_candles.csv", index=True)
-        save_status_json(evaluated, metadata=metadata, out_path=staging / "status.json")
+        save_status_json(
+            operational_evaluated,
+            metadata=metadata,
+            out_path=staging / "status.json",
+        )
         save_live_status_json(
             action=live_action,
             price_usd=usd_market.price,
             price_eur=eur_market.price,
             volume_24h_eth=usd_market.volume_24h,
             buy_statuses=live_buy,
+            breakout_statuses=live_breakout,
             sell_statuses=live_sell,
+            position_open=bool(live_latest["Position_Open"]),
             rsi=float(live_latest["RSI"]),
             sma50=float(live_latest["SMA50"]),
             sma200=float(live_latest["SMA200"]),
@@ -145,18 +165,18 @@ def run_pipeline(
             metadata=metadata,
             out_path=staging / "live-status.json",
         )
-        save_chart_data_json(evaluated, staging / "chart-data.json", metadata)
-        save_historical_csv(evaluated, staging / "historical_signals.csv")
+        save_chart_data_json(model_evaluated, staging / "chart-data.json", metadata)
+        save_historical_csv(model_evaluated, staging / "historical_signals.csv")
         save_dataframe_csv(equity, staging / "equity_timeseries.csv", index=True)
         save_text_report(
-            evaluated,
+            operational_evaluated,
             strategy_metrics,
             buy_hold_metrics,
             staging / "report.txt",
             price_eur=eur_market.price,
             price_usd=usd_market.price,
         )
-        plot_price_and_sma_with_signals(evaluated, staging / "price_sma_signals.png")
+        plot_price_and_sma_with_signals(model_evaluated, staging / "price_sma_signals.png")
         write_manifest(
             staging,
             metadata,
@@ -170,15 +190,17 @@ def run_pipeline(
 
     return PipelineResult(
         run_id=metadata["run_id"],
-        candle_date=evaluated.index[-1].strftime("%Y-%m-%d"),
-        daily_action=str(evaluated.iloc[-1]["Segnale"]),
+        candle_date=operational_evaluated.index[-1].strftime("%Y-%m-%d"),
+        daily_action=str(operational_evaluated.iloc[-1]["Segnale"]),
         live_action=live_action,
         live_conditions_key=conditions_key,
         price_usd=usd_market.price,
         price_eur=eur_market.price,
         volume_24h_eth=usd_market.volume_24h,
         buy_statuses=live_buy,
+        breakout_statuses=live_breakout,
         sell_statuses=live_sell,
+        position_open=bool(live_latest["Position_Open"]),
         strategy_metrics=strategy_metrics,
         buy_hold_metrics=buy_hold_metrics,
         evaluation_start=period["evaluation_start"],

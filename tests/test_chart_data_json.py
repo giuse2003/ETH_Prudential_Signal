@@ -29,7 +29,7 @@ class ChartDataJsonTests(unittest.TestCase):
         self.assertEqual(payload["mode"], "DAILY")
         self.assertEqual(payload["rows"][0]["action"], "MANTIENI STATO ATTUALE")
 
-    def test_saves_live_status_with_five_buy_and_two_sell_conditions(self) -> None:
+    def test_saves_live_status_with_both_buy_paths_and_sell_conditions(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             path = Path(tmp_dir) / "live-status.json"
             save_live_status_json(
@@ -38,7 +38,9 @@ class ChartDataJsonTests(unittest.TestCase):
                 price_eur=2600.0,
                 volume_24h_eth=10000.0,
                 buy_statuses=[False, False, True, False, False],
+                breakout_statuses=[False] * 8,
                 sell_statuses=[True, False],
+                position_open=False,
                 rsi=45.0,
                 sma50=2900.0,
                 sma200=2500.0,
@@ -51,7 +53,9 @@ class ChartDataJsonTests(unittest.TestCase):
         self.assertEqual(payload["run_id"], "run-1")
         self.assertEqual(payload["action"], "VENDI")
         self.assertEqual(len(payload["condition_groups"]["buy"]), 5)
+        self.assertEqual(len(payload["condition_groups"]["buy_breakout"]), 8)
         self.assertEqual(len(payload["condition_groups"]["sell"]), 2)
+        self.assertFalse(payload["position_open"])
 
 
 if __name__ == "__main__":

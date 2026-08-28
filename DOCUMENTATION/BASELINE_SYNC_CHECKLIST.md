@@ -10,7 +10,10 @@
 
 ## Modello
 
-- [ ] Sono presenti esattamente cinque condizioni `ACQUISTA` e due `VENDI`.
+- [ ] `ACQUISTA` usa il percorso standard OR il breakout protetto.
+- [ ] Il percorso standard contiene cinque condizioni.
+- [ ] Il breakout protetto contiene sette conferme e il guardrail di regime.
+- [ ] Il percorso breakout e operativo dal `2026-08-28` senza backfill del 17 agosto.
 - [ ] RSI 65 limita solo i nuovi ingressi.
 - [ ] `Close < SMA50 * 0,98` vende dopo una candela.
 - [ ] Il trailing 8% richiede momentum 7 giorni `>= -15%` e volume relativo `>= +20%`.
@@ -32,7 +35,7 @@
 - [ ] I test sono verdi.
 - [ ] `reproduce.py` riesce offline da checkout pulito.
 - [ ] Il tag della baseline coincide con il manifest e non viene spostato.
-- [ ] La vecchia baseline e il relativo tag restano immutati.
+- [ ] Le baseline `v1` e `v2` e i relativi tag restano immutati.
 
 ## Pubblicazione
 
@@ -40,4 +43,4 @@
 - [ ] GitHub Actions Linux e verde.
 - [ ] GitHub Pages mostra il pacchetto ETH corrente.
 - [ ] Il Worker e stato distribuito e `/segnale` verificato.
-- [ ] Telegram mostra cinque buy, due sell e icone rosse/verdi.
+- [ ] Telegram mostra entrambi i percorsi buy, due sell e icone rosse/verdi.

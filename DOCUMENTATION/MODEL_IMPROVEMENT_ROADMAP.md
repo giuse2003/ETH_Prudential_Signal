@@ -1,6 +1,6 @@
 # ETH Model Improvement Roadmap
 
-Ultimo aggiornamento: 2026-07-27
+Ultimo aggiornamento: 2026-08-28
 
 ## Obiettivo
 
@@ -14,26 +14,29 @@ costi realistici.
 
 ## Baseline Attuale
 
-Stato dopo la promozione del 2026-07-27:
+Stato dopo la promozione del 2026-08-28:
 
-- cinque ingressi invariati, incluso `RSI <= 65` sui soli nuovi ingressi;
+- percorso 1 con le cinque condizioni di trend confermato;
+- percorso 2 con breakout protetto e guardrail di regime;
+- percorso 2 operativo dal 28 agosto senza ingresso retroattivo sul 17 agosto;
 - uscita ufficiale `Close < SMA50 * 0,98` oppure
   `Trail8 / momentum >= -15% / volume >= +20%`;
 - mercato e fonte: Coinbase Advanced Trade `ETH-USD`;
 - costo ufficiale del backtest: 0,6% per lato;
-- report canonico: `reports/official_baseline_implementation.md`;
-- manifest interno: `docs/runs/baseline-v2-2026-07-26/manifest.json`.
+- report canonico: `reports/breakout_official_promotion_2026-08-28.md`;
+- manifest interno: `docs/runs/baseline-v3-2026-08-27/manifest.json`.
 
 | Metrica | Baseline ufficiale | Buy & Hold |
 |---|---:|---:|
-| Rendimento totale | 56.672,64% | 23.431,28% |
-| Rendimento annualizzato | 93,12% | 76,25% |
-| Max drawdown | -43,00% | -94,01% |
-| Sharpe Ratio | 1,615 | 1,074 |
-| Operazioni chiuse | 30 | n/a |
+| Rendimento totale | 240.310,55% | 30.163,66% |
+| Rendimento annualizzato | 122,70% | 79,95% |
+| Max drawdown | -39,05% | -94,01% |
+| Sharpe Ratio | 1,845 | 1,097 |
+| Operazioni chiuse | 32 | n/a |
 
-La vecchia baseline e congelata separatamente in
-`docs/runs/baseline-v1-2026-07-26/`. Tutte le sezioni successive sono archivio
+Le baseline precedenti sono congelate separatamente in
+`docs/runs/baseline-v2-2026-07-26/` e `docs/runs/baseline-v1-2026-07-26/`.
+Tutte le sezioni successive sono archivio
 cronologico: le parole "baseline" e "ufficiale" al loro interno descrivono lo
 stato vigente alla data del test, non il modello operativo corrente.
 

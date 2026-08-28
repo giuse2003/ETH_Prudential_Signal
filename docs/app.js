@@ -1,4 +1,4 @@
-const DATA_VERSION = "20260719-daily-candles";
+const DATA_VERSION = "20260828-breakout-entry";
 const STATUS_ENDPOINT = `./live-status.json?v=${DATA_VERSION}`;
 const CHART_DATA_ENDPOINT = `./chart-data.json?v=${DATA_VERSION}`;
 const MANIFEST_ENDPOINT = `./manifest.json?v=${DATA_VERSION}`;
@@ -29,6 +29,7 @@ const els = {
   corsHelper: document.getElementById("corsHelper"),
   subscriberCount: document.getElementById("subscriberCount"),
   buyConditions: document.getElementById("buyConditions"),
+  breakoutConditions: document.getElementById("breakoutConditions"),
   sellConditions: document.getElementById("sellConditions"),
   ethTrendChart: document.getElementById("ethTrendChart"),
   chartLoading: document.getElementById("chartLoading"),
@@ -161,7 +162,9 @@ function updateBotUI(data) {
     els.signalHint.textContent = "Uscita protettiva attiva secondo le regole.";
   } else {
     els.signalCard.classList.add("signal-hold");
-    els.signalHint.textContent = "Nessuna nuova operazione secondo il metodo.";
+    els.signalHint.textContent = data.position_open
+      ? "Stato operativo DENTRO: posizione mantenuta."
+      : "Stato operativo FUORI: nessuna nuova operazione.";
   }
 
   // Update risk level card
@@ -186,6 +189,7 @@ function updateBotUI(data) {
   els.sma200Val.textContent = data.sma200 ? formatCurrency(data.sma200, "USD") : "N/D";
   els.atrVal.textContent = data.atr ? data.atr.toFixed(2) : "N/D";
   updateConditionList(els.buyConditions, data.condition_groups?.buy);
+  updateConditionList(els.breakoutConditions, data.condition_groups?.buy_breakout);
   updateConditionList(els.sellConditions, data.condition_groups?.sell);
 
   // Last update time

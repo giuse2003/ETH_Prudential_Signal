@@ -15,7 +15,7 @@ from dataclasses import dataclass
 class Config:
     model_name: str = "ETH-USD Signal"
     # Versione interna. Non viene mostrata nei messaggi operativi pubblici.
-    model_version: str = "2.0"
+    model_version: str = "3.0"
     data_source: str = "Coinbase Advanced Trade"
     transaction_cost_rate: float = 0.006
 

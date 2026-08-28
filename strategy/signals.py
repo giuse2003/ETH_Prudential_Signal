@@ -24,6 +24,13 @@ SMA50_BREAK_PCT = 0.02
 TRAILING_STOP_PCT = 0.08
 TRAILING_MOMENTUM_MIN = -0.15
 TRAILING_VOLUME_REL_MIN = 0.20
+BREAKOUT_OPERATIONAL_START = pd.Timestamp("2026-08-28")
+BREAKOUT_SMA200_PROXIMITY_MIN = 0.90
+BREAKOUT_VOLUME_REL_MIN = 0.20
+BREAKOUT_LOOKBACK_DAYS = 5
+BREAKOUT_SMA50_SLOPE_DAYS = 5
+BREAKOUT_GUARD_SMA200_SLOPE_DAYS = 20
+BREAKOUT_GUARD_SMA50_GAP_MAX = -0.15
 HOLD_ACTION = "MANTIENI STATO ATTUALE"
 
 
@@ -91,7 +98,67 @@ def score_rowwise(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
+def _breakout_components(df: pd.DataFrame) -> pd.DataFrame:
+    close = df["Close"]
+    sma50 = df["SMA50"]
+    sma200 = df["SMA200"]
+    momentum_col = f"Close_{CFG.momentum_days}d_ago"
+    close_momentum = df.get(momentum_col, pd.Series(np.nan, index=df.index))
+    sma50_slope = sma50 / sma50.shift(BREAKOUT_SMA50_SLOPE_DAYS) - 1.0
+    sma200_slope = (
+        sma200 / sma200.shift(BREAKOUT_GUARD_SMA200_SLOPE_DAYS) - 1.0
+    )
+    sma50_gap = sma50 / sma200 - 1.0
+    prior_high = (
+        close.shift(1)
+        .rolling(BREAKOUT_LOOKBACK_DAYS, min_periods=BREAKOUT_LOOKBACK_DAYS)
+        .max()
+    )
+
+    components = pd.DataFrame(index=df.index)
+    components["regime"] = sma50 <= sma200
+    components["price_recovery"] = (
+        (close > sma50) & (close >= sma200 * BREAKOUT_SMA200_PROXIMITY_MIN)
+    )
+    components["sma50_slope"] = sma50_slope >= 0.0
+    components["rsi"] = df["RSI"].between(40.0, ENTRY_RSI_MAX, inclusive="both")
+    components["momentum"] = close > close_momentum
+    components["volume"] = (
+        df["Volume"] >= df["VolumeAvg20"] * (1.0 + BREAKOUT_VOLUME_REL_MIN)
+    )
+    components["breakout"] = close > prior_high
+    components["guard_passed"] = ~(
+        (sma200_slope > 0.0) & (sma50_gap < BREAKOUT_GUARD_SMA50_GAP_MAX)
+    )
+    components["raw"] = components[
+        [
+            "regime",
+            "price_recovery",
+            "sma50_slope",
+            "rsi",
+            "momentum",
+            "volume",
+            "breakout",
+        ]
+    ].all(axis=1)
+    components["entry"] = components["raw"] & components["guard_passed"]
+    return components.fillna(False)
+
+
+def _activation_mask(index: pd.Index, active_from: pd.Timestamp | str | None) -> pd.Series:
+    if active_from is None:
+        return pd.Series(True, index=index)
+    if not isinstance(index, pd.DatetimeIndex):
+        raise ValueError("La data di attivazione richiede un DatetimeIndex.")
+    return pd.Series(index >= pd.Timestamp(active_from), index=index)
+
+
+def compute_strict_signal(
+    df: pd.DataFrame,
+    *,
+    breakout_active_from: pd.Timestamp | str | None = None,
+    state_reset_date: pd.Timestamp | str | None = None,
+) -> pd.DataFrame:
     """
     Classificazione stretta:
     ACQUISTA se TUTTE le condizioni rialziste sono vere.
@@ -123,20 +190,32 @@ def compute_strict_signal(df: pd.DataFrame) -> pd.DataFrame:
         (volume > volume_avg20)
     )
     filtered_new_entry_cond = official_buy_cond & entry_rsi_filter
+    breakout = _breakout_components(df)
+    breakout_enabled = _activation_mask(df.index, breakout_active_from)
+    breakout_entry_cond = breakout["entry"] & breakout_enabled
 
     official_sell_cond = _sma50_sell_condition(close, sma50)
 
-    signal, trail_stop_hit, trail_confirmed = _stateful_signals(
+    signal, trail_stop_hit, trail_confirmed, entry_path, position_open = _stateful_signals(
         df=df,
         official_buy_cond=official_buy_cond,
         filtered_new_entry_cond=filtered_new_entry_cond,
+        breakout_entry_cond=breakout_entry_cond,
         official_sell_cond=official_sell_cond,
+        state_reset_date=state_reset_date,
     )
 
     df["Entry_RSI_Filter_Passed"] = entry_rsi_filter
+    df["Standard_Entry"] = filtered_new_entry_cond
+    df["Breakout_Raw"] = breakout["raw"]
+    df["Breakout_Guard_Passed"] = breakout["guard_passed"]
+    df["Breakout_Enabled"] = breakout_enabled
+    df["Breakout_Entry"] = breakout_entry_cond
+    df["Entry_Path"] = entry_path
     df["Official_Sell"] = official_sell_cond
     df["Trail8_Stop_Hit"] = trail_stop_hit
     df["Trail8_Confirmed"] = trail_confirmed
+    df["Position_Open"] = position_open
     df["Segnale"] = signal
     return df
 
@@ -146,8 +225,10 @@ def _stateful_signals(
     df: pd.DataFrame,
     official_buy_cond: pd.Series,
     filtered_new_entry_cond: pd.Series,
+    breakout_entry_cond: pd.Series | None = None,
     official_sell_cond: pd.Series,
-) -> tuple[np.ndarray, pd.Series, pd.Series]:
+    state_reset_date: pd.Timestamp | str | None = None,
+) -> tuple[np.ndarray, pd.Series, pd.Series, np.ndarray, pd.Series]:
     """
     Applica la Baseline ufficiale con il trailing stop confermato.
 
@@ -157,14 +238,29 @@ def _stateful_signals(
     signal = np.full(len(df), HOLD_ACTION, dtype=object)
     trail_stop_hit = pd.Series(False, index=df.index)
     trail_confirmed = pd.Series(False, index=df.index)
+    entry_path = np.full(len(df), "", dtype=object)
+    position_open = pd.Series(False, index=df.index)
+    breakout_entry_cond = (
+        breakout_entry_cond
+        if breakout_entry_cond is not None
+        else pd.Series(False, index=df.index)
+    )
+    reset_at = pd.Timestamp(state_reset_date) if state_reset_date is not None else None
+    reset_applied = False
 
     exposure = False
     peak_close: float | None = None
 
     for pos, (date, row) in enumerate(df.iterrows()):
+        if reset_at is not None and not reset_applied and pd.Timestamp(date) >= reset_at:
+            exposure = False
+            peak_close = None
+            reset_applied = True
+
         close_value = float(row["Close"])
         official_buy = bool(official_buy_cond.loc[date])
         filtered_new_entry = bool(filtered_new_entry_cond.loc[date])
+        breakout_new_entry = bool(breakout_entry_cond.loc[date])
         should_official_sell = bool(official_sell_cond.loc[date])
         should_trail_sell = False
 
@@ -172,15 +268,20 @@ def _stateful_signals(
             signal[pos] = "VENDI"
             exposure = False
             peak_close = None
+            position_open.loc[date] = exposure
             continue
 
-        if official_buy:
-            if not exposure and filtered_new_entry:
-                signal[pos] = "ACQUISTA"
-                exposure = True
-                peak_close = close_value
-            elif exposure:
-                peak_close = max(peak_close if peak_close is not None else close_value, close_value)
+        if not exposure and (filtered_new_entry or breakout_new_entry):
+            signal[pos] = "ACQUISTA"
+            entry_path[pos] = "standard" if filtered_new_entry else "breakout_protected"
+            exposure = True
+            peak_close = close_value
+            position_open.loc[date] = exposure
+            continue
+
+        if official_buy and exposure:
+            peak_close = max(peak_close if peak_close is not None else close_value, close_value)
+            position_open.loc[date] = exposure
             continue
 
         if exposure:
@@ -208,8 +309,9 @@ def _stateful_signals(
             signal[pos] = "VENDI"
             exposure = False
             peak_close = None
+        position_open.loc[date] = exposure
 
-    return signal, trail_stop_hit, trail_confirmed
+    return signal, trail_stop_hit, trail_confirmed, entry_path, position_open
 
 
 def compute_risk_level(df: pd.DataFrame) -> pd.Series:
@@ -250,7 +352,12 @@ def compute_risk_level(df: pd.DataFrame) -> pd.Series:
     return risk
 
 
-def compute_signals(df_indicators: pd.DataFrame) -> pd.DataFrame:
+def compute_signals(
+    df_indicators: pd.DataFrame,
+    *,
+    breakout_active_from: pd.Timestamp | str | None = None,
+    state_reset_date: pd.Timestamp | str | None = None,
+) -> pd.DataFrame:
     """
     Pipeline completa:
     - calcola punteggio tecnico (solo per report log, non decide il segnale)
@@ -258,7 +365,11 @@ def compute_signals(df_indicators: pd.DataFrame) -> pd.DataFrame:
     - calcola il livello di rischio informativo
     """
     df = score_rowwise(df_indicators)
-    df = compute_strict_signal(df)
+    df = compute_strict_signal(
+        df,
+        breakout_active_from=breakout_active_from,
+        state_reset_date=state_reset_date,
+    )
     df["Livello_Rischio"] = compute_risk_level(df)
     return df
 
@@ -267,7 +378,9 @@ def format_condition_message(
     signal: str,
     price_eur: float | None,
     buy_statuses: list[bool],
+    breakout_statuses: list[bool],
     sell_statuses: list[bool],
+    position_open: bool | None = None,
     title: str = "ETH-USD Signal - LIVE PREVIEW",
 ) -> str:
     if price_eur is None:
@@ -280,14 +393,22 @@ def format_condition_message(
             title,
             "",
             f"Azione: {signal}",
+            *(
+                [f"Stato operativo: {'DENTRO' if position_open else 'FUORI'}"]
+                if position_open is not None
+                else []
+            ),
             "",
             "Prezzo informativo:",
             price_text,
             "",
             "(per le condizioni: /conditions)",
             "",
-            "ACQUISTA:",
+            "ACQUISTA - PERCORSO 1:",
             *_format_condition_numbers(buy_statuses),
+            "",
+            "ACQUISTA - BREAKOUT PROTETTO:",
+            *_format_condition_numbers(breakout_statuses),
             "",
             "VENDI:",
             *_format_condition_numbers(sell_statuses),
@@ -312,11 +433,14 @@ def format_telegram_message(
         if pd.isna(eur_val):
             eur_val = None
 
+    standard, breakout, sell = live_condition_statuses(df_with_signals)
     return format_condition_message(
         signal=str(segnale),
         price_eur=eur_val,
-        buy_statuses=_buy_condition_statuses(df_with_signals),
-        sell_statuses=_sell_condition_statuses(df_with_signals),
+        buy_statuses=standard,
+        breakout_statuses=breakout,
+        sell_statuses=sell,
+        position_open=bool(row.get("Position_Open", False)),
         title=title,
     )
 
@@ -328,26 +452,40 @@ def condition_state_key(df_with_signals: pd.DataFrame) -> str:
     Serve al monitor automatico per inviare una notifica solo quando cambia
     almeno una condizione, ignorando le oscillazioni del solo prezzo live.
     """
-    buy_key = _bools_to_key(_buy_condition_statuses(df_with_signals))
-    sell_key = _bools_to_key(_sell_condition_statuses(df_with_signals))
-    return f"BUY:{buy_key}|SELL:{sell_key}"
+    standard, breakout, sell = live_condition_statuses(df_with_signals)
+    return (
+        f"BUY_STANDARD:{_bools_to_key(standard)}|"
+        f"BUY_BREAKOUT:{_bools_to_key(breakout)}|SELL:{_bools_to_key(sell)}"
+    )
 
 
-def condition_key_from_statuses(buy_statuses: list[bool], sell_statuses: list[bool]) -> str:
-    return f"BUY:{_bools_to_key(buy_statuses)}|SELL:{_bools_to_key(sell_statuses)}"
+def condition_key_from_statuses(
+    buy_statuses: list[bool],
+    breakout_statuses: list[bool],
+    sell_statuses: list[bool],
+) -> str:
+    return (
+        f"BUY_STANDARD:{_bools_to_key(buy_statuses)}|"
+        f"BUY_BREAKOUT:{_bools_to_key(breakout_statuses)}|"
+        f"SELL:{_bools_to_key(sell_statuses)}"
+    )
 
 
-def signal_from_condition_statuses(buy_statuses: list[bool], sell_statuses: list[bool]) -> str:
+def signal_from_condition_statuses(
+    buy_statuses: list[bool],
+    breakout_statuses: list[bool],
+    sell_statuses: list[bool],
+) -> str:
     if any(sell_statuses):
         return "VENDI"
-    if all(buy_statuses):
+    if all(buy_statuses) or all(breakout_statuses):
         return "ACQUISTA"
     return HOLD_ACTION
 
 
 def live_condition_statuses(
     df_with_signals: pd.DataFrame,
-) -> tuple[list[bool], list[bool]]:
+) -> tuple[list[bool], list[bool], list[bool]]:
     row = df_with_signals.iloc[-1]
     previous = df_with_signals.iloc[-2] if len(df_with_signals) >= 2 else None
     momentum_col = f"Close_{CFG.momentum_days}d_ago"
@@ -359,11 +497,22 @@ def live_condition_statuses(
         bool(row["Close"] > row[momentum_col]),
         bool(row["Volume"] > row["VolumeAvg20"]),
     ]
+    breakout = _breakout_components(df_with_signals).iloc[-1]
+    breakout_statuses = [
+        bool(breakout["regime"]),
+        bool(breakout["price_recovery"]),
+        bool(breakout["sma50_slope"]),
+        bool(breakout["rsi"]),
+        bool(breakout["momentum"]),
+        bool(breakout["volume"]),
+        bool(breakout["breakout"]),
+        bool(breakout["guard_passed"]),
+    ]
     sell_statuses = [
         bool(_sma50_sell_condition(row["Close"], row["SMA50"])),
         bool(row.get("Trail8_Confirmed", False)),
     ]
-    return buy_statuses, sell_statuses
+    return buy_statuses, breakout_statuses, sell_statuses
 
 
 def build_live_signal_frame(
@@ -409,7 +558,11 @@ def build_live_signal_frame(
 
     df_ind = compute_all_indicators(df_live)
     df_ind.loc[live_day, "VolumeAvg20"] = df_closed_daily["Volume"].tail(CFG.vol_avg_period).mean()
-    return compute_signals(df_ind)
+    return compute_signals(
+        df_ind,
+        breakout_active_from=BREAKOUT_OPERATIONAL_START,
+        state_reset_date=BREAKOUT_OPERATIONAL_START,
+    )
 
 
 def _bools_to_key(statuses: list[bool]) -> str:

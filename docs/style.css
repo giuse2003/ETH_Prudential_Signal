@@ -530,6 +530,18 @@ h1 {
   letter-spacing: 0.5px;
 }
 
+.condition-columns h4 {
+  margin: 14px 0 8px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.condition-columns h3 + h4 {
+  margin-top: 0;
+}
+
 .condition-columns ol {
   margin: 0;
   padding: 0;

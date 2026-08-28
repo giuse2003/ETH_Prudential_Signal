@@ -30,7 +30,7 @@
           <h2>Entra quando il trend e favorevole. Esci quando il rischio aumenta.</h2>
           <p>
             Il bot controlla Ethereum ogni 10 minuti e invia notifiche Telegram
-            solo quando varia una delle 7 condizioni LIVE.
+            solo quando varia una condizione LIVE.
           </p>
           <div class="hero-actions">
             <a
@@ -57,15 +57,30 @@
             Usa solo candele giornaliere chiuse e cerca conferme su trend,
             momentum e volume.
           </p>
+          <p>
+            ACQUISTA si attiva quando uno dei due percorsi e interamente verde.
+          </p>
           <div class="condition-columns">
             <div>
               <h3>ACQUISTA</h3>
+              <h4>Percorso 1 - Trend confermato</h4>
               <ol id="buyConditions">
                 <li>Prezzo sopra SMA200</li>
                 <li>SMA50 sopra SMA200</li>
                 <li>Valore RSI compreso tra 40 e 65</li>
                 <li>Prezzo sopra quello di 7 giorni prima</li>
                 <li>Volume sopra media 20 giorni</li>
+              </ol>
+              <h4>Percorso 2 - Breakout protetto</h4>
+              <ol id="breakoutConditions">
+                <li>SMA50 sotto o uguale a SMA200</li>
+                <li>Prezzo sopra SMA50 e almeno al 90% di SMA200</li>
+                <li>SMA50 non in calo rispetto a 5 giorni prima</li>
+                <li>Valore RSI compreso tra 40 e 65</li>
+                <li>Prezzo sopra quello di 7 giorni prima</li>
+                <li>Volume almeno 20% sopra media 20 giorni</li>
+                <li>Close sopra i 5 Close precedenti</li>
+                <li>Guardrail di regime superato</li>
               </ol>
             </div>
             <div>
@@ -192,8 +207,8 @@
               <div class="label">Notifiche Telegram</div>
               <h2 id="telegramTitle">Ricevi solo i cambi LIVE</h2>
               <p class="telegram-description">
-                Nessun segnale DAILY. Il bot scrive solo quando una delle 7
-                condizioni LIVE passa da verde a rossa, o viceversa. Puoi
+                Nessun segnale DAILY. Il bot scrive solo quando una condizione
+                LIVE passa da verde a rossa, o viceversa. Puoi
                 comunque chiedere il segnale LIVE in qualsiasi momento con
                 <span class="mono">/segnale</span>.
               </p>
@@ -306,6 +321,6 @@
       </footer>
     </main>
 
-    <script src="./app.js?v=13"></script>
+    <script src="./app.js?v=14"></script>
   </body>
 </html>

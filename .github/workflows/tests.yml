@@ -31,7 +31,10 @@ jobs:
         run: python -m unittest discover -s tests -v
 
       - name: Reproduce official frozen baseline offline
-        run: python reproduce.py --manifest docs/runs/baseline-v2-2026-07-26/manifest.json
+        run: python reproduce.py --manifest docs/runs/baseline-v3-2026-08-27/manifest.json
+
+      - name: Verify previous baseline archive is unchanged
+        run: git diff --exit-code baseline-v2-2026-07-26 -- docs/runs/baseline-v2-2026-07-26
 
       - name: Verify legacy baseline archive is unchanged
         run: git diff --exit-code baseline-v1-2026-07-26 -- docs/runs/baseline-v1-2026-07-26

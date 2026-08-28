@@ -173,7 +173,10 @@ def _formulas() -> dict:
             "momentum7": "Close.shift(7)",
         },
         "actions": {
-            "buy": "new entry only when Close>SMA200 and SMA50>SMA200 and 40<=RSI14<=65 and Close>Close.shift(7) and Volume>VolumeAvg20",
+            "buy_standard": "Close>SMA200 and SMA50>SMA200 and 40<=RSI14<=65 and Close>Close.shift(7) and Volume>VolumeAvg20",
+            "buy_breakout": "SMA50<=SMA200 and Close>SMA50 and Close>=0.90*SMA200 and SMA50>=SMA50.shift(5) and 40<=RSI14<=65 and Close>Close.shift(7) and Volume>=1.20*VolumeAvg20 and Close>max(previous 5 Close)",
+            "breakout_guardrail": "block only when SMA200/SMA200.shift(20)-1>0 and SMA50/SMA200-1<-0.15",
+            "buy_logic": "buy_standard OR buy_breakout",
             "sell": "Close<SMA50*0.98 OR stateful trailing stop 8% from post-entry peak confirmed by momentum7>=-15% and relative volume>=20%",
             "precedence": "sell, then buy, otherwise MANTIENI STATO ATTUALE",
         },

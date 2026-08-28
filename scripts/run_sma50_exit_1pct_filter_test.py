@@ -60,7 +60,7 @@ def _build_1pct_filter(df: pd.DataFrame) -> pd.DataFrame:
     below_sma50_deep_1pct = close <= sma50 * 0.99
     official_sell = below_sma50_two_days | below_sma50_deep_1pct
 
-    signal, trail_hit, trail_confirmed = _stateful_signals(
+    signal, trail_hit, trail_confirmed, _, _ = _stateful_signals(
         df=out,
         official_buy_cond=official_buy,
         filtered_new_entry_cond=filtered_buy,
