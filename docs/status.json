@@ -1,9 +1,9 @@
 {
-  "run_id": "20260828T062237Z-6c1b92a2",
-  "generated_at_utc": "2026-08-28T06:22:37.338837+00:00",
+  "run_id": "20260828T100344Z-600cfc99",
+  "generated_at_utc": "2026-08-28T10:03:44.453830+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
-  "model_version": "2.0",
+  "model_version": "3.0",
   "data_source": "Coinbase Advanced Trade",
   "market": "ETH-USD",
   "timezone": "UTC",
@@ -13,6 +13,8 @@
   "price_usd": 2511.67,
   "price_eur": null,
   "status": "Attivo",
+  "position_open": false,
+  "breakout_operational_start": "2026-08-28",
   "risk_level": "ALTO",
   "rsi": 77.54551381038712,
   "sma50": 1977.5586,
@@ -42,6 +44,40 @@
       },
       {
         "label": "volume ETH-USD sopra media 20 giorni",
+        "passed": true
+      }
+    ],
+    "buy_breakout": [
+      {
+        "label": "SMA50 sotto o uguale a SMA200",
+        "passed": true
+      },
+      {
+        "label": "prezzo sopra SMA50 e almeno al 90% di SMA200",
+        "passed": true
+      },
+      {
+        "label": "SMA50 non in calo rispetto a 5 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "RSI tra 40 e 65",
+        "passed": false
+      },
+      {
+        "label": "prezzo sopra quello di 7 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "volume ETH-USD almeno 20% sopra media 20 giorni",
+        "passed": true
+      },
+      {
+        "label": "Close sopra i 5 Close precedenti",
+        "passed": true
+      },
+      {
+        "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
         "passed": true
       }
     ],

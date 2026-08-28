@@ -1,22 +1,24 @@
 {
-  "run_id": "20260828T062237Z-6c1b92a2",
-  "generated_at_utc": "2026-08-28T06:22:37.338837+00:00",
+  "run_id": "20260828T100344Z-600cfc99",
+  "generated_at_utc": "2026-08-28T10:03:44.453830+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
-  "model_version": "2.0",
+  "model_version": "3.0",
   "data_source": "Coinbase Advanced Trade",
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2502.59,
-  "price_eur": 2150.31,
-  "volume_24h_eth": 135708.1816199,
+  "price_usd": 2486.87,
+  "price_eur": 2136.62,
+  "volume_24h_eth": 120189.87845654,
   "status": "Attivo",
-  "rsi": 76.46777379105588,
-  "sma50": 1992.734,
-  "sma200": 2018.4723000000001,
-  "atr": 89.94935485557903,
+  "position_open": false,
+  "breakout_operational_start": "2026-08-28",
+  "rsi": 74.67107034198261,
+  "sma50": 1992.4196,
+  "sma200": 2018.3937000000003,
+  "atr": 91.07221199843619,
   "risk_level": "ALTO",
   "condition_groups": {
     "buy": [
@@ -38,6 +40,40 @@
       },
       {
         "label": "volume ETH-USD live sopra media 20 giorni",
+        "passed": true
+      }
+    ],
+    "buy_breakout": [
+      {
+        "label": "SMA50 live sotto o uguale a SMA200",
+        "passed": true
+      },
+      {
+        "label": "prezzo live sopra SMA50 e almeno al 90% di SMA200",
+        "passed": true
+      },
+      {
+        "label": "SMA50 live non in calo rispetto a 5 giorni prima",
+        "passed": true
+      },
+      {
+        "label": "RSI live tra 40 e 65",
+        "passed": false
+      },
+      {
+        "label": "prezzo live sopra quello di 7 giorni prima",
+        "passed": false
+      },
+      {
+        "label": "volume ETH-USD live almeno 20% sopra media 20 giorni",
+        "passed": false
+      },
+      {
+        "label": "Close live sopra i 5 Close precedenti",
+        "passed": false
+      },
+      {
+        "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
         "passed": true
       }
     ],
