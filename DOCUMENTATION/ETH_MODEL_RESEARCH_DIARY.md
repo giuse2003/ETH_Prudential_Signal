@@ -4234,3 +4234,6 @@ Telegram e Worker:
 - aggiunta una migrazione della chiave condizioni: al primo run v3 il passaggio
   dal vecchio schema a sette stati al nuovo schema `5+8+2` salva una nuova
   baseline LIVE senza inviare un falso avviso Telegram.
+- il cron GitHub resta ogni dieci minuti ma viene spostato ai minuti
+  `03,13,23,33,43,53`, per ridurre ritardi e job scartati nei minuti piu'
+  congestionati; nessuna regola del modello viene modificata.
