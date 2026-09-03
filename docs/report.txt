@@ -1,35 +1,35 @@
 ETH-USD SIGNAL
-Candela DAILY: 2026-09-01 UTC
+Candela DAILY: 2026-09-02 UTC
 Fonte: Coinbase Advanced Trade - ETH-USD
 
 Azione: MANTIENI STATO ATTUALE
 Posizione operativa: FUORI
 Secondo ingresso breakout operativo dalle candele chiuse del 2026-08-28
 Rischio informativo: MEDIO
-Close ETH-USD: 2417.25 USD
-Spot ETH-USD: 2378.10 USD
-Spot ETH-EUR: 2052.77 EUR
-SMA50: 2043.47
-SMA200: 2027.19
-RSI14: 63.81
-ATR14: 97.21
+Close ETH-USD: 2390.83 USD
+Spot ETH-USD: 2373.82 USD
+Spot ETH-EUR: 2048.01 EUR
+SMA50: 2053.47
+SMA200: 2028.72
+RSI14: 61.22
+ATR14: 95.46
 
-BACKTEST 2016-12-08 - 2026-09-01
+BACKTEST 2016-12-08 - 2026-09-02
 Esecuzione: azione a chiusura t applicata al rendimento t+1
 Commissione: 0.6% per lato inclusa
 Spread, slippage, imposte e rendimento della liquidita: non inclusi
 
 ETH-USD Signal
-- Rendimento totale: 231272.91%
-- Rendimento annualizzato: 121.57%
+- Rendimento totale: 228744.06%
+- Rendimento annualizzato: 121.27%
 - Drawdown massimo: -39.05%
 - Operazioni completate: 32
 - Operazioni vincenti: 59.4%
-- Sharpe Ratio: 1.835
+- Sharpe Ratio: 1.833
 - Profit factor: 17.813
 
 Buy & Hold ETH-USD
-- Rendimento totale: 29025.98%
-- Rendimento annualizzato: 79.10%
+- Rendimento totale: 28707.64%
+- Rendimento annualizzato: 78.86%
 - Drawdown massimo: -94.01%
-- Sharpe Ratio: 1.092
+- Sharpe Ratio: 1.090
