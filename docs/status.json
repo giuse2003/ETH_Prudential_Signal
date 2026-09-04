@@ -1,6 +1,6 @@
 {
-  "run_id": "20260903T224612Z-c8cc5d84",
-  "generated_at_utc": "2026-09-03T22:46:12.670900+00:00",
+  "run_id": "20260904T002748Z-cc41de48",
+  "generated_at_utc": "2026-09-04T00:27:48.090169+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,22 +8,22 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "DAILY",
-  "candle_date": "2026-09-02",
+  "candle_date": "2026-09-03",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2390.83,
+  "price_usd": 2507.47,
   "price_eur": null,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
   "risk_level": "MEDIO",
-  "rsi": 61.22381026624817,
-  "sma50": 2053.471,
-  "sma200": 2028.7221,
-  "atr": 95.46116043053591,
-  "volume_eth": 74246.34712404,
-  "volume_avg20_eth": 114520.33778974302,
-  "previous_close": 2417.25,
-  "previous_sma50": 2043.4669999999999,
+  "rsi": 67.48405521897078,
+  "sma50": 2065.2852,
+  "sma200": 2031.4326500000002,
+  "atr": 100.20179182835477,
+  "volume_eth": 132027.16502023,
+  "volume_avg20_eth": 118842.09638709,
+  "previous_close": 2390.83,
+  "previous_sma50": 2053.471,
   "condition_groups": {
     "buy": [
       {
@@ -36,7 +36,7 @@
       },
       {
         "label": "RSI tra 40 e 65 per i nuovi ingressi",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo sopra quello di 7 giorni prima",
@@ -44,7 +44,7 @@
       },
       {
         "label": "volume ETH-USD sopra media 20 giorni",
-        "passed": false
+        "passed": true
       }
     ],
     "buy_breakout": [
@@ -62,7 +62,7 @@
       },
       {
         "label": "RSI tra 40 e 65",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo sopra quello di 7 giorni prima",
@@ -74,7 +74,7 @@
       },
       {
         "label": "Close sopra i 5 Close precedenti",
-        "passed": false
+        "passed": true
       },
       {
         "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
