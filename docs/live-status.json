@@ -1,6 +1,6 @@
 {
-  "run_id": "20260914T104603Z-2fbd2f1b",
-  "generated_at_utc": "2026-09-14T10:46:03.763446+00:00",
+  "run_id": "20260914T163814Z-ee0324e8",
+  "generated_at_utc": "2026-09-14T16:38:14.210845+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -9,16 +9,16 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2516.7,
-  "price_eur": 2180.8,
-  "volume_24h_eth": 68156.407244,
+  "price_usd": 2520.42,
+  "price_eur": 2182.1,
+  "volume_24h_eth": 93748.03390087,
   "status": "Attivo",
   "position_open": true,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 61.306136591892496,
-  "sma50": 2197.2844,
-  "sma200": 2060.34715,
-  "atr": 89.8845496186807,
+  "rsi": 61.55068419733371,
+  "sma50": 2197.3588,
+  "sma200": 2060.36575,
+  "atr": 90.150263904395,
   "risk_level": "MEDIO",
   "condition_groups": {
     "buy": [
@@ -40,7 +40,7 @@
       },
       {
         "label": "volume ETH-USD live sopra media 20 giorni",
-        "passed": false
+        "passed": true
       }
     ],
     "buy_breakout": [
