@@ -7,8 +7,8 @@ Posizione operativa: DENTRO
 Secondo ingresso breakout operativo dalle candele chiuse del 2026-08-28
 Rischio informativo: BASSO
 Close ETH-USD: 2416.57 USD
-Spot ETH-USD: 2448.00 USD
-Spot ETH-EUR: 2133.11 EUR
+Spot ETH-USD: 2465.76 USD
+Spot ETH-EUR: 2147.91 EUR
 SMA50: 2217.30
 SMA200: 2064.93
 RSI14: 51.78
