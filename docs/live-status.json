@@ -1,6 +1,6 @@
 {
-  "run_id": "20260918T095124Z-11d087d6",
-  "generated_at_utc": "2026-09-18T09:51:24.835434+00:00",
+  "run_id": "20260918T135452Z-fb91b746",
+  "generated_at_utc": "2026-09-18T13:54:52.145276+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -9,16 +9,16 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2505.14,
-  "price_eur": 2181.11,
-  "volume_24h_eth": 104213.72608994,
+  "price_usd": 2557.23,
+  "price_eur": 2230.36,
+  "volume_24h_eth": 109218.44611127,
   "status": "Attivo",
   "position_open": true,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 58.365534610013796,
-  "sma50": 2239.8074,
-  "sma200": 2069.8498,
-  "atr": 94.76488554476549,
+  "rsi": 61.52871671440684,
+  "sma50": 2240.8492,
+  "sma200": 2070.11025,
+  "atr": 98.48559983047979,
   "risk_level": "MEDIO",
   "condition_groups": {
     "buy": [
@@ -36,7 +36,7 @@
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
-        "passed": false
+        "passed": true
       },
       {
         "label": "volume ETH-USD live sopra media 20 giorni",
@@ -62,7 +62,7 @@
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
-        "passed": false
+        "passed": true
       },
       {
         "label": "volume ETH-USD live almeno 20% sopra media 20 giorni",
@@ -70,7 +70,7 @@
       },
       {
         "label": "Close live sopra i 5 Close precedenti",
-        "passed": false
+        "passed": true
       },
       {
         "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
