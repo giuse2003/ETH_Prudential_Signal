@@ -1,6 +1,6 @@
 {
-  "run_id": "20260919T213624Z-5e04a8e4",
-  "generated_at_utc": "2026-09-19T21:36:24.015783+00:00",
+  "run_id": "20260919T233004Z-46e2770f",
+  "generated_at_utc": "2026-09-19T23:30:04.336312+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -9,16 +9,16 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2621.6,
-  "price_eur": 2280.78,
-  "volume_24h_eth": 70156.51352079,
+  "price_usd": 2631.83,
+  "price_eur": 2288.82,
+  "volume_24h_eth": 64220.09715156,
   "status": "Attivo",
   "position_open": true,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 64.86759560804235,
-  "sma50": 2257.1502,
-  "sma200": 2073.57445,
-  "atr": 98.82703657728226,
+  "rsi": 65.37567280651919,
+  "sma50": 2257.3548,
+  "sma200": 2073.6256,
+  "atr": 99.55775086299654,
   "risk_level": "MEDIO",
   "condition_groups": {
     "buy": [
@@ -32,7 +32,7 @@
       },
       {
         "label": "RSI live tra 40 e 65 per i nuovi ingressi",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
@@ -58,7 +58,7 @@
       },
       {
         "label": "RSI live tra 40 e 65",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
