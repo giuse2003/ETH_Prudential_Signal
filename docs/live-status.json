@@ -1,6 +1,6 @@
 {
-  "run_id": "20260929T010239Z-9e37a777",
-  "generated_at_utc": "2026-09-29T01:02:39.698158+00:00",
+  "run_id": "20260929T064715Z-319a4de0",
+  "generated_at_utc": "2026-09-29T06:47:15.500171+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -9,16 +9,16 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2679.42,
-  "price_eur": 2357.45,
-  "volume_24h_eth": 97838.10415287,
+  "price_usd": 2697.4,
+  "price_eur": 2373.94,
+  "volume_24h_eth": 106110.16616887,
   "status": "Attivo",
   "position_open": true,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 61.910942103708734,
-  "sma50": 2419.6274,
-  "sma200": 2106.8836499999998,
-  "atr": 87.81452612209648,
+  "rsi": 63.662570943772565,
+  "sma50": 2419.987,
+  "sma200": 2106.9735499999997,
+  "atr": 87.95738326495365,
   "risk_level": "MEDIO",
   "condition_groups": {
     "buy": [
@@ -70,7 +70,7 @@
       },
       {
         "label": "Close live sopra i 5 Close precedenti",
-        "passed": false
+        "passed": true
       },
       {
         "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
