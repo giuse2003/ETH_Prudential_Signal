@@ -1,6 +1,6 @@
 {
-  "run_id": "20260928T211623Z-59335eb5",
-  "generated_at_utc": "2026-09-28T21:16:23.501135+00:00",
+  "run_id": "20260929T010239Z-9e37a777",
+  "generated_at_utc": "2026-09-29T01:02:39.698158+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -11,9 +11,9 @@
     "coinbase_history_start": "2016-05-23",
     "warmup_end": "2016-12-07",
     "evaluation_start": "2016-12-08",
-    "evaluation_end": "2026-09-27",
-    "calendar_days": 3581,
-    "observations": 3581,
+    "evaluation_end": "2026-09-28",
+    "calendar_days": 3582,
+    "observations": 3582,
     "breakout_operational_start": "2026-08-28",
     "operational_position_open": true
   },
@@ -50,12 +50,12 @@
   },
   "metrics": {
     "strategy": {
-      "total_return": 2572.1041586510996,
-      "annualized_return": 1.2269692930360256,
+      "total_return": 2571.319275880617,
+      "annualized_return": 1.226402208979862,
       "max_drawdown": -0.39054414423097705,
       "num_operations": 32,
       "win_rate": 0.59375,
-      "sharpe_ratio": 1.8463817725527938,
+      "sharpe_ratio": 1.8460586675882733,
       "profit_factor": 17.813017225255965,
       "average_trade_return": 0.5036654371918464,
       "median_trade_return": 0.1621249198420177,
@@ -65,17 +65,17 @@
       "worst_trade": -0.12876755547893204,
       "average_trade_days": 33.5,
       "median_trade_days": 32.5,
-      "exposure_ratio": 0.31080703714046354,
+      "exposure_ratio": 0.310999441652708,
       "turnover": 65.0,
       "transaction_cost_rate": 0.006
     },
     "buy_and_hold": {
-      "total_return": 322.910733692683,
-      "annualized_return": 0.8028150996156358,
+      "total_return": 322.8119300926829,
+      "annualized_return": 0.8024623726131099,
       "max_drawdown": -0.940116304238034,
       "num_operations": 0,
       "win_rate": 0.0,
-      "sharpe_ratio": 1.0992706194270283,
+      "sharpe_ratio": 1.0990830488079215,
       "profit_factor": null,
       "average_trade_return": null,
       "median_trade_return": null,
@@ -91,7 +91,7 @@
     }
   },
   "provenance": {
-    "source_commit": "44db972583d9e2e8ead10743ddfe0a597a31903f",
+    "source_commit": "bab11433e06fc0a34f7ee2fd7f626afd8634f27a",
     "python": "3.13.0",
     "dependencies": {
       "numpy": "2.4.6",
@@ -100,53 +100,53 @@
       "requests": "2.34.2"
     },
     "requirements_lock_sha256": "fab3e8cfa60b28ba3c8d3999d5a78c1077b20eb8b2066e74811d9b4ddd39073b",
-    "input_candles_sha256": "b367e32ce3b22fac7ab469013a6c710241b8412a6a9120ad3caa22e6c1628c0d",
-    "input_observations": 3780,
+    "input_candles_sha256": "231f444787444fdcf13517dd43561e4180b57e43814bd73a60ca9e7b0bd170fa",
+    "input_observations": 3781,
     "input_first_candle": "2016-05-23",
-    "input_last_candle": "2026-09-27",
+    "input_last_candle": "2026-09-28",
     "historical_cache_allowed": true,
     "frozen_baseline_manifest": "runs/baseline-v3-2026-08-27/manifest.json"
   },
   "artifacts": {
     "raw_candles.csv": {
       "path": "raw_candles.csv",
-      "sha256": "b367e32ce3b22fac7ab469013a6c710241b8412a6a9120ad3caa22e6c1628c0d",
-      "bytes": 209841
+      "sha256": "231f444787444fdcf13517dd43561e4180b57e43814bd73a60ca9e7b0bd170fa",
+      "bytes": 209898
     },
     "status.json": {
       "path": "status.json",
-      "sha256": "36e4750b00adef02cd0a1ded5928000bf60dbbb0d5842249acd4fdf62bd48712",
-      "bytes": 2361
+      "sha256": "0ec7c279a30696c03ece4ba98e167a573f0102d26d9c51e3ede9c0ea802a974e",
+      "bytes": 2363
     },
     "live-status.json": {
       "path": "live-status.json",
-      "sha256": "ef4d4c67a9f1ce1cc15379be197abccfb0a0f482b822ff2b741e203542a8f868",
-      "bytes": 2307
+      "sha256": "8e96b563f12a14e5178aefa85e5adac8d87b576c864315d112ddb849e0c6119f",
+      "bytes": 2309
     },
     "chart-data.json": {
       "path": "chart-data.json",
-      "sha256": "26bcd9ccbd2a65448ba3dc16e0fdf448da973f9058b676e1ec9dc995a960b2a0",
-      "bytes": 882341
+      "sha256": "0d868d2fc164bedfd948a8e24b36a5e0315043cd200cc74bed31f2db68c63b7d",
+      "bytes": 882592
     },
     "historical_signals.csv": {
       "path": "historical_signals.csv",
-      "sha256": "9eaaf96738068f08f1873fd117d65151b90b0f9b985333bcb313cbeac9ee2812",
-      "bytes": 758371
+      "sha256": "db593183365cfaed2978d8cb23ac0694beb7a8e4fb28a94058bdd9b448dd15c2",
+      "bytes": 758588
     },
     "equity_timeseries.csv": {
       "path": "equity_timeseries.csv",
-      "sha256": "1e9c5f3f14c51cf24889082b9ebada6732fd85833adf73c363c200c9385231ed",
-      "bytes": 309463
+      "sha256": "ff45c527f1825f9959ba145edbc3f70325829bab06e844d853d27d6cfbaa66f2",
+      "bytes": 309565
     },
     "report.txt": {
       "path": "report.txt",
-      "sha256": "a8278a9721ccbba9e09833508531e57e249e1ea66c4c0b7a2ead500cd3f02c8a",
+      "sha256": "ea277a2c88939271ae9569678e3b32ba1cd8489fc104c9ba6be1d15274b5573d",
       "bytes": 926
     },
     "price_sma_signals.png": {
       "path": "price_sma_signals.png",
-      "sha256": "33787c0e2fc17325ec6c92f0779fcf9c485a75d30ce086b33cdb845deeb2caaf",
-      "bytes": 247840
+      "sha256": "b6d37a6acd4d85b2838921ed375c740ce08bd02689d8b316995bd53adf58d6e9",
+      "bytes": 248907
     }
   }
 }
