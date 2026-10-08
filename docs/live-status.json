@@ -1,6 +1,6 @@
 {
-  "run_id": "20261008T072023Z-b2a70c6d",
-  "generated_at_utc": "2026-10-08T07:20:23.521984+00:00",
+  "run_id": "20261008T144020Z-9f01ce87",
+  "generated_at_utc": "2026-10-08T14:40:20.079085+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,18 +8,18 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
-  "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2569.74,
-  "price_eur": 2296.66,
-  "volume_24h_eth": 167612.0340254,
+  "action": "VENDI",
+  "price_usd": 2527.13,
+  "price_eur": 2253.0,
+  "volume_24h_eth": 131074.81892091,
   "status": "Attivo",
-  "position_open": true,
+  "position_open": false,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 45.0180067110633,
-  "sma50": 2552.8145999999997,
-  "sma200": 2129.1151499999996,
-  "atr": 80.59590141712597,
-  "risk_level": "MEDIO",
+  "rsi": 41.36623754444842,
+  "sma50": 2551.9624,
+  "sma200": 2128.9021,
+  "atr": 83.63947284569738,
+  "risk_level": "BASSO",
   "condition_groups": {
     "buy": [
       {
@@ -50,7 +50,7 @@
       },
       {
         "label": "prezzo live sopra SMA50 e almeno al 90% di SMA200",
-        "passed": true
+        "passed": false
       },
       {
         "label": "SMA50 live non in calo rispetto a 5 giorni prima",
@@ -84,7 +84,7 @@
       },
       {
         "label": "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
-        "passed": false
+        "passed": true
       }
     ]
   }
