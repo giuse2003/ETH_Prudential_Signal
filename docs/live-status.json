@@ -1,6 +1,6 @@
 {
-  "run_id": "20261012T164141Z-ec52e001",
-  "generated_at_utc": "2026-10-12T16:41:41.903674+00:00",
+  "run_id": "20261012T231328Z-806129ec",
+  "generated_at_utc": "2026-10-12T23:13:28.753212+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,17 +8,17 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
-  "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2527.31,
-  "price_eur": 2265.26,
-  "volume_24h_eth": 77588.67320546,
+  "action": "VENDI",
+  "price_usd": 2458.41,
+  "price_eur": 2203.35,
+  "volume_24h_eth": 81998.14692579,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 43.84678833786458,
-  "sma50": 2557.3392000000003,
-  "sma200": 2136.21405,
-  "atr": 78.49857651433085,
+  "rsi": 38.459782032292765,
+  "sma50": 2555.9611999999997,
+  "sma200": 2135.86955,
+  "atr": 83.42000508575943,
   "risk_level": "BASSO",
   "condition_groups": {
     "buy": [
@@ -32,7 +32,7 @@
       },
       {
         "label": "RSI live tra 40 e 65 per i nuovi ingressi",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
@@ -58,7 +58,7 @@
       },
       {
         "label": "RSI live tra 40 e 65",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
@@ -80,7 +80,7 @@
     "sell": [
       {
         "label": "prezzo live oltre il 2% sotto SMA50",
-        "passed": false
+        "passed": true
       },
       {
         "label": "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
