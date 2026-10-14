@@ -1,6 +1,6 @@
 {
-  "run_id": "20261014T121458Z-b29fe17a",
-  "generated_at_utc": "2026-10-14T12:14:58.734663+00:00",
+  "run_id": "20261014T171918Z-914d1c30",
+  "generated_at_utc": "2026-10-14T17:19:18.986223+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,17 +8,17 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
-  "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2514.87,
-  "price_eur": 2246.1,
-  "volume_24h_eth": 68263.89170647,
+  "action": "VENDI",
+  "price_usd": 2444.32,
+  "price_eur": 2196.85,
+  "volume_24h_eth": 106616.58992251,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 44.94474776936788,
-  "sma50": 2557.398,
-  "sma200": 2140.92985,
-  "atr": 85.62160788371241,
+  "rsi": 39.29275345187576,
+  "sma50": 2555.987,
+  "sma200": 2140.5771000000004,
+  "atr": 87.94089359799811,
   "risk_level": "BASSO",
   "condition_groups": {
     "buy": [
@@ -32,7 +32,7 @@
       },
       {
         "label": "RSI live tra 40 e 65 per i nuovi ingressi",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
@@ -40,7 +40,7 @@
       },
       {
         "label": "volume ETH-USD live sopra media 20 giorni",
-        "passed": false
+        "passed": true
       }
     ],
     "buy_breakout": [
@@ -58,7 +58,7 @@
       },
       {
         "label": "RSI live tra 40 e 65",
-        "passed": true
+        "passed": false
       },
       {
         "label": "prezzo live sopra quello di 7 giorni prima",
@@ -66,7 +66,7 @@
       },
       {
         "label": "volume ETH-USD live almeno 20% sopra media 20 giorni",
-        "passed": false
+        "passed": true
       },
       {
         "label": "Close live sopra i 5 Close precedenti",
@@ -80,7 +80,7 @@
     "sell": [
       {
         "label": "prezzo live oltre il 2% sotto SMA50",
-        "passed": false
+        "passed": true
       },
       {
         "label": "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
