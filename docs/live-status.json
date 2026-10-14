@@ -1,6 +1,6 @@
 {
-  "run_id": "20261013T224414Z-5d9d8d42",
-  "generated_at_utc": "2026-10-13T22:44:14.627640+00:00",
+  "run_id": "20261014T012617Z-840c533b",
+  "generated_at_utc": "2026-10-14T01:26:17.054359+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,17 +8,17 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
-  "action": "MANTIENI STATO ATTUALE",
-  "price_usd": 2509.75,
-  "price_eur": 2241.12,
-  "volume_24h_eth": 75302.39808488,
+  "action": "VENDI",
+  "price_usd": 2504.81,
+  "price_eur": 2235.65,
+  "volume_24h_eth": 67667.53063851,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 44.33984274322321,
-  "sma50": 2556.23,
-  "sma200": 2138.39,
-  "atr": 86.17969860004192,
+  "rsi": 43.94237394304012,
+  "sma50": 2557.1968,
+  "sma200": 2140.87955,
+  "atr": 84.90303645514099,
   "risk_level": "BASSO",
   "condition_groups": {
     "buy": [
@@ -80,7 +80,7 @@
     "sell": [
       {
         "label": "prezzo live oltre il 2% sotto SMA50",
-        "passed": false
+        "passed": true
       },
       {
         "label": "trailing stop 8% confermato da momentum 7g >= -15% e volume >= +20%",
