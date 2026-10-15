@@ -1,6 +1,6 @@
 {
-  "run_id": "20261015T115501Z-bf4773e1",
-  "generated_at_utc": "2026-10-15T11:55:01.175108+00:00",
+  "run_id": "20261015T162122Z-de09779a",
+  "generated_at_utc": "2026-10-15T16:21:22.780238+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -9,16 +9,16 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "VENDI",
-  "price_usd": 2363.11,
-  "price_eur": 2108.01,
-  "volume_24h_eth": 157247.17338779,
+  "price_usd": 2435.0,
+  "price_eur": 2174.77,
+  "volume_24h_eth": 153416.7812158,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 34.35729010163455,
-  "sma50": 2552.5974,
-  "sma200": 2142.34955,
-  "atr": 90.62297262671252,
+  "rsi": 39.386762176481085,
+  "sma50": 2554.0352,
+  "sma200": 2142.709,
+  "atr": 87.82225834099826,
   "risk_level": "BASSO",
   "condition_groups": {
     "buy": [
@@ -54,7 +54,7 @@
       },
       {
         "label": "SMA50 live non in calo rispetto a 5 giorni prima",
-        "passed": false
+        "passed": true
       },
       {
         "label": "RSI live tra 40 e 65",
