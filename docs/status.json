@@ -1,6 +1,6 @@
 {
-  "run_id": "20261031T223417Z-70c5d00c",
-  "generated_at_utc": "2026-10-31T22:34:17.666218+00:00",
+  "run_id": "20261101T012702Z-69881a20",
+  "generated_at_utc": "2026-11-01T01:27:02.026774+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,22 +8,22 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "DAILY",
-  "candle_date": "2026-10-30",
+  "candle_date": "2026-10-31",
   "action": "VENDI",
-  "price_usd": 2241.07,
+  "price_usd": 2252.66,
   "price_eur": null,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
   "risk_level": "BASSO",
-  "rsi": 30.16945189980447,
-  "sma50": 2525.5988,
-  "sma200": 2158.44045,
-  "atr": 91.45597938776577,
-  "volume_eth": 219473.08891497,
-  "volume_avg20_eth": 92774.842587502,
-  "previous_close": 2248.34,
-  "previous_sma50": 2529.5245999999997,
+  "rsi": 31.948027555668403,
+  "sma50": 2520.3262,
+  "sma200": 2158.08585,
+  "atr": 87.20340943149678,
+  "volume_eth": 39420.07081616,
+  "volume_avg20_eth": 92485.0819088555,
+  "previous_close": 2241.07,
+  "previous_sma50": 2525.5988,
   "condition_groups": {
     "buy": [
       {
@@ -44,7 +44,7 @@
       },
       {
         "label": "volume ETH-USD sopra media 20 giorni",
-        "passed": true
+        "passed": false
       }
     ],
     "buy_breakout": [
@@ -70,7 +70,7 @@
       },
       {
         "label": "volume ETH-USD almeno 20% sopra media 20 giorni",
-        "passed": true
+        "passed": false
       },
       {
         "label": "Close sopra i 5 Close precedenti",
