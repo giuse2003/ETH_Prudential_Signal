@@ -1,6 +1,6 @@
 {
-  "run_id": "20261104T215232Z-a2c80bde",
-  "generated_at_utc": "2026-11-04T21:52:32.690686+00:00",
+  "run_id": "20261105T015136Z-8c546bb6",
+  "generated_at_utc": "2026-11-05T01:51:36.247094+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -8,22 +8,22 @@
   "market": "ETH-USD",
   "timezone": "UTC",
   "mode": "DAILY",
-  "candle_date": "2026-11-03",
+  "candle_date": "2026-11-04",
   "action": "VENDI",
-  "price_usd": 2271.64,
+  "price_usd": 2422.27,
   "price_eur": null,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
   "risk_level": "BASSO",
-  "rsi": 36.603328594011785,
-  "sma50": 2505.864,
-  "sma200": 2156.4084,
-  "atr": 81.91408911115104,
-  "volume_eth": 71981.96386184,
-  "volume_avg20_eth": 88689.2284719815,
-  "previous_close": 2249.66,
-  "previous_sma50": 2510.7398,
+  "rsi": 54.14190696628753,
+  "sma50": 2506.3866,
+  "sma200": 2156.76295,
+  "atr": 92.15308274606885,
+  "volume_eth": 188582.79420505,
+  "volume_avg20_eth": 91490.79748154001,
+  "previous_close": 2271.64,
+  "previous_sma50": 2505.864,
   "condition_groups": {
     "buy": [
       {
@@ -36,15 +36,15 @@
       },
       {
         "label": "RSI tra 40 e 65 per i nuovi ingressi",
-        "passed": false
+        "passed": true
       },
       {
         "label": "prezzo sopra quello di 7 giorni prima",
-        "passed": false
+        "passed": true
       },
       {
         "label": "volume ETH-USD sopra media 20 giorni",
-        "passed": false
+        "passed": true
       }
     ],
     "buy_breakout": [
@@ -62,19 +62,19 @@
       },
       {
         "label": "RSI tra 40 e 65",
-        "passed": false
+        "passed": true
       },
       {
         "label": "prezzo sopra quello di 7 giorni prima",
-        "passed": false
+        "passed": true
       },
       {
         "label": "volume ETH-USD almeno 20% sopra media 20 giorni",
-        "passed": false
+        "passed": true
       },
       {
         "label": "Close sopra i 5 Close precedenti",
-        "passed": false
+        "passed": true
       },
       {
         "label": "guardrail superato: non insieme SMA200 slope20 > 0% e gap SMA50/SMA200 < -15%",
