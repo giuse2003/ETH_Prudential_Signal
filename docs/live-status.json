@@ -1,6 +1,6 @@
 {
-  "run_id": "20261108T191152Z-cf42d9e9",
-  "generated_at_utc": "2026-11-08T19:11:52.505014+00:00",
+  "run_id": "20261108T225220Z-e2557edd",
+  "generated_at_utc": "2026-11-08T22:52:20.298784+00:00",
   "run_type": "operational-latest",
   "project": "ETH-USD Signal",
   "model_version": "3.0",
@@ -9,22 +9,22 @@
   "timezone": "UTC",
   "mode": "LIVE PREVIEW",
   "action": "VENDI",
-  "price_usd": 2230.12,
-  "price_eur": 2002.04,
-  "volume_24h_eth": 34065.27290119,
+  "price_usd": 2118.86,
+  "price_eur": 1903.67,
+  "volume_24h_eth": 57543.77083093,
   "status": "Attivo",
   "position_open": false,
   "breakout_operational_start": "2026-08-28",
-  "rsi": 39.22327056840251,
-  "sma50": 2483.0186000000003,
-  "sma200": 2155.03675,
-  "atr": 86.9672242375696,
-  "risk_level": "BASSO",
+  "rsi": 32.75328378480272,
+  "sma50": 2480.7934,
+  "sma200": 2154.48045,
+  "atr": 94.91436709471243,
+  "risk_level": "MEDIO",
   "condition_groups": {
     "buy": [
       {
         "label": "prezzo live sopra SMA200",
-        "passed": true
+        "passed": false
       },
       {
         "label": "SMA50 live sopra SMA200",
