@@ -7,8 +7,8 @@ Posizione operativa: FUORI
 Secondo ingresso breakout operativo dalle candele chiuse del 2026-08-28
 Rischio informativo: MEDIO
 Close ETH-USD: 1660.84 USD
-Spot ETH-USD: 1662.26 USD
-Spot ETH-EUR: 1520.54 EUR
+Spot ETH-USD: 1651.34 USD
+Spot ETH-EUR: 1510.13 EUR
 SMA50: 2150.85
 SMA200: 2106.20
 RSI14: 27.89
